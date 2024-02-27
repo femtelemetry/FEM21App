@@ -12,6 +12,5 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main); //sets the initial layout to "activity_main.xml"
     }
 
-    //TODO: Make Bluetooth.java
     //TODO: Copy and revise previous code
 }
