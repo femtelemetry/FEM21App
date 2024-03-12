@@ -8,6 +8,7 @@ import android.view.WindowManager;
 public class MainActivity extends AppCompatActivity {
 
     //TODO:Define 3 types of variables and initialize (e.g. view, status, flags): How to format?
+    //TODO: Weerawit test
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
