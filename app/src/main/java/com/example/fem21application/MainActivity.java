@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
 
         Button crashButton = findViewById(R.id.CrashButton);
         crashButton.setOnClickListener(view -> {
-            throw new RuntimeException("Test Crash"); // Force a crash
+            throw new RuntimeException("Test Crash"); // Force a crash event
         });
 
 
