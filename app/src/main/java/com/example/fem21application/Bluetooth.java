@@ -44,7 +44,7 @@ import java.util.Set;
 import java.util.UUID;
 
 public abstract class Bluetooth extends Service {
-    BluetoothAdapter btAdapter; //Bluetooth Adapter
+    /*BluetoothAdapter btAdapter; //Bluetooth Adapter
     BluetoothDevice btDevice; //Bluetooth Device
     static BluetoothSocket mSocket; //Bluetooth Socket
     static BluetoothAdapter bluetoothAdapter;
@@ -77,6 +77,7 @@ public abstract class Bluetooth extends Service {
 
     @Override
     public void onCreate() {
+        /*
         MainActivity.btServiceOn = true;
         sendBroadcast(MainActivity.VIEW_STATUS, "Bluetooth.java running..."); //デバック用
 
@@ -117,7 +118,7 @@ public abstract class Bluetooth extends Service {
         mThread = new ConnectThread(btDevice);
         isRunning = true;
         mThread.start();
-
+        //
     }
 
 
@@ -128,6 +129,7 @@ public abstract class Bluetooth extends Service {
 
     @Override
     public void onDestroy() {
+        /*
         isRunning = false;
         MainActivity.btServiceOn = false;
         MainActivity.btConnected = false;
@@ -142,6 +144,7 @@ public abstract class Bluetooth extends Service {
         }
         stopSelf();
         super.onDestroy();
+        //
     }
 
     @Override
@@ -159,12 +162,13 @@ public abstract class Bluetooth extends Service {
         }
     }
     
-     */
+     //
 
  
 
     //レイアウト変更メソッド
     public void LayoutChange(){
+        /*
         if(MainActivity.LVFlag && !MainActivity.HVFlag && !MainActivity.RtDOn && !MainActivity.RtDFlag){
             if(!(MainActivity.NowLayout == MainActivity.LVON)) {
                 sendBroadcast(MainActivity.LAYOUT_LVON, null);
@@ -203,7 +207,7 @@ public abstract class Bluetooth extends Service {
                 //HVONモードに遷移
                 sendBroadcast(MainActivity.LAYOUT_HVON, null);
             }
-        }*/
+        }//
         else{
             if(!(MainActivity.NowLayout == MainActivity.DEFAULT) && !MainActivity.btConnected) {
                 //LVONモードに遷移
@@ -211,6 +215,7 @@ public abstract class Bluetooth extends Service {
             }
             Log.d(TAG, "LayoutChange() called default");
         }
+        //
     }
     MainActivity main = new MainActivity();
     public class ConnectThread extends Thread {
@@ -334,12 +339,12 @@ public abstract class Bluetooth extends Service {
             }
             // Create or overwrite the file
             FileWriter writer = new FileWriter(file, true);
-            /*/
+            //
             //for adding time stamp to each data input
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             String timestampedData = LocalDateTime.now().format(formatter) + ":";
             writer.write(timestampedData);
-            */
+            //
             // Write data to the file
             for (int i = 0; i < n - 1; i++) {
                 writer.write(arr[i] + "/");
@@ -530,7 +535,7 @@ public abstract class Bluetooth extends Service {
                             }
                         }
                     });
-                     */
+                     //
 
                     if (maxMT >= 115) { //高温判定
                         if (!(MainActivity.isHITEMP)) { //高温表示
@@ -623,7 +628,7 @@ public abstract class Bluetooth extends Service {
                         if (values[MainActivity.VIEW_VELO].length() >= 3) {
                             values[MainActivity.VIEW_VELO] = values[MainActivity.VIEW_VELO].substring(0, 3);
                         }
-*/
+//
                         sendBroadcast(MainActivity.VIEW_VELO, values[3]);
                     }
                     //TODO: Fix this
@@ -642,7 +647,7 @@ public abstract class Bluetooth extends Service {
                         }
                     });
                     
-                     */
+                     //
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -738,7 +743,7 @@ public abstract class Bluetooth extends Service {
                             }
                         });
                         
-                         */
+                         //
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -845,7 +850,7 @@ public abstract class Bluetooth extends Service {
         wakelock = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK
                 | PowerManager.ACQUIRE_CAUSES_WAKEUP
                 | PowerManager.ON_AFTER_RELEASE, "myapp:Your App Tag");
-        wakelock.acquire(10*60*1000L /*10 minutes*/);
+        wakelock.acquire(10*60*1000L /*10 minutes//);
         isWakelock = true;
     }
     public void appendLog(String text){
@@ -864,6 +869,6 @@ public abstract class Bluetooth extends Service {
             e.printStackTrace();
         }
     }
-
+    */
 }
 

@@ -5,6 +5,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.WindowManager;
 
+import io.embrace.android.embracesdk.Embrace;
+import io.embrace.android.embracesdk.EmbraceSamples;
+
 public class MainActivity extends AppCompatActivity {
 
     //TODO:Define 3 types of variables and initialize (e.g. view, status, flags): How to format?
@@ -13,6 +16,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Embrace.getInstance().start(this);
+        EmbraceSamples.verifyIntegration(); // temporarily add this to verify the integration
+
+
         setContentView(R.layout.activity_main); //sets the initial layout to "activity_main.xml"
         //Log layout
 
