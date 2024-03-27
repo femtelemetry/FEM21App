@@ -36,7 +36,6 @@ android {
 dependencies {
 
     implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("io.embrace:embrace-android-sdk:6.5.0") //just added by Wee
 
     // Import the Firebase BoM
     implementation(platform("com.google.firebase:firebase-bom:32.8.0"))
