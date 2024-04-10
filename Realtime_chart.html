@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Realtime Chart</title>
+    <script src="realtime.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-apexcharts@latest"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+    <!-- Include jQuery and Epoch library -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/epoch@0.8.4/dist/css/epoch.min.css">
+    <!-- <script src="https://cdn.jsdelivr.net/npm/epoch@0.8.4/dist/js/epoch.min.js"></script> -->
+
+    <script nonce="undefined" src="https://cdn.zingchart.com/zingchart.min.js"></script>
+</head>
+<body>
+    <div id="app">
+        <h1 style="text-align: center;">Realtime Chart</h1>
+        <button id="stop">STOP</button>
+        <button id="update">UPDATE</button>
+        <div id="linechart">
+          <apexchart ref="realtimeChart" type=line height=350 :options="chartOptions" :series="series" />
+        </div>
+        
+    </div>
+    <h1 style="text-align: center;">Gauge Chart</h1>
+    <p id="monitor" style="text-align: center; font-size: 30px;">Value</p>
+    <div id="gaugeChart" class="epoch gauge-small"></div>
+    <div id='myChart'>
+      <!-- <a class="zc-ref" href="https://www.zingchart.com/">Charts by ZingChart</a> -->
+
+    </div>
+
+    <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script> -->
+
+    <script type="module">
+        import { initializeApp} from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-analytics.js";
+        import { getDatabase, set, get, child, update, ref, remove, onValue } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-database.js";
+        // Initialize Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyC58hQrNqoixKEU2APb9FqnpjNA4PmnwAE",
+            authDomain: "fem21app-f43ef.firebaseapp.com",
+            databaseURL: "https://fem21app-f43ef-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "fem21app-f43ef",
+            storageBucket: "fem21app-f43ef.appspot.com",
+            messagingSenderId: "764926693156",
+            appId: "1:764926693156:web:216e15768d6394ad6a6db1",
+            measurementId: "G-4QTXEQZ53M"
+        };
+        // Initialize Firebase app
+        const app = initializeApp(firebaseConfig);
+        // Get a reference to the database
+        const db  = getDatabase(app);
+
+        // Reference to the ".info/connected" node from db reference
+        var connectedRef = ref(db, ".info/connected");
+        var day = new Date().toISOString().slice(0, 10);
+        const folder = "FEM21App data/" + day;
+        console.log(folder);
+
+        //Check whether the website is connected to the database
+        onValue(connectedRef, (snapshot) => {
+            const isConnected = snapshot.val();
+            if (isConnected === true) {
+                console.log("Database is connected");
+                alert("Database is connected");
+            } else {
+                console.log("Database is not connected");
+            }
+        });
+
+        // Listen for real-time changes in "FEM21App data" in the database
+        onValue(ref(db, folder), (snapshot) => {
+            const data = snapshot.val();
+            const timestamps = Object.keys(data);
+            const velocities = timestamps.map(timestamp => data[timestamp]);
+            document.querySelector("#monitor").textContent = velocities[velocities.length - 1];
+
+        });
+
+        
+        // function clicked(){
+        //     console.log("You clicked the button");
+        // }
+        // document.querySelector("#button").addEventListener('click', clicked);
+        // updateBtn.addEventListener('click', clicked);
+
+        document.querySelector("#update").addEventListener('click', function() {
+            // console.log("Cliked!");
+            get(ref(db, folder))
+            .then((snapshot) =>{
+                if (snapshot.exists()){
+                    // console.log("snapshot works!");
+                    const info = snapshot.val();
+                    const keys = Object.keys(info);
+                    const values = keys.map(id => info[id]);
+
+                    for (let i = 0; i < keys.length; i++){
+                        console.log(" "+ keys[i] + ":" + values[i]);
+                    }
+
+                } else {
+                    alert("No data found");
+                }
+            }).catch((error)=>{
+                alert("Button Error!");
+            });
+        });
+        let stopFlag = 0;
+        function obtainData(){
+            get(ref(db, folder))
+            .then((snapshot) =>{
+                if (snapshot.exists()){
+                    const Data = snapshot.val();
+                    const keys = Object.keys(Data);
+                    const values = keys.map(key => Data[key]);
+                    var date = new Date();
+                    var formattedDate = `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}:${date.getMilliseconds().toString().padStart(3, '0')}`;
+                    console.log("key:"+ keys[keys.length - 1]);
+                    console.log("val:"+ values[values.length - 1]);
+                    data.push({
+                        x: formattedDate,    //x: keys[keys.length - 1],
+                        y: values[values.length - 1]
+                    })
+                    if (data.length > 20){
+                        data.shift();
+                    }
+
+                } else {
+                    stopFlag = 1;
+                    alert("No data found, code error:" + stopFlag );
+                    document.querySelector("#stop").textContent = "START";
+                }
+            }).catch((error)=>{
+                console.log("ObtainData Error!")
+            });
+        }
+
+        new Vue({
+        el: "#linechart",
+        components: {
+            apexchart: VueApexCharts
+        },
+        data: {
+            series: [{data: data.slice()}],
+
+            chartOptions: {
+            chart: {
+                animations: {
+                enabled: false,
+                easing: "linear",
+                dynamicAnimation: {
+                    speed: 5000
+                }
+                },
+                toolbar: {
+                show: false
+                },
+                zoom: {
+                enabled: false
+                }
+            },
+            dataLabels: {
+                enabled: false
+            },
+            stroke: {
+                curve: "smooth"
+            },
+
+            title: {
+                text: "Dynamic Updating Chart",
+                align: "left"
+            },
+            markers: {
+                size:0
+            },
+            // xaxis: {
+            //     type: "datewtime"
+            // },
+            yaxis: {
+                max: 120,
+                min: 0
+            },
+            legend: {
+                show: false
+            }
+            }
+        },
+        mounted: function() {
+            this.intervals();
+        },
+        methods: {
+            intervals: function() {
+                var me = this;
+                document.querySelector("#stop").addEventListener('click', function(){
+                    if(stopFlag == 0){
+                        stopFlag = 1;
+                        document.querySelector("#stop").textContent = "CONTINUE";
+                    } else{
+                        stopFlag = 0;
+                        document.querySelector("#stop").textContent = "STOP";
+                    }
+   
+                });
+                // Update chart data every 2 seconds
+                window.setInterval(function() {
+                    //var newDataPoint = obtainData();
+                    if (stopFlag == 0){
+                        obtainData();
+                        me.$refs.realtimeChart.updateSeries([{ data: data }]);
+                    }
+                }, 100);
+                
+                //console.log(me.$refs.realtimeChart.series);
+                // // Remove one data point every 1 seconds
+                // window.setInterval(function() {
+                //     // Get the current series data
+                //     var currentSeries = me.$refs.realtimeChart.series;
+                //     console.log("len:" + currentSeries.length);
+                //     // If there are data points to remove
+                //     if (currentSeries.length > 0) {
+                //         // Remove the first data point from the series
+                //         currentSeries.shift();
+                //         console.log(currentSeries);
+                //         // Update the chart with the modified series data
+                //         me.$refs.realtimeChart.updateSeries([{ data: currentSeries }]);
+                //     }
+                // }, 2000);
+
+                // // Reset chart data every 60 seconds
+                // window.setInterval(function() {
+                //     resetData();
+                //     me.$refs.realtimeChart.updateSeries([{ data }], false, true);
+                // }, 30000);
+            }
+        }});
+
+        function getData() {
+            return get(ref(db, folder))
+                .then((snapshot) => {
+                    if (snapshot.exists()) {
+                        const Data = snapshot.val();
+                        const keys = Object.keys(Data);
+                        const values = keys.map(key => Data[key]);
+                        return values[values.length - 1];
+
+                    } else {
+                        throw new Error("No data found");
+                        console.log("No data found");
+                    }
+                })
+                .catch((error) => {
+                    console.log("getData Error:", error);
+                    throw error; // rethrowing the error for further handling
+                });
+        }
+        
+        ZC.LICENSE = ["569d52cefae586f634c54f86dc99e6a9", "b55b025e438fa8a98e32482b5f768ff5"];
+        window.feed = function(callback) {
+            getData() // Call the getData() function
+            .then((data) => {
+                var tick = {};
+                tick.plot0 = data; // Assign the retrieved data to the plot0 property
+                callback(JSON.stringify(tick)); // Pass the data to the callback function
+            })
+            .catch((error) => {
+                console.error("Error fetching data:", error);
+                // Handling error - you might want to provide a fallback value or handle the error differently
+                var tick = {};
+                tick.plot0 = 0; // Assuming a default value if data fetching fails
+                callback(JSON.stringify(tick)); // Pass the default value to the callback function
+            });
+        };
+     
+        var myConfig = {
+          type: "gauge",
+          globals: {
+            fontSize: 25 //Label size 
+          },
+          plotarea: {
+            marginTop: 80
+          },
+          plot: {
+            size: '100%',
+            valueBox: {
+              placement: 'center',
+              text: '%v', //default
+              fontSize: 35, //Size of number shown in the center
+              rules: [{
+                  rule: '%v >= 80',
+                  text: '%v<br>DANGER'
+                },
+                {
+                  rule: '%v < 80 && %v > 50',
+                  text: '%v<br>FAST'
+                },
+                {
+                  rule: '%v <= 50 && %v > 30',
+                  text: '%v<br>MEDIUM'
+                },
+                {
+                  rule: '%v <=  30',
+                  text: '%v<br>SLOW'
+                }
+              ]
+            }
+          },
+          tooltip: {
+            borderRadius: 5
+          },
+          scaleR: {
+            aperture: 180,
+            minValue: 0,
+            maxValue: 100,
+            step: 10,
+            center: {
+              visible: false
+            },
+            tick: {
+              visible: true
+            },
+            item: {
+              offsetR: 0,
+              rules: [{
+                rule: '%i == 9',
+                offsetX: 15
+              }]
+            },
+            labels: ['0', '10', '20', '30', '40', '50', '60', '70', '80', '90', '100'],
+            ring: {
+              size: 50,
+              rules: [{
+                  rule: '%v <= 20',
+                  backgroundColor: '#29B6F6'
+                },
+                {
+                  rule: '%v > 20 && %v < 50',
+                  backgroundColor: '#FFA726'
+                },
+                {
+                  rule: '%v >= 50 && %v <script 80',
+                  backgroundColor: '#EF5350'
+                },
+                {
+                  rule: '%v >= 80',
+                  backgroundColor: '#E53935'
+                }
+              ]
+            }
+          },
+          refresh: {
+            type: "feed",
+            transport: "js",
+            url: "feed()",
+            interval: 200,
+            resetTimeout: 300
+          },
+          series: [{
+            values: [0], // starting value
+            backgroundColor: 'black',
+            indicator: [10, 10, 10, 10, 0.75],
+            animation: {
+              effect: 2,
+              method: 1,
+              sequence: 4,
+              speed: 900
+            },
+          }]
+        };
+        
+        zingchart.render({
+          id: 'myChart',
+          data: myConfig,
+          height: 500,
+          width: '100%'
+        });
+    </script>
+
+</body>
+</html>
