@@ -10,8 +10,8 @@
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="180dp"
-        android:layout_marginBottom="38dp"
+        android:layout_marginTop="65dp"
+        android:layout_marginBottom="36dp"
         android:text="Hello World!"
         android:textSize="30sp"
         app:layout_constraintBottom_toTopOf="@+id/TextBox"
@@ -23,10 +23,10 @@
         android:id="@+id/TextBox"
         android:layout_width="255dp"
         android:layout_height="0dp"
-        android:layout_marginBottom="190dp"
+        android:layout_marginBottom="200dp"
         android:hint="Put anything Here!"
         android:text="Example"
-        app:layout_constraintBottom_toTopOf="@+id/TextBox2"
+        app:layout_constraintBottom_toTopOf="@+id/RunButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView" />
@@ -35,8 +35,8 @@
         android:id="@+id/SubmitButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="397dp"
-        android:layout_marginBottom="27dp"
+        android:layout_marginTop="272dp"
+        android:layout_marginBottom="34dp"
         android:text="SUBMIT"
         app:layout_constraintBottom_toTopOf="@+id/ReadButton"
         app:layout_constraintEnd_toEndOf="parent"
@@ -48,7 +48,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="25dp"
         android:text="Crash Button"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -58,8 +58,8 @@
         android:id="@+id/ReadButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="5dp"
-        android:layout_marginBottom="35dp"
+        android:layout_marginStart="6dp"
+        android:layout_marginBottom="153dp"
         android:text="READ"
         app:layout_constraintBottom_toTopOf="@+id/TextBox2"
         app:layout_constraintStart_toStartOf="@+id/SubmitButton"
@@ -79,6 +79,29 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/ReadButton" />
+
+    <Button
+        android:id="@+id/RunButton"
+        android:layout_width="221dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="57dp"
+        android:text="RUN NUMBER"
+        app:layout_constraintBottom_toTopOf="@+id/TextBox2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/TextBox"
+        app:rippleColor="#03A9F4"
+        app:strokeColor="#03A9F4" />
+
+    <Button
+        android:id="@+id/signallingButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:layout_marginEnd="16dp"
+        android:text="Activate signalling"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/TextBox2" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
