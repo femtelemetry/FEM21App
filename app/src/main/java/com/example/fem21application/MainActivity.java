@@ -1,7 +1,5 @@
 package com.example.fem21application;
 
-
-
 import android.os.Bundle;
 import android.util.Log;
 import android.view.WindowManager;
@@ -9,24 +7,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.SetOptions;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -38,11 +26,8 @@ public class MainActivity extends AppCompatActivity {
     String collectionPath = title; //Title of a collection [Cloud FireStore database]
     String documentPath = "test"; //Title of document inside a collection [Cloud FireStore database]
     String TAG = "cloud";
-    FirebaseFirestore db = FirebaseFirestore.getInstance(); //Connect to Cloud FireStore.
-    FirebaseDatabase database = FirebaseDatabase.getInstance("https://fem21app-f43ef-default-rtdb.asia-southeast1.firebasedatabase.app"); //connect to the Realtime Database
-    String date = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date()); // Create a SimpleDateFormat object with the desired date format
+    Firebase firebase = new Firebase();
     int signalFlag = 1;
-    int COUNT = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
                 executor.get().scheduleAtFixedRate(() -> {
                     // Your method to be executed periodically
                     num[0]++;
-                    RealFireStore(date,"0", num[0]);
+                    firebase.DatabaseSignaling(num[0]);
                     System.out.println("sending signal: " + num[0]);
                 }, 0, 10, TimeUnit.SECONDS);
             } else{
@@ -95,12 +80,12 @@ public class MainActivity extends AppCompatActivity {
             String text = textbox.getText().toString();
 
             // Write a message to the Realtime database (RealFireStore) and Cloud database (CloudFireStore)
+            firebase.CountRun();
+            firebase.RealFireStore("MOTOR", time, text);  //type of stored data can be anything simple.
 
-            RealFireStore("MOTOR", time, text);  //type of stored data can be anything simple.
-            CountRun();
-            Map<String, Object> data = new HashMap<>();  //For Cloud Firebase, the data needs to be of HashMap.
-            data.put(time, text);
-            CloudFireStore(date, data);
+//            Map<String, Object> data = new HashMap<>();  //For Cloud Firebase, the data needs to be of HashMap.
+//            data.put(time, text);
+//            CloudFireStore(date, data);
             Toast.makeText(this, "The message is sent to the database...", Toast.LENGTH_SHORT).show();
 
         });
@@ -108,31 +93,33 @@ public class MainActivity extends AppCompatActivity {
         //To run number infinitely
         Button RunButton = findViewById(R.id.RunButton);
         RunButton.setOnClickListener( v -> {
-            Log.i("database", "The data is being sent to the database");
-            CountRun();
-            for (int i = 0; i<=100; i++){
-                long nanoTime = System.nanoTime();
-                long micros = (nanoTime / 100000000); // Extract microseconds from nanoseconds
-
-                String time = new SimpleDateFormat("HH:mm:ss:" + micros, Locale.getDefault()).format(new Date()); //Use timestamp as keys
-
-                //Map<String, Object> data = new HashMap<>();  //For Cloud Firebase, the data needs to be of HashMap.
-                //data.put(time, i);
-                //CloudFireStore(date, data);
-                //Random random = new Random();
-                // Generate a random integer between 0 and 120
-//                int randomNumber = (new Random()).nextInt(120);
-                RealFireStore("MOTOR", time, i);
-                CountRun();
-
-                Log.i("database", time + ":" + i);
-                try {
-                    Thread.sleep(300);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            }
             Toast.makeText(this, "The number is running now...", Toast.LENGTH_SHORT).show();
+            firebase.CountRun();
+            Log.i("database", "The data is being sent to the database");
+            new Thread(() -> {
+                for (int i = 0; i<=5; i++){
+                    long nanoTime = System.nanoTime();
+                    long micros = (nanoTime / 100000000); // Extract microseconds from nanoseconds
+
+                    String time = new SimpleDateFormat("HH:mm:ss:" + micros, Locale.getDefault()).format(new Date()); //Use timestamp as keys
+
+                    //Map<String, Object> data = new HashMap<>();  //For Cloud Firebase, the data needs to be of HashMap.
+                    //data.put(time, i);
+                    //CloudFireStore(date, data);
+//                Random random = new Random();
+//                Generate a random integer between 0 and 120
+                    int randomNumber = (new Random()).nextInt(120);
+                    firebase.RealFireStore("MOTOR", time, i);
+
+//                Log.i("database", time + ":" + i);
+                    try {
+                        Thread.sleep(300);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }).start();
+
         });
 
         //TextView Textbox = findViewById(R.id.TextBox2);
@@ -143,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
 
             //Read everything in the Realtime database (RealFireStore) and Cloud database (CloudFireStore)
             //RealFireRead(date);
-            CloudFireRead();
+            firebase.CloudFireRead();
         });
 
         Button crashButton = findViewById(R.id.CrashButton);
@@ -171,133 +158,4 @@ public class MainActivity extends AppCompatActivity {
     //"Refind Id"
     //handler
 
-
-    //Store data to Realtime Database
-    private void RealFireStore(String folder,String key, Object data){
-
-        DatabaseReference REF = database.getReference(title + "/" + date + "/COUNT");
-
-//        System.out.println(REF.getKey());
-
-        REF.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                Integer count = dataSnapshot.getValue(Integer.class);
-                if (count != null) {
-                    COUNT = count;
-                    System.out.println("CounT: " + count);
-                    // Write a message to the database
-                    System.out.println("COUNT: " + COUNT);
-                    DatabaseReference myRef = database.getReference(title + "/" + date + "/RUN:" + COUNT + "/" + folder);
-                    myRef.child(key).setValue(data);
-                } else {
-                    COUNT = 0;
-                    System.out.println("No data found.");
-                    DatabaseReference myRef = database.getReference(title + "/" + date);
-                    myRef.child( "/RUN:" + COUNT + "/" + folder + "/" +key).setValue(data);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                System.out.println("Error: " + databaseError.getMessage());
-            }
-        });
-
-
-    }
-    private void CountRun(){
-        DatabaseReference REF = database.getReference(title + "/" + date + "/COUNT");
-
-        REF.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                Integer count = dataSnapshot.getValue(Integer.class);
-                System.out.println("Read count:" + count);
-                if (count != null) {
-                    count++;
-                    COUNT = count;
-                    DatabaseReference countRef = database.getReference(title + "/" + date);
-                    countRef.child("COUNT").setValue(COUNT);
-                    System.out.println("New count:" + COUNT);
-                } else {
-                    COUNT = 1;
-                    System.out.println("No data found.");
-                    DatabaseReference myRef = database.getReference(title + "/" + date);
-                    myRef.child( "COUNT").setValue(COUNT);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                System.out.println("Error: " + databaseError.getMessage());
-            }
-        });
-
-    }
-    //TODO: Fix RealFireRead
-    //Detect any change in Realtime database
-    private void RealFireRead(String folder){
-        // Read from the database
-        DatabaseReference myRef = database.getReference(title);
-        myRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                // This method is called once with the initial value and again
-                // whenever data at this location is updated.
-                String value = dataSnapshot.getValue(String.class);
-                Log.d("database", "Value is: " + value);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                // Failed to read value
-                Log.w("database", "Failed to read value.", error.toException());
-            }
-
-        });
-    }
-
-    private void CloudFireStore(String documentPath, Object data){
-/*
-        //Add a new document (equivalent to a file) with a generated ID under "Test collection" collection (equivalent to folder)
-        db.collection("Test collection")
-                .add(data)
-                .addOnSuccessListener(documentReference -> {
-                        Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
-                })
-                .addOnFailureListener(e -> {
-                        Log.w(TAG, "Error adding document", e);
-                });
- */
-
-
-        //Add a new field (equivalent to data to be stored inside a document) to a specific document in the collection.
-        db.collection(collectionPath).document(documentPath)
-                .set(data, SetOptions.merge()) //This specifies the need for merging new data to an existing document, if do not want use: .set(data) ,this will overwrite the existing document.
-                .addOnSuccessListener(aVoid -> Log.d(TAG, "DocumentSnapshot successfully written!"))
-                .addOnFailureListener(e -> Log.w(TAG, "Error writing document", e));
-    }
-
-    private void CloudFireRead() {
-        db.collection(collectionPath)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            Log.d(TAG, document.getId() + " => " + document.getData());
-                            //Textbox.setText((CharSequence) document.getData());
-                        }
-                    } else {
-                        Log.w(TAG, "Error getting documents.", task.getException());
-                    }
-                });
-    }
-
-    private void DatabaseSignaling (int duration){
-        while (true) {
-
-        }
-    }
 }

@@ -15,6 +15,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FEM21Application"
         tools:targetApi="31">
+        <service
+            android:name=".Firebase"
+            android:enabled="true"
+            android:exported="true"></service>
+
         <activity
             android:name=".MainActivity"
             android:exported="true">
