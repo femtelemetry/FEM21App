@@ -10,23 +10,20 @@
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="65dp"
-        android:layout_marginBottom="36dp"
+        android:layout_marginTop="1dp"
         android:text="Hello World!"
         android:textSize="30sp"
-        app:layout_constraintBottom_toTopOf="@+id/TextBox"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/bluetoothbtn" />
 
     <EditText
         android:id="@+id/TextBox"
         android:layout_width="255dp"
-        android:layout_height="0dp"
-        android:layout_marginBottom="200dp"
+        android:layout_height="78dp"
+        android:layout_marginTop="37dp"
         android:hint="Put anything Here!"
         android:text="Example"
-        app:layout_constraintBottom_toTopOf="@+id/RunButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView" />
@@ -35,61 +32,59 @@
         android:id="@+id/SubmitButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="272dp"
         android:layout_marginBottom="34dp"
         android:text="SUBMIT"
         app:layout_constraintBottom_toTopOf="@+id/ReadButton"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/CrashButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginBottom="25dp"
+        android:layout_marginBottom="30dp"
         android:text="Crash Button"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/TextBox2" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/ReadButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="6dp"
-        android:layout_marginBottom="153dp"
+        android:layout_marginBottom="18dp"
         android:text="READ"
-        app:layout_constraintBottom_toTopOf="@+id/TextBox2"
-        app:layout_constraintStart_toStartOf="@+id/SubmitButton"
-        app:layout_constraintTop_toBottomOf="@+id/SubmitButton" />
+        app:layout_constraintBottom_toTopOf="@+id/RunButton"
+        app:layout_constraintStart_toStartOf="@+id/SubmitButton" />
 
     <TextView
-        android:id="@+id/TextBox2"
+        android:id="@+id/InputStream"
         android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="36dp"
-        android:layout_marginEnd="36dp"
-        android:layout_marginBottom="84dp"
-        android:text="Data will be shown here"
-        android:textAlignment="center"
-        android:textSize="20sp"
+        android:layout_height="122dp"
+        android:layout_marginStart="9dp"
+        android:layout_marginTop="92dp"
+        android:layout_marginEnd="9dp"
+        android:layout_marginBottom="97dp"
+        android:background="@color/white"
+        android:ems="10"
+        android:text="InputStream will appear here"
+        android:textAlignment="gravity"
+        android:textSize="18dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ReadButton" />
+        app:layout_constraintTop_toTopOf="@+id/RunButton" />
 
     <Button
         android:id="@+id/RunButton"
         android:layout_width="221dp"
-        android:layout_height="0dp"
-        android:layout_marginBottom="57dp"
+        android:layout_height="78dp"
+        android:layout_marginBottom="233dp"
         android:text="RUN NUMBER"
-        app:layout_constraintBottom_toTopOf="@+id/TextBox2"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/TextBox"
         app:rippleColor="#03A9F4"
         app:strokeColor="#03A9F4" />
 
@@ -97,11 +92,21 @@
         android:id="@+id/signallingButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
         android:layout_marginEnd="16dp"
+        android:layout_marginBottom="30dp"
         android:text="Activate signalling"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/TextBox2" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <Button
+        android:id="@+id/bluetoothbtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:text="Bluetooth"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

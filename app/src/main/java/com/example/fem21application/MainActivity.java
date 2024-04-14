@@ -1,13 +1,27 @@
 package com.example.fem21application;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 
@@ -21,6 +35,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class MainActivity extends AppCompatActivity {
+
     String title = "FEM21App data"; //Title of a directory [Realtime database]
     String folder1 = "folder 1"; //Title of a folder inside the directory [Realtime database]
     String collectionPath = title; //Title of a collection [Cloud FireStore database]
@@ -28,6 +43,128 @@ public class MainActivity extends AppCompatActivity {
     String TAG = "cloud";
     Firebase firebase = new Firebase();
     int signalFlag = 1;
+
+
+    //Action(ステータス表示).
+    static final int VIEW_STATUS = 0; //integers generally just set for the sake of
+/*
+    //Action(LV).
+    static final int VIEW_LV = 1;
+
+    //Action(HV)
+    static final int VIEW_HV = 2;
+
+    //Action(MOTOR)
+    static final int VIEW_MT = 3;
+
+    //Action(INV)
+    static final int VIEW_INV = 4;
+
+    //Action(RTD)
+    static final int VIEW_RTD = 5;
+
+    //信号受信時エラーは六番目
+    static final int VIEW_ERR = 6;
+    //Action(VELOCITY)
+    static final int VIEW_VELO = 7;
+
+    //Action(ERROR)
+    static final int VIEW_ERRFR = 61;
+    static final int VIEW_ERRFL = 62;
+    static final int VIEW_ERRRR = 63;
+    static final int VIEW_ERRRL = 64;
+
+    //Action(NOWBTT)
+    static final int VIEW_NOWBTT = 10;
+
+    //Action(VCMINFO)
+    static final int VIEW_VCMINFO = 11;
+
+    //Action(TSV)
+    static final int VIEW_TSV = 12;
+
+    //Action(MAXCELLV)
+    static final int VIEW_MAXCELLV = 13;
+
+    //Action(MINCELLV)
+    static final int VIEW_MINCELLV = 14;
+
+    //Action(ZYUUDEN)
+    static final int VIEW_ZYUUDEN = 15;
+
+    //Action(MAXCELLT)
+    static final int VIEW_MAXCELLT = 16;
+
+    //Action(ERRORAMS)
+    static final int VIEW_ERRORAMS = 17;
+
+    //Action(ERRORCOUNT)
+    static final int VIEW_ERRORCOUNT = 18;
+
+    //Action(STATUSAMS)
+    static final int VIEW_STATUSAMS = 19;
+
+    static final int VIEW_RED = 20;
+    static final int VIEW_YELLOW = 21;
+    static final int VIEW_LIGHTGREEN = 22;
+    static final int VIEW_GREEN = 23;
+
+    //Action(LayoutChange:RTD)
+    static final int LAYOUT_RTD = 51;
+
+    //Action(LayoutChange:HVON)
+    static final int LAYOUT_HVON = 52;
+
+    //Action(LayoutChange:LVON)
+    static final int LAYOUT_DEFAULT = 53;
+
+    //Action(LayoutChange:ERROR)
+    static final int LAYOUT_ERR = 54;
+
+    //Action(LayoutChange:BORON)
+    static final int LAYOUT_BOR = 55;
+
+    //Action(LayoutVisible:HITEMP)
+    static final int LAYOUT_HITEMP = 56;
+
+    static final int LAYOUT_DRIVE = 57;
+
+    static final int LAYOUT_LVON = 58;
+    */
+
+    //Action(bluetooth)
+    static final int VIEW_BLUETOOTH = 100;
+
+    //Action(デバック用取得文字列)
+    static final int VIEW_INPUT = 101;
+
+
+    static final int CHECK_RTOD = 102;
+
+    //Showmessageする文字列の受け渡し用
+    static String msg;
+
+    //HTTPSサービス確認用フラグ
+    static boolean isSerHTTPS = false;
+
+    //BLUETOOTHサービス確認用フラグ
+    static boolean btServiceOn = false;
+
+    static boolean btConnected = false;
+
+    boolean isRun;
+    static boolean isSleep;
+    public static boolean LVFlag;
+
+    TextView counterTxt, welcomeTxt, ShowTxt;
+    Button bluetoothBtn;
+    Button ToHomeBtn;
+    Button ToPage2Btn;
+    ConstraintLayout main, page2;
+    FrameLayout container, container2;
+    Bluetooth bluetooth = new Bluetooth();
+
+    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -122,6 +259,33 @@ public class MainActivity extends AppCompatActivity {
 
         });
 
+
+        // このonReceiveでMainServiceからのIntentを受信する。
+        //Try using intent.getExtra only.
+        //Bundle bundle = intent.getExtras();
+        //int VIEW = bundle.getInt("VIEW");
+        //String message = bundle.getString("message");
+        //ShowMessage(VIEW, message); //受信した文字列を表示 - this shows the received string characters on the screen of the phone
+        BroadcastReceiver mReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                // このonReceiveでMainServiceからのIntentを受信する。
+                //Try using intent.getExtra only.
+                int VIEW = intent.getIntExtra("VIEW", 0);
+                String message = intent.getStringExtra("message");
+                //Bundle bundle = intent.getExtras();
+                //int VIEW = bundle.getInt("VIEW");
+                //String message = bundle.getString("message");
+                //ShowMessage(VIEW, message); //受信した文字列を表示 - this shows the received string characters on the screen of the phone
+                ShowTxt = findViewById(R.id.InputStream);
+                ShowTxt.setText(message);
+            }
+        };
+        // "BLUETOOTH" Intentフィルターをセット  Filter to receive only the message with code BLUETOOTH
+        IntentFilter mIntentFilter = new IntentFilter();
+        mIntentFilter.addAction("BLUETOOTH");
+        registerReceiver(mReceiver, mIntentFilter, Context.RECEIVER_NOT_EXPORTED);
+
         //TextView Textbox = findViewById(R.id.TextBox2);
 
         //To read data stored in databases
@@ -138,6 +302,25 @@ public class MainActivity extends AppCompatActivity {
             throw new RuntimeException("Test Crash"); // Force a crash event
         });
 
+
+
+        bluetoothBtn = findViewById(R.id.bluetoothbtn);
+
+        bluetoothBtn.setOnClickListener(v -> {
+            //Toast.makeText(MainActivity.this, "Bluetooth is starting...", Toast.LENGTH_SHORT).show();
+            Log.d(TAG, "Bluetooth is starting...");
+            bluetoothBtn.setEnabled(false);
+            bluetooth.BluetoothEnable();
+//            setContentView(R.layout.page2);
+            bluetooth.BluetoothConnection();
+        });
+
+//        ToHomeBtn.setOnClickListener(v -> {
+//            Intent changeLayout = new Intent(MainActivity.this, Bluetooth_wee.class);
+//            //startActivity(changeLayout);
+//            launcher.launch(changeLayout);
+//            setContentView(R.layout.activity_main);
+//        });
 
         //receiver to receive messages from Bluetooth.java
         //FindID
@@ -157,5 +340,36 @@ public class MainActivity extends AppCompatActivity {
     //showMessage
     //"Refind Id"
     //handler
+    ActivityResultLauncher<Intent> launcher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == RESULT_OK) {
+                    // User enabled Bluetooth
+                    // Proceed with your Bluetooth-related logic
+                    Log.d(TAG, "Bluetooth is turning ON");
+                } else {
+                    // User canceled or didn't enable Bluetooth
+                    // Handle accordingly
+                    Log.d(TAG, "Bluetooth isn't turning ON");
+                }
+            });
 
+    public void checkPermission(){
+        if (ContextCompat.checkSelfPermission(getBaseContext(), android.Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(this, "Connecting permission is needed", Toast.LENGTH_SHORT).show();
+            Log.i("permission", "CONNECT permission is needed");
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.BLUETOOTH_CONNECT}, 100);
+        } else {
+            Log.i("permission", "CONNECT permission is not need");
+        }
+
+        if (ContextCompat.checkSelfPermission(getBaseContext(), android.Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(this, "SCAN permission is needed", Toast.LENGTH_SHORT).show();
+            Log.i("permission", "SCAN permission is needed");
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.BLUETOOTH_SCAN}, 100);
+        } else{
+            Log.i("permission", "SCAN permission is not needed");
+        }
+
+    }
 }
