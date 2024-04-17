@@ -7,34 +7,21 @@
     tools:context=".MainActivity">
 
     <EditText
-        android:id="@+id/TextBox"
+        android:id="@+id/textBox"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="73dp"
-        android:layout_marginBottom="365dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="31dp"
         android:autofillHints="Any Text"
         android:hint="Put anything Here!"
         android:inputType="text"
-        android:text="Example"
-        app:layout_constraintBottom_toTopOf="@+id/RunButton"
+        app:layout_constraintBottom_toTopOf="@+id/scrollView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/bluetoothButton" />
 
     <Button
-        android:id="@+id/SubmitButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="5dp"
-        android:layout_marginEnd="37dp"
-        android:layout_marginBottom="19dp"
-        android:text="SUBMIT"
-        app:layout_constraintBottom_toTopOf="@+id/InputStream2"
-        app:layout_constraintEnd_toStartOf="@+id/ReadButton"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <Button
-        android:id="@+id/CrashButton"
+        android:id="@+id/crashButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -43,27 +30,14 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <Button
-        android:id="@+id/ReadButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="26dp"
-        android:layout_marginBottom="19dp"
-        android:text="READ"
-        app:layout_constraintBottom_toTopOf="@+id/InputStream2"
-        app:layout_constraintEnd_toStartOf="@+id/RunButton"
-        app:layout_constraintStart_toEndOf="@+id/SubmitButton" />
-
     <ScrollView
         android:id="@+id/scrollView"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="320dp"
-        android:layout_marginTop="94dp"
-        android:layout_marginBottom="93dp"
-        app:layout_constraintBottom_toBottomOf="@+id/RunButton"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/bluetoothbtn">
+        app:layout_constraintTop_toTopOf="parent">
 
         <TextView
             android:id="@+id/InputStream"
@@ -77,37 +51,39 @@
 
     </ScrollView>
 
-    <TextView
-        android:id="@+id/InputStream2"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="4dp"
-        android:layout_marginTop="18dp"
-        android:layout_marginEnd="4dp"
-        android:layout_marginBottom="16dp"
-        android:background="@color/white"
-        android:ems="10"
-        android:text="InputStream will appear here"
-        android:textAlignment="gravity"
-        android:textSize="18dp"
-        app:layout_constraintBottom_toTopOf="@+id/CrashButton"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/RunButton" />
-
     <Button
-        android:id="@+id/RunButton"
+        android:id="@+id/testButton"
         android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginEnd="32dp"
-        android:layout_marginBottom="167dp"
+        android:layout_height="63dp"
+        android:layout_marginTop="23dp"
+        android:layout_marginEnd="19dp"
         android:text="RUN NUMBER"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/ReadButton"
-        app:layout_constraintTop_toBottomOf="@+id/TextBox"
+        app:layout_constraintStart_toEndOf="@+id/readButton"
+        app:layout_constraintTop_toBottomOf="@+id/scrollView"
         app:rippleColor="#03A9F4"
         app:strokeColor="#03A9F4" />
+
+    <Button
+        android:id="@+id/submitButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="45dp"
+        android:text="SUBMIT"
+        app:layout_constraintBaseline_toBaselineOf="@+id/readButton"
+        app:layout_constraintEnd_toStartOf="@+id/readButton"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/readButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="19dp"
+        android:text="READ"
+        app:layout_constraintBottom_toBottomOf="@+id/testButton"
+        app:layout_constraintEnd_toStartOf="@+id/testButton"
+        app:layout_constraintStart_toEndOf="@+id/submitButton" />
 
     <Button
         android:id="@+id/signallingButton"
@@ -120,23 +96,37 @@
         app:layout_constraintEnd_toEndOf="parent" />
 
     <Button
-        android:id="@+id/bluetoothbtn"
+        android:id="@+id/bluetoothButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:text="Bluetooth"
+        app:layout_constraintEnd_toStartOf="@+id/connectButton"
+        app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/connectbtn"
+        android:id="@+id/connectButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="19dp"
         android:text="connect"
+        app:layout_constraintEnd_toStartOf="@+id/runButton"
+        app:layout_constraintStart_toEndOf="@+id/bluetoothButton"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/runButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="19dp"
+        android:text="PAUSE"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/connectButton"
         app:layout_constraintTop_toTopOf="parent" />
 
 

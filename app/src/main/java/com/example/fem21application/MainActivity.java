@@ -1,8 +1,5 @@
 package com.example.fem21application;
 
-import android.Manifest;
-import android.app.Activity;
-import android.bluetooth.BluetoothManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -10,24 +7,18 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
@@ -165,10 +156,11 @@ public class MainActivity extends AppCompatActivity {
     public static boolean LVFlag;
 
     TextView ShowTxt;
-    Button bluetoothBtn, readButton, crashButton, RunButton, submitButton, signallingBtn, connectBtn;
+    Button bluetoothBtn, readButton, crashButton, RunButton, submitButton, signallingBtn, connectBtn, runBtn;
     EditText textbox;
     ScrollView scrollView;
-
+    Firebase firebase = new Firebase();
+    private int count = 0;
     IntentFilter BTIntentFilter, RDIntentFilter, mIntentFilter, fIntentFilter;
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
     @Override
@@ -183,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
         FirebaseAnalytics mFirebaseAnalytics = FirebaseAnalytics.getInstance(this); //Google Analytics (Firebase) for logging specific events
 
         setContentView(R.layout.activity_main); //sets the initial layout to "activity_main.xml"
-
+//        Firebase firebase = new Firebase();
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON); //keeps screen on
 
         //To continuously send signal to database to keep connecting to it.
@@ -197,7 +189,7 @@ public class MainActivity extends AppCompatActivity {
                 final int[] num = {0};
                 executor.get().scheduleAtFixedRate(() -> {      // Schedule the task to run every 10 seconds
                     num[0]++;
-                    firebase.DatabaseSignaling(num[0]);
+                    firebase.databaseSignaling(num[0]);
                     System.out.println("sending signal: " + num[0]);
                 }, 0, 10, TimeUnit.SECONDS);
             } else {
@@ -208,30 +200,31 @@ public class MainActivity extends AppCompatActivity {
             }
 
         });
-
+//        Firebase firebase = new Firebase();
+        Intent intent = new Intent(MainActivity.this, Firebase.class);
+        startService(intent);
         //To submit any input text to the databases
-        submitButton = findViewById(R.id.SubmitButton);
-        textbox = findViewById(R.id.TextBox);
+        submitButton = findViewById(R.id.submitButton);
+        textbox = findViewById(R.id.textBox);
         submitButton.setOnClickListener(v -> {
-            Firebase firebase = new Firebase();
+//            Firebase firebase = new Firebase();
             String time = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date()); //Use timestamp as keys
             String text = textbox.getText().toString();
             // Write a message to the Realtime database (RealFireStore) and Cloud database (CloudFireStore)
-            firebase.CountRun();
-            firebase.RealFireStore("MOTOR", time, text);  //type of stored data can be anything simple.
+            firebase.countRun();
+            firebase.realFireStore("MOTOR", time, text);  //type of stored data can be anything simple.
 //            Map<String, Object> data = new HashMap<>();  //For Cloud Firebase, the data needs to be of HashMap.
 //            data.put(time, text);
 //            CloudFireStore(date, data);
             Toast.makeText(this, "The message is sent to the database...", Toast.LENGTH_SHORT).show();
-
         });
 
         //To run number infinitely
-        RunButton = findViewById(R.id.RunButton);
+        RunButton = findViewById(R.id.testButton);
         RunButton.setOnClickListener(v -> {
-            Firebase firebase = new Firebase();
+//            Firebase firebase = new Firebase();
             Toast.makeText(this, "The number is running now...", Toast.LENGTH_SHORT).show();
-            firebase.CountRun();
+            firebase.countRun();
             Log.i("database", "The data is being sent to the database");
             new Thread(() -> {
                 for (int i = 0; i <= 5; i++) {
@@ -244,7 +237,7 @@ public class MainActivity extends AppCompatActivity {
 //                Random random = new Random();
 //                Generate a random integer between 0 and 120
                     int randomNumber = (new Random()).nextInt(120);
-                    firebase.RealFireStore("MOTOR", time, i);
+                    firebase.realFireStore("MOTOR", time, i);
 //                Log.i("database", time + ":" + i);
                     try {
                         Thread.sleep(300);
@@ -256,23 +249,23 @@ public class MainActivity extends AppCompatActivity {
         });
 
         //To read data stored in databases
-        readButton = findViewById(R.id.ReadButton);
+        readButton = findViewById(R.id.readButton);
         readButton.setOnClickListener(v -> {
-            Firebase firebase = new Firebase();
+//            Firebase firebase = new Firebase();
             //Read everything in the Realtime database (RealFireStore) and Cloud database (CloudFireStore)
-            //RealFireRead(date);
-            firebase.CloudFireRead();
+            firebase.realFireRead();
+            firebase.cloudFireRead();
         });
 
-        crashButton = findViewById(R.id.CrashButton);
+        crashButton = findViewById(R.id.crashButton);
         crashButton.setOnClickListener(view -> {
             throw new RuntimeException("Test Crash"); // Force a crash event
         });
+        Bluetooth bluetooth = new Bluetooth();
 
-        //
         scrollView = findViewById(R.id.scrollView);
         ShowTxt = findViewById(R.id.InputStream);
-        bluetoothBtn = findViewById(R.id.bluetoothbtn);
+        bluetoothBtn = findViewById(R.id.bluetoothButton);
         bluetoothBtn.setOnClickListener(v -> {
             //Toast.makeText(MainActivity.this, "Bluetooth is starting...", Toast.LENGTH_SHORT).show();
             Log.d(TAG, "Bluetooth is starting...");
@@ -280,28 +273,36 @@ public class MainActivity extends AppCompatActivity {
             bluetoothBtn.setEnabled(false);
 //            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.BLUETOOTH_SCAN}, 100);
             startService(new Intent(MainActivity.this, Bluetooth.class));
+
 //           bluetooth.BluetoothEnable((BluetoothManager) this.getSystemService(Context.BLUETOOTH_SERVICE));
 //            setContentView(R.layout.page2);
 
         });
 
-        connectBtn = findViewById(R.id.connectbtn);
+        connectBtn = findViewById(R.id.connectButton);
         connectBtn.setOnClickListener(v -> {
-            Bluetooth bluetooth = new Bluetooth();
             bluetooth.BluetoothConnection(this);
+//            bluetooth.controlThread("START");
+            firebase.countRun();
+//            connectBtn.setEnabled(false);
+        });
+        /*
+        runBtn = findViewById(R.id.runButton);
+        runBtn.setOnClickListener(v -> {
+            if (count == 1){
+                runBtn.setText("PAUSE");
+                bluetooth.controlThread("RESUME");
+                firebase.countRun();
+                count = 0;
+            } else if (count == 0) {
+                runBtn.setText("RESUME");
+                bluetooth.controlThread("PAUSE");
+                count = 1;
 
-//            bluetooth.ContinueSend();
+            }
         });
 
-//        ActivityCompat.requestPermissions( this , new String[]{android.Manifest.permission.BLUETOOTH_CONNECT}, 100);
-        //FindID
-        //receiver to receive messages from Bluetooth.java
-
-        // "BLUETOOTH" Intentフィルターをセット  Filter to receive only the message with code BLUETOOTH
-
-//        LocalBroadcastManager.getInstance(this).registerReceiver(fReceiver, new IntentFilter("firebase"));
-
-//        LocalBroadcastManager.getInstance(this).registerReceiver(rReceiver, new IntentFilter("random"));
+         */
     }
 
     BroadcastReceiver fReceiver = new BroadcastReceiver() {
@@ -323,15 +324,15 @@ public class MainActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             // このonReceiveでMainServiceからのIntentを受信する。
             long nanoTime = System.nanoTime();
-            long micros = (nanoTime / 100000000); // Extract microseconds from nanoseconds
+            long micros = (nanoTime / 1000000); // Extract microseconds from nanoseconds
             String time = new SimpleDateFormat("HH:mm:ss:" + micros, Locale.getDefault()).format(new Date()); //Use timestamp as keys
             int VIEW = intent.getIntExtra("VIEW", 0);
             String message = intent.getStringExtra("message");
             //ShowMessage(VIEW, message); //受信した文字列を表示 - this shows the received string characters on the screen of the phone
+//            Firebase firebase = new Firebase();
+            ShowTxt.append(time + ":" + message + "\n");
             Log.i(TAG, "receive: " + message);
-            if (message != ""){
-                ShowTxt.append(time + ":" + message + "\n");
-            }
+            firebase.realFireStore("MOTOR", time, message);
 
 //            ShowTxt.setMovementMethod(new ScrollingMovementMethod());
 
@@ -421,19 +422,6 @@ public class MainActivity extends AppCompatActivity {
     //showMessage
     //"Refind Id"
     //handler
-    ActivityResultLauncher<Intent> launcher = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(),
-            result -> {
-                if (result.getResultCode() == RESULT_OK) {
-                    // User enabled Bluetooth
-                    // Proceed with your Bluetooth-related logic
-                    Log.d(TAG, "Bluetooth is turning ON");
-                } else {
-                    // User canceled or didn't enable Bluetooth
-                    // Handle accordingly
-                    Log.d(TAG, "Bluetooth isn't turning ON");
-                }
-            });
 
     public void checkPermission(Context context){
         if (ActivityCompat.checkSelfPermission(context, android.Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
@@ -442,14 +430,5 @@ public class MainActivity extends AppCompatActivity {
         } else {
             Log.i("permission", "CONNECT permission is granted already");
         }
-
-//        if (ActivityCompat.checkSelfPermission(context, android.Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
-////            Toast.makeText(MainActivity.this, "SCAN permission is needed", Toast.LENGTH_SHORT).show();
-//            Log.e("permission", "SCAN permission is being asked");
-//            ActivityCompat.requestPermissions( (Activity) MainActivity.this, new String[]{android.Manifest.permission.BLUETOOTH_SCAN}, 100);
-//        } else{
-//            Log.i("permission", "SCAN permission is granted");
-//        }
-
     }
 }
