@@ -2,10 +2,12 @@ package com.example.fem21application;
 
 import android.app.Service;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.IBinder;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -22,16 +24,14 @@ import java.util.Locale;
 
 public class Firebase extends Service {
 
-    String title = "FEM21App data"; //Title of a directory [Realtime database]
-    String collectionPath = title; //Title of a collection [Cloud FireStore database]
-    String TAG = "cloud";
+    private final String title = "FEM21App data"; //Title of a directory [Realtime database]
+    private final String collectionPath = title; //Title of a collection [Cloud FireStore database]
+    private final String TAG = "FIREBASE_SERVICE";
     FirebaseFirestore db = FirebaseFirestore.getInstance(); //Connect to Cloud FireStore.
     FirebaseDatabase database = FirebaseDatabase.getInstance("https://fem21app-f43ef-default-rtdb.asia-southeast1.firebasedatabase.app"); //connect to the Realtime Database
     String date = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date()); // Create a SimpleDateFormat object with the desired date format
     int COUNT = 0;
-    public Firebase() {
-
-    }
+    public Firebase(){}
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -39,9 +39,22 @@ public class Firebase extends Service {
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        Log.i(TAG, "FIREBASE_SERVICE IS CREATED");
+    }
 
     //Store data to Realtime Database
     public void RealFireStore(String folder,String key, Object data){
+
+        //Example of sending Broadcast
+/*
+        Intent intent = new Intent("firebase");
+        intent.putExtra("message", "firebase is connected!");
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+*/
+
 
         DatabaseReference REF = database.getReference(title + "/" + date);
         //To read the value COUNT stored in each date first, in order to name the RUN:x

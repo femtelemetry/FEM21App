@@ -6,36 +6,31 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="1dp"
-        android:text="Hello World!"
-        android:textSize="30sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/bluetoothbtn" />
-
     <EditText
         android:id="@+id/TextBox"
-        android:layout_width="255dp"
-        android:layout_height="78dp"
-        android:layout_marginTop="37dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="73dp"
+        android:layout_marginBottom="365dp"
+        android:autofillHints="Any Text"
         android:hint="Put anything Here!"
+        android:inputType="text"
         android:text="Example"
+        app:layout_constraintBottom_toTopOf="@+id/RunButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/SubmitButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="34dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="37dp"
+        android:layout_marginBottom="19dp"
         android:text="SUBMIT"
-        app:layout_constraintBottom_toTopOf="@+id/ReadButton"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/InputStream2"
+        app:layout_constraintEnd_toStartOf="@+id/ReadButton"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
@@ -44,7 +39,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginBottom="30dp"
-        android:text="Crash Button"
+        android:text="CRASH"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -52,39 +47,65 @@
         android:id="@+id/ReadButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="6dp"
-        android:layout_marginBottom="18dp"
+        android:layout_marginEnd="26dp"
+        android:layout_marginBottom="19dp"
         android:text="READ"
-        app:layout_constraintBottom_toTopOf="@+id/RunButton"
-        app:layout_constraintStart_toStartOf="@+id/SubmitButton" />
+        app:layout_constraintBottom_toTopOf="@+id/InputStream2"
+        app:layout_constraintEnd_toStartOf="@+id/RunButton"
+        app:layout_constraintStart_toEndOf="@+id/SubmitButton" />
+
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="match_parent"
+        android:layout_height="320dp"
+        android:layout_marginTop="94dp"
+        android:layout_marginBottom="93dp"
+        app:layout_constraintBottom_toBottomOf="@+id/RunButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/bluetoothbtn">
+
+        <TextView
+            android:id="@+id/InputStream"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxLines="@integer/google_play_services_version"
+            android:scrollbars="vertical"
+            android:text="InputStream will be here\n"
+            android:textSize="20dp"
+            tools:layout_editor_absoluteY="178dp" />
+
+    </ScrollView>
 
     <TextView
-        android:id="@+id/InputStream"
+        android:id="@+id/InputStream2"
         android:layout_width="0dp"
-        android:layout_height="122dp"
-        android:layout_marginStart="9dp"
-        android:layout_marginTop="92dp"
-        android:layout_marginEnd="9dp"
-        android:layout_marginBottom="97dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="18dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginBottom="16dp"
         android:background="@color/white"
         android:ems="10"
         android:text="InputStream will appear here"
         android:textAlignment="gravity"
         android:textSize="18dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/CrashButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/RunButton" />
+        app:layout_constraintTop_toBottomOf="@+id/RunButton" />
 
     <Button
         android:id="@+id/RunButton"
-        android:layout_width="221dp"
-        android:layout_height="78dp"
-        android:layout_marginBottom="233dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginBottom="167dp"
         android:text="RUN NUMBER"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/ReadButton"
+        app:layout_constraintTop_toBottomOf="@+id/TextBox"
         app:rippleColor="#03A9F4"
         app:strokeColor="#03A9F4" />
 
@@ -106,6 +127,16 @@
         android:layout_marginTop="16dp"
         android:text="Bluetooth"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/connectbtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:layout_marginEnd="8dp"
+        android:text="connect"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
 
