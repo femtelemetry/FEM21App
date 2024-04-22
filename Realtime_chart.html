@@ -19,7 +19,7 @@
     <style>
       *{
         font-family: Arial, Helvetica, sans-serif;
-        border: 1px solid black;
+        /* border: 1px solid black; */
       }
 
       body {
@@ -73,7 +73,7 @@
         /* align-items: center; */
         justify-content: center;
       }
-      .picker {
+      .pickers {
         padding: 20px;
         display: flex;
   
@@ -137,9 +137,11 @@
           align-items: center;
           flex-direction: column;
         }
-        .picker {
+        .pickers {
           padding: 5px;
           justify-content: center;
+          flex-direction: column;
+          align-items: center;
         }
       }
 
@@ -178,22 +180,22 @@
     </div>
 
     <div class="charts">
-      <h2>LINE CHARTS</h2>
+       <h2>LINE CHARTS</h2>
 
-      <form action="" class="picker">
-        <input type="checkbox" name="graphs" id="">INVERTER
-        <input type="checkbox" name="graphs" id="">MOTOR
-        <input type="checkbox" name="graphs" id="">VCM
-        <input type="checkbox" name="graphs" id="">BATTERY
+      <form action="" class="pickers">
+        <input class="picker" type="checkbox" name="category" checked>INVERTER
+        <input class="picker" type="checkbox" name="category" checked>MOTOR
+        <input class="picker" type="checkbox" name="category" checked>VCM
+        <input class="picker" type="checkbox" name="category" checked>BATTERY
       </form>
 
-      <div id="linechart">
+      <div id="INVERTER">
+        <apexchart ref="realtimeChart" type=line height=350 :options="chartOptions" :series="series" id="inv" />
+      </div>
+      <div id="MOTOR">
         <apexchart ref="realtimeChart" type=line height=350 :options="chartOptions" :series="series" />
       </div>
       <!-- <div id="linechart">
-        <apexchart ref="realtimeChart" type=line height=350 :options="chartOptions" :series="series" />
-      </div>
-      <div id="linechart">
         <apexchart ref="realtimeChart" type=line height=350 :options="chartOptions" :series="series" />
       </div>
       <div id="linechart">
@@ -207,7 +209,6 @@
       <div id='guageChart'></div>
     </div>
     
-
     <script type="module">
         // import { initializeApp} from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
         // import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-analytics.js";
