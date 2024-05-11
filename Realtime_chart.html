@@ -1,573 +1,147 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Realtime Chart</title>
+    <link rel="stylesheet" href="realtime.css">
     <script type="module" src="realtime.js"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue-apexcharts@latest"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script
+      src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
+    <script type="text/javascript"
+      src="https://code.jscharting.com/latest/jscharting.js"></script>
+    <script type="text/javascript"
+      src="https://code.jscharting.com/latest/modules/types.js"></script>
     <!-- Include jQuery and Epoch library -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/epoch@0.8.4/dist/css/epoch.min.css">
-    <!-- <script src="https://cdn.jsdelivr.net/npm/epoch@0.8.4/dist/js/epoch.min.js"></script> -->
+    <link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/epoch@0.8.4/dist/css/epoch.min.css">
+    <script
+      src="https://cdn.jsdelivr.net/npm/epoch@0.8.4/dist/js/epoch.min.js"></script>
 
-    <script nonce="undefined" src="https://cdn.zingchart.com/zingchart.min.js"></script>
-    <style>
-      *{
-        font-family: Arial, Helvetica, sans-serif;
-        /* border: 1px solid black; */
-      }
+    <script nonce="undefined"
+      src="https://cdn.zingchart.com/zingchart.min.js"></script>
+    
+  </head>
 
-      body {
-        margin: 0;
-        padding: 0;
-      }
-      .banner {
-        height: 120px;
-        max-height: 15vw;
-        width: 100%;
-        margin: 0;
-        background-color: rgba(200, 254, 118, 0.567);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 3vw ;
-        & #fem-logo, #firebase-logo {
-          height: 50%;
-        }
-      }
+  <body>
 
-      h1 {
-        text-align: center;
-        padding: 2%;
-        margin-top: 10px;
-        background-color: rgba(48, 255, 65, 0.628);
-      }
-      h2 {
-        text-align: center;
-      }
-      .container {
-        display: flex;
-        /* height: fit-content; */
-        /* flex-direction: row; */
-      }
-      .container1 {
-          display: flex;
-          /* width: 20px; */
-          /* flex-direction: column; */
-        }
-      .form {
-        border: 1px solid red;
-        width: 100%;
-        font-size:larger;
-        display: flex;
-        flex-direction: row;
-      }
-      .charts {
-        display: flex;
-        flex-direction: column;
-        /* align-items: center; */
-        justify-content: center;
-      }
-      .pickers {
-        padding: 20px;
-        display: flex;
-  
-      }
-      #status-tab, #RUN-tab {
-        /* border: 1px solid black; */
-        padding-left: 20px;
-        font-size: x-large;
-        /* margin: 20px; */
-      }
-      #status {
-        font-size:x-large;
-        color: red;  
-      }
-      #RUN {
-        font-size:x-large;
-        padding-left: 40px;
-      }
-      #buttons {
-        border: 2px solid red;
-        display: flex;
-        justify-content:center;
-        align-items: center;
-        gap: 5vw;
-        margin-top: 1vw;
-        /* margin-bottom: 2vw; */
-      }
-      #choose {
-        margin-left: 20px ;
-        margin-top: 5px;
-      }
-      #stop, #update{
-          padding: 20px;
-          font-size: larger;
-          background-color: rgb(240, 250, 51);
-          color: rgb(255, 74, 46);
-          border-radius: 10px;
-      }
-      
-      @media screen and (max-width: 600px){
-        h1{
-          font-size: larger;
-        }
-        h2{
-          font-size: large;
-        }
-        #status-tab, #status, #RUN-tab {
-          text-align: center;
-        }
-        #RUN {
-          padding-left: 0px;
-          text-align: center;
-        }
-        .container {
-          flex-direction: column;
-        }
-        .container1 {
-          justify-content: center;
-        }
-        .form {
-          align-items: center;
-          flex-direction: column;
-        }
-        .pickers {
-          padding: 5px;
-          justify-content: center;
-          flex-direction: column;
-          align-items: center;
-        }
-      }
-
-    </style>
-</head>
-<body>
     <div class="banner">
-      <img id="fem-logo" src="image/FEM_logo.png" alt="">
-      <img id="firebase-logo" src="image/firebase_logo_1.png" alt="">
+      <img id="fem-logo" src="image/FEM_logo.png" alt>
+      <img id="firebase-logo" src="image/firebase_logo_1.png" alt>
     </div>
 
     <h1>REALTIME DATA VISUALIZER</h1>
 
-    <div class="container">
-      <span id="status-tab">STATUS: </span>
-      <span id="status">NOT CONNECTED</span>
-    </div>
-
-    <div class="container">
-      <span id="RUN-tab">RUN: </span>
-      <span id="RUN">1</span>
-    </div>
-    
-    <form class="form">
-      <div style="padding-left: 20px;">choose any RUN from this box </div>
-      <div>
-        <input type="number" name="RUN" id="RUN-choose" value="0" min="1">
+    <div class="infoBlock">
+      <div class="container">
+        <span class="tabs" id="status-tab">STATUS: </span>
+        <span id="status">NOT CONNECTED</span>
       </div>
-    </form>
 
-    <div class="container1"><button id="choose">CHOOSE</button></div>
-    
-    <div id="buttons">
-      <button id="stop">STOP</button>
-      <button id="update">UPDATE</button>
-    </div>
+      <div class="container">
+        <span class="tabs" id="RUN-tab">RUN: </span>
+        <span id="RUN">1</span>
+      </div>
 
-    <div class="charts">
-       <h2>LINE CHARTS</h2>
-
-      <form action="" class="pickers">
-        <input class="picker" type="checkbox" name="category" checked>INVERTER
-        <input class="picker" type="checkbox" name="category" checked>MOTOR
-        <input class="picker" type="checkbox" name="category" checked>VCM
-        <input class="picker" type="checkbox" name="category" checked>BATTERY
+      <form class="form">
+        <div class="text">Choose any RUN: </div>
+        <input type="number" name="RUN" id="RUNnumber" value="0" min="1">
       </form>
 
-      <div id="INVERTER">
-        <apexchart ref="realtimeChart" type=line height=350 :options="chartOptions" :series="series" id="inv" />
+      <div class="container1">
+        <button class="choose" id="RUNchoose">CHOOSE</button>
       </div>
-      <div id="MOTOR">
-        <apexchart ref="realtimeChart" type=line height=350 :options="chartOptions" :series="series" />
+
+      <form class="form">
+        <div class="text" >Change the configuration:</div>
+        <select name="configuration" id="configSelector">
+          <option value="dense">dense</option>
+          <option value="expand">expand</option>
+        </select>
+      </form>
+
+      <div class="container1">
+        <button class="choose" id="configChoose">CHOOSE</button>
       </div>
-      <!-- <div id="linechart">
-        <apexchart ref="realtimeChart" type=line height=350 :options="chartOptions" :series="series" />
-      </div>
-      <div id="linechart">
-        <apexchart ref="realtimeChart" type=line height=350 :options="chartOptions" :series="series" />
-      </div> -->
-    </div>
     
-    <div class="charts">
-      <h2 style="text-align: center;">GAUGE CHART</h2>
-      <p id="monitor" style="text-align: center; font-size: 30px; margin: 5px;">Value</p>
-      <div id='guageChart'></div>
+      <div class="buttons">
+        <button class="controlBtn" id="stop">STOP</button>
+        <button class="controlBtn" id="update">UPDATE</button>
+      </div>
     </div>
-    
-    <script type="module">
-        // import { initializeApp} from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
-        // import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-analytics.js";
-        // import { getDatabase, set, get, child, update, ref, remove, onValue } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-database.js";
-        // // Initialize Firebase
-        // const firebaseConfig = {
-        //     apiKey: "AIzaSyC58hQrNqoixKEU2APb9FqnpjNA4PmnwAE",
-        //     authDomain: "fem21app-f43ef.firebaseapp.com",
-        //     databaseURL: "https://fem21app-f43ef-default-rtdb.asia-southeast1.firebasedatabase.app",
-        //     projectId: "fem21app-f43ef",
-        //     storageBucket: "fem21app-f43ef.appspot.com",
-        //     messagingSenderId: "764926693156",
-        //     appId: "1:764926693156:web:216e15768d6394ad6a6db1",
-        //     measurementId: "G-4QTXEQZ53M"
-        // };
-        // // Initialize Firebase app
-        // const app = initializeApp(firebaseConfig);
-        // // Get a reference to the database
-        // const db  = getDatabase(app);
 
-        // // Reference to the ".info/connected" node from db reference
-        // var connectedRef = ref(db, ".info/connected");
-        // var date = new Date().toISOString().slice(0, 10);
-        // const FOLDER = "FEM21App data/" + date;
-        // // console.log(folder);
+    <div class="statusBlock">
+      <div class="carStatus">
+        <p>MOTOR TEMP. + RTD</p>
+        <img src="" alt="">
+      </div>
+      <div class="carStatus">
+        <p>Brake switch:</p>
+        <p id="BRAKE_SW"></p>
+      </div>
+      <div class="carStatus">
+        <p>High voltage (HV) status:</p>
+        <p id="HV_STATUS"></p>
+      </div>
+      <div class="carStatus">
+        <p>ERROR:</p>
+        <p id="ERROR"></p>
+      </div>
+      <div class="carStatus">
+        <p>VCM Info:</p>
+        <p id="VCMINFO"></p>
+      </div>
+    </div>
 
-        // //Check whether the website is connected to the database
-        // onValue(connectedRef, (snapshot) => {
-        //     const isConnected = snapshot.val();
-        //     if (isConnected === true) {
-        //         document.querySelector("#status").textContent = "CONNECTED";
-        //         document.getElementById("status").style.color = 'green';
-        //         console.log("Database is connected");
-        //         // alert("Database is connected");
-        //     } else {
-        //         document.querySelector("#status").textContent = "NOT CONNECTED";
-        //         document.getElementById("status").style.color = 'red';
-        //         console.log("Database is not connected");
-        //     }
-        // });
-        // var data = [];
-        // // Listen for real-time changes in "FEM21App data" in the database
-        // onValue(ref(db, FOLDER), (snapshot) => {
-        //     const data = snapshot.val();
-        //     const timestamps = Object.keys(data);
-        //     const velocities = timestamps.map(timestamp => data[timestamp]);
-        //     document.querySelector("#monitor").textContent = velocities[velocities.length - 1];
+    <div class="pedalBlock">
+      <h2 style="text-align: center; border: 1px solid black">PEDAL CHARTS</h2>
+      <div class="pedalcharts">
+        <!-- <p id="monitor" style="text-align: center; font-size: 30px; margin: 5px;">Value</p> -->
+        <!-- <div id='guageChart'></div> -->
+        <div class="pedalChart" id="batteryChart"></div>
+        <div class="pedalChart" id="accChart"></div>
+        <div class="pedalChart" id="brakeChart"></div>
+      </div>
+    </div>
 
-        // });
-        
-        // // function clicked(){
-        // //     console.log("You clicked the button");
-        // // }
-        // // document.querySelector("#button").addEventListener('click', clicked);
-        // // updateBtn.addEventListener('click', clicked);
+    <div class="linecharts">
+      <h2>LINE CHARTS</h2>
 
-        // var count = 1;
-        // var folder = "FEM21App data/" + date + "/RUN:" + count;
-        
-        // document.querySelector("#update").addEventListener('click', function(e) {
-        //     e.defaultPrevented;
-        //     get(ref(db, FOLDER))
-        //     .then((snapshot) =>{
-        //         if (snapshot.exists()){
-        //             const info = snapshot.val();
-        //             const KEYS = Object.keys(info);
-        //             const VALUES = KEYS.map(key => info[key]);
-        //             count = VALUES[0];
-        //             document.querySelector("#RUN").textContent = count;
-        //             folder = "FEM21App data/" + date + "/RUN:" + count;
-        //             console.log("COUNT = " + count);
-        //         } else {
-        //             alert("COUNT not found");
-        //         }
-        //     }).catch((error)=>{
-        //         alert("UPDATE Error! COUNT = " + count + "folder:" + folder);
+      <form action class="pickers">
+        <input class="picker" type="checkbox" name="category" checked>Velocity
+        <input class="picker" type="checkbox" name="category" checked>LV
+        <input class="picker" type="checkbox" name="category" checked>HV
+        <input class="picker" type="checkbox" name="category" checked>Torque
+      </form>
 
-        //     });
-        // });
-        
-        // // document.getElementById("choose").addEventListener('click', function(e){
-        // //   count = document.getElementById("RUN-choose").value;
-        // //   document.getElementById("RUN").textContent = count;
-        // //   folder = "FEM21App data/" + date + "/RUN:" + count + "/MOTOR";
-        // //   console.log("choose:" + count);
-        // //   e.preventDefault;
-        // // })
+      <div class="linechart" id="VELOCITY"> 
+        <apexchart ref="realtimeChart" type=line height=400
+          :options="chartOptions" :series="series" id="inv" />
+      </div>
+      <div class="linechart" id="LV">
+        <apexchart ref="realtimeChart" type=line height=400
+          :options="chartOptions" :series="series" />
+      </div>
+      <div class="linechart" id="HV">
+        <apexchart ref="realtimeChart" type=line height=400 
+          :options="chartOptions" :series="series" />
+      </div>
+      <div class="linechart" id="TORQUE">
+        <apexchart ref="realtimeChart" type=line height=400 
+          :options="chartOptions" :series="series" />
+      </div>
+    </div>
 
-        // let stopFlag = 0;
-        
-        // function obtainData(category){
-        //     get(ref(db, folder + "/" + category))
-        //     .then((snapshot) =>{
-        //         if (snapshot.exists()){
-        //             // console.log("COUNT = " + count);
-        //             const Data = snapshot.val();
-        //             const keys = Object.keys(Data);
-        //             const values = keys.map(key => Data[key]);
-        //             var date = new Date();
-        //             var formattedDate = `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}:${date.getMilliseconds().toString().padStart(3, '0')}`;
-        //             console.log("key:"+ keys[keys.length - 1]);
-        //             console.log("val:"+ values[values.length - 1]);
-        //             data.push({
-        //                 x: formattedDate,
-        //                 y: values[values.length - 1]
-        //             })
-        //             if (data.length > 20){
-        //                 data.shift();
-        //             }
+    <!-- <footer>
 
-        //         } else {
-        //             stopFlag = 1;
-        //             // alert("No data found, code error:" + stopFlag );
-        //             document.querySelector("#stop").textContent = "START";
-        //         }
-        //     }).catch((error)=>{
-        //         console.log("ObtainData Error!")
-        //     });
-        // }
+    </footer> -->
 
-        // new Vue({
-        // el: "#linechart",
-        // components: {
-        //     apexchart: VueApexCharts
-        // },
-        // data: {
-        //     series: [{data: data.slice()}],
+  </body>
 
-        //     chartOptions: {
-        //     chart: {
-        //         animations: {
-        //         enabled: false,
-        //         easing: "linear",
-        //         dynamicAnimation: {
-        //             speed: 1000
-        //         }
-        //         },
-        //         toolbar: {
-        //         show: false
-        //         },
-        //         zoom: {
-        //         enabled: false
-        //         }
-        //     },
-        //     dataLabels: {
-        //         enabled: true
-        //     },
-        //     stroke: {
-        //         curve: "smooth"
-        //     },
-
-        //     title: {
-        //         text: "Dynamic Updating Chart",
-        //         align: "left"
-        //     },
-        //     markers: {
-        //         size:0
-        //     },
-        //     // xaxis: {
-        //     //     type: "datewtime"
-        //     // },
-        //     yaxis: {
-        //         max: 120,
-        //         min: 0
-        //     },
-        //     legend: {
-        //         show: false
-        //     }
-        //     }
-        // },
-        // mounted: function() {
-        //     this.intervals();
-        // },
-        // methods: {
-        //     intervals: function() {
-        //         var me = this;
-        //         document.querySelector("#stop").addEventListener('click', function(){
-        //             if(stopFlag == 0){
-        //                 stopFlag = 1;
-        //                 document.querySelector("#stop").textContent = "CONTINUE";
-        //             } else{
-        //                 stopFlag = 0;
-        //                 document.querySelector("#stop").textContent = "STOP";
-        //             }
-   
-        //         });
-        //         // Update chart data every 2 seconds
-        //         window.setInterval(function() {
-        //             //var newDataPoint = obtainData();
-        //             if (stopFlag == 0){
-        //                 obtainData("MOTOR");
-        //                 me.$refs.realtimeChart.updateSeries([{ data: data }]);
-        //             }
-        //         }, 200);
-                
-        //         //console.log(me.$refs.realtimeChart.series);
-        //         // // Remove one data point every 1 seconds
-        //         // window.setInterval(function() {
-        //         //     // Get the current series data
-        //         //     var currentSeries = me.$refs.realtimeChart.series;
-        //         //     console.log("len:" + currentSeries.length);
-        //         //     // If there are data points to remove
-        //         //     if (currentSeries.length > 0) {
-        //         //         // Remove the first data point from the series
-        //         //         currentSeries.shift();
-        //         //         console.log(currentSeries);
-        //         //         // Update the chart with the modified series data
-        //         //         me.$refs.realtimeChart.updateSeries([{ data: currentSeries }]);
-        //         //     }
-        //         // }, 2000);
-
-        //         // // Reset chart data every 60 seconds
-        //         // window.setInterval(function() {
-        //         //     resetData();
-        //         //     me.$refs.realtimeChart.updateSeries([{ data }], false, true);
-        //         // }, 30000);
-        //     }
-        // }});
-
-        // function getData(category) {
-        //     return get(ref(db, folder + "/" + category))
-        //         .then((snapshot) => {
-        //             if (snapshot.exists()) {
-        //                 const Data = snapshot.val();
-        //                 const keys = Object.keys(Data);
-        //                 const values = keys.map(key => Data[key]);
-        //                 return values[values.length - 1];
-
-        //             } else {
-        //                 throw new Error("No data found");
-        //                 console.log("No data found");
-        //             }
-        //         })
-        //         .catch((error) => {
-        //             console.log("getData Error:", error);
-        //             throw error; // rethrowing the error for further handling
-        //         });
-        // }
-        
-        // ZC.LICENSE = ["569d52cefae586f634c54f86dc99e6a9", "b55b025e438fa8a98e32482b5f768ff5"];
-        // window.feed = function(callback) {
-        //     getData("MOTOR") // Call the getData() function
-        //     .then((data) => {
-        //         var tick = {};
-        //         tick.plot0 = data; // Assign the retrieved data to the plot0 property
-        //         callback(JSON.stringify(tick)); // Pass the data to the callback function
-        //     })
-        //     .catch((error) => {
-        //         console.error("Error fetching data:", error);
-        //         // Handling error - you might want to provide a fallback value or handle the error differently
-        //         var tick = {};
-        //         tick.plot0 = 0; // Assuming a default value if data fetching fails
-        //         callback(JSON.stringify(tick)); // Pass the default value to the callback function
-        //     });
-        // };
-     
-        // var myConfig = {
-        //   type: "gauge",
-        //   globals: {
-        //     fontSize: 25 //Label size 
-        //   },
-        //   plotarea: {
-        //     marginTop: 80
-        //   },
-        //   plot: {
-        //     size: '100%',
-        //     valueBox: {
-        //       placement: 'center',
-        //       text: '%v', //default
-        //       fontSize: 35, //Size of number shown in the center
-        //       rules: [{
-        //           rule: '%v >= 80',
-        //           text: '%v<br>DANGER'
-        //         },
-        //         {
-        //           rule: '%v < 80 && %v > 50',
-        //           text: '%v<br>FAST'
-        //         },
-        //         {
-        //           rule: '%v <= 50 && %v > 30',
-        //           text: '%v<br>MEDIUM'
-        //         },
-        //         {
-        //           rule: '%v <=  30',
-        //           text: '%v<br>SLOW'
-        //         }
-        //       ]
-        //     }
-        //   },
-        //   tooltip: {
-        //     borderRadius: 5
-        //   },
-        //   scaleR: {
-        //     aperture: 180,
-        //     minValue: 0,
-        //     maxValue: 100,
-        //     step: 10,
-        //     center: {
-        //       visible: false
-        //     },
-        //     tick: {
-        //       visible: true
-        //     },
-        //     item: {
-        //       offsetR: 0,
-        //       rules: [{
-        //         rule: '%i == 9',
-        //         offsetX: 15
-        //       }]
-        //     },
-        //     labels: ['0', '10', '20', '30', '40', '50', '60', '70', '80', '90', '100'],
-        //     ring: {
-        //       size: 50,
-        //       rules: [{
-        //           rule: '%v <= 20',
-        //           backgroundColor: '#29B6F6'
-        //         },
-        //         {
-        //           rule: '%v > 20 && %v < 50',
-        //           backgroundColor: '#FFA726'
-        //         },
-        //         {
-        //           rule: '%v >= 50 && %v <script 80',
-        //           backgroundColor: '#EF5350'
-        //         },
-        //         {
-        //           rule: '%v >= 80',
-        //           backgroundColor: '#E53935'
-        //         }
-        //       ]
-        //     }
-        //   },
-        //   refresh: {
-        //     type: "feed",
-        //     transport: "js",
-        //     url: "feed()",
-        //     interval: 200,
-        //     resetTimeout: 300
-        //   },
-        //   series: [{
-        //     values: [0], // starting value
-        //     backgroundColor: 'black',
-        //     indicator: [10, 10, 10, 10, 0.75],
-        //     animation: {
-        //       effect: 2,
-        //       method: 1,
-        //       sequence: 4,
-        //       speed: 900
-        //     },
-        //   }]
-        // };
-        
-        // zingchart.render({
-        //   id: 'guageChart',
-        //   data: myConfig,
-        //   height: 500,
-        //   width: '100%'
-        // });
-    </script>
-
-</body>
 </html>
