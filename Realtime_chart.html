@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Realtime Chart</title>
+
+    <link rel="stylesheet" href="realtime.css">
+    <link rel="stylesheet" href="image/wheels_illustrator_2.css">
+    <script type="module" src="realtime.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-apexcharts@latest"></script>
+    <script
+      src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+    <script type="text/javascript"
+      src="https://code.jscharting.com/latest/jscharting.js"></script>
+    <script type="text/javascript"
+      src="https://code.jscharting.com/latest/modules/types.js"></script>
+    <!-- Include jQuery and Epoch library -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/epoch@0.8.4/dist/css/epoch.min.css">
+    <script
+      src="https://cdn.jsdelivr.net/npm/epoch@0.8.4/dist/js/epoch.min.js"></script>
+
+    <script nonce="undefined"
+      src="https://cdn.zingchart.com/zingchart.min.js"></script>
+    
+  </head>
+
+  <body>
+
+    <div class="banner">
+      <img id="fem-logo" src="image/FEM_logo.png" alt>
+      <img id="firebase-logo" src="image/firebase_logo_1.png" alt>
+    </div>
+
+    <h1>REALTIME DATA VISUALIZER</h1>
+
+    <div class="infoBlock">
+      <div class="container">
+        <span class="tabs" id="status-tab">STATUS: </span>
+        <span id="status">NOT CONNECTED</span>
+      </div>
+
+      <div class="container">
+        <span class="tabs" id="RUN-tab">RUN: </span>
+        <span id="RUN">1</span>
+      </div>
+
+      <form class="form">
+        <div class="text">Choose Date & RUN: </div>
+        <input type="number" name="RUN" id="RUNnumber" value="0" min="1">
+        <input type="date" name="" id="date">
+      </form>
+
+      <div class="container1">
+        <button class="choose" id="RUNchoose">CHOOSE</button>
+      </div>
+
+      <form class="form">
+        <div class="text" >Change the configuration:</div>
+        <select name="configuration" id="configSelector">
+          <option value="dense">dense</option>
+          <option value="expand">expand</option>
+        </select>
+      </form>
+
+      <div class="container1">
+        <button class="choose" id="configChoose">CHOOSE</button>
+      </div>
+    
+      <div class="buttons">
+        <button class="controlBtn" id="stop">STOP</button>
+        <button class="controlBtn" id="update">UPDATE</button>
+      </div>
+    </div>
+
+    <div class="statusBlock">
+      <div class="carTemps">
+        <div class="car">
+          <div class="car_structure"></div>
+          <div class="wheel_1" id="wheel_1">--</div>
+          <div class="wheel_2" id="wheel_2">--</div>
+          <div class="wheel_3" id="wheel_3">--</div>
+          <div class="wheel_4" id="wheel_4">--</div>
+          <div class="inv_text" >INVTemp</div>
+          <div class="inv_block" id="INV_TEMP">--</div>
+          <div class="btr_text">BTRTEMP</div>
+          <div class="btr_block" id="BTR_TEMP">--</div>
+        </div>
+      </div>
+      <div class="carStatus">
+        <div class="status">
+          <span>Brake switch:</span>
+          <span id="BRAKE_SW">OFF</span>
+          <br>
+          <span>High voltage (HV) status:</span>
+          <span id="HV_STATUS">OFF</span>
+        </div>
+
+        <div class="status_message">
+          <div class="message">
+            <span>ERROR:</span>
+            <br>
+            <span id="ERROR">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Facere explicabo rerum, deleniti officia nihil similique ullam nobis minus nulla dolorem totam debitis laborum animi distinctio, sint corrupti doloremque eveniet a!</span>
+          </div>
+          <div class="message">
+            <span>VCM INFO:</span>
+            <br>
+            <span id="VCMINFO">cabo facilis antium maiores quasi consequatur tenedeserunt, corrupti molestiae.</span>
+          </div>
+        </div>
+
+      </div> 
+    </div>
+
+    <div class="pedalBlock">
+      <h2 style="text-align: center;">PEDAL CHARTS</h2>
+      <div class="pedalcharts">
+        <!-- <p id="monitor" style="text-align: center; font-size: 30px; margin: 5px;">Value</p> -->
+        <!-- <div id='guageChart'></div> -->
+        <div class="pedalChart" id="batteryChart"></div>
+        <div class="pedalChart" id="accChart"></div>
+        <div class="pedalChart" id="brakeChart"></div>
+      </div>
+    </div>
+
+    <div class="linecharts">
+      <h2>LINE CHARTS</h2>
+
+      <form action class="pickers">
+        <input class="picker" type="checkbox" name="category" checked>Velocity
+        <input class="picker" type="checkbox" name="category" checked>LV
+        <input class="picker" type="checkbox" name="category" checked>HV
+        <input class="picker" type="checkbox" name="category" checked>Torque
+      </form>
+
+      <div class="linechart" id="VELOCITY"> 
+        <apexchart ref="realtimeChart" type=line height=400
+          :options="chartOptions" :series="series" id="inv" />
+      </div>
+      <div class="linechart" id="LV">
+        <apexchart ref="realtimeChart" type=line height=400
+          :options="chartOptions" :series="series" />
+      </div>
+      <div class="linechart" id="HV">
+        <apexchart ref="realtimeChart" type=line height=400 
+          :options="chartOptions" :series="series" />
+      </div>
+      <div class="linechart" id="TORQUE">
+        <apexchart ref="realtimeChart" type=line height=400 
+          :options="chartOptions" :series="series" />
+      </div>
+    </div>
+
+    <!-- <footer>
+
+    </footer> -->
+
+  </body>
+
+</html>
