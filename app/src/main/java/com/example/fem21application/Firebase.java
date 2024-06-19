@@ -6,6 +6,7 @@ import android.os.IBinder;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -43,6 +44,25 @@ public class Firebase extends Service {
         super.onCreate();
         Log.i(TAG, "FIREBASE_SERVICE IS CREATED");
         ref.child("STATUS").setValue("START");
+
+
+        Log.i(TAG, "Thread ToDriver Started");
+        DatabaseReference myRef = database.getReference(title + '/' + date);
+        myRef.child("ToDriver").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                // This method is called once with the initial value and again whenever data at this location is updated.
+                String message = dataSnapshot.getValue(String.class);
+                Log.d(TAG, "Message: " + message);
+                SendBroadcast(0, message);
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                // Failed to read value
+                Log.e(TAG, "Failed to read value.", error.toException());
+            }
+        });
+
     }
 
     @Override
@@ -170,4 +190,12 @@ public class Firebase extends Service {
         signalRef.child("signal").setValue(duration);
     }
 
+    private void SendBroadcast(int VIEW, String message) {
+        // IntentをブロードキャストすることでMainActivityへデータを送信
+        Intent intent = new Intent();
+        intent.setAction("FIREBASE");  //Set code as BLUETOOTH for the receiver to know where the information is from
+        intent.putExtra("VIEW", VIEW);
+        intent.putExtra("message", message);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
 }

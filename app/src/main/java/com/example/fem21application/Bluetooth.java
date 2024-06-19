@@ -7,14 +7,20 @@ import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Environment;
 import android.os.IBinder;
 import android.util.Log;
 
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Set;
 import java.util.UUID;
 
@@ -39,7 +45,7 @@ public class Bluetooth extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "BLUETOOTH_SERVICE IS STARTED");
-        SendBroadcast("BLUETOOTH_SERVICE IS STARTED");
+        SendBroadcast(0,"BLUETOOTH_SERVICE IS STARTED");
 
         MainActivity Main = new MainActivity();
         BluetoothManager bluetoothManager = (BluetoothManager) this.getSystemService(Context.BLUETOOTH_SERVICE);
@@ -157,13 +163,13 @@ public class Bluetooth extends Service {
                 //Proceed with any task
 //                BluetoothCommunication(bluetoothSocket, ThreadContext);
                 try {
-                    SendBroadcast("CONNECTING TO: " + deviceName);
+                    SendBroadcast(0,"CONNECTING TO: " + deviceName);
                     bluetoothSocket.connect();
                     mConnectedThread = new ConnectedThread(bluetoothSocket);
 //                    Log.d("Thread", "mConnectedThread IS CREATED ");
                     mConnectedThread.start();
                 } catch (IOException e) {
-                    SendBroadcast("FAILED CONNECTING TO:" + deviceName);
+                    SendBroadcast(0,"FAILED CONNECTING TO:" + deviceName);
                     try {
                         bluetoothSocket.close();
                         Log.e("Thread", "SOCKET CONNECTION FAILED, STOPPING SERVICE");
@@ -223,13 +229,14 @@ public class Bluetooth extends Service {
                     int length = inputStream.read(buffer);
                     String message = new String(buffer, 0, length);
                     if (!message.trim().isEmpty()) {  //To skip any empty message
-//                            Log.i("Thread", "receive:" + message);
-                        SendBroadcast(message);
+                            Log.i("Thread", "receive:" + message);
+//                        categorizeMessage(message);
+//                        SendBroadcast(MainActivity.VIEW_INPUT, m);
                     }
                 } catch (IOException e) {
                     Log.e("Thread", e.toString());
                     Log.e("Thread", "UNABLE TO READ/WRITE, STOPPING SERVICE");
-                    SendBroadcast("UNABLE TO READ/WRITE, STOPPING SERVICE");
+                    SendBroadcast(0,"UNABLE TO READ/WRITE, STOPPING SERVICE");
                     stopSelf();
                     break;
                 }
@@ -249,13 +256,253 @@ public class Bluetooth extends Service {
         }
     }
 
-    private void SendBroadcast(String message) {
+    private void SendBroadcast(int VIEW, String message) {
         // IntentをブロードキャストすることでMainActivityへデータを送信
         Intent intent = new Intent();
         intent.setAction("BLUETOOTH");  //Set code as BLUETOOTH for the receiver to know where the information is from
-        //intent.putExtra("VIEW", VIEW);
+        intent.putExtra("VIEW", VIEW);
         intent.putExtra("message", message);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
+
+//    private void categorizeMessage(String message){
+//        int values_count = 0;
+//        Write_file(message.trim(), "data_log.csv", 0);
+//        if (message.trim().startsWith("A") && message.trim().endsWith("A")) {
+//            try{
+//                appendLog(message.trim());
+//                SendBroadcast(MainActivity.VIEW_INPUT, message.trim()); //デバック用
+//
+//                String[] values;
+//                values = message.trim().split("/", 0);
+//                values_count = values.length;
+//
+//
+//                //LV解析
+//                try{
+//                    if (!values[MainActivity.VIEW_LV].contains("-")) {
+//                        //values[MainActivity.VIEW_LV] = "ON";
+//
+//                        // 小数第一位以下を表示しないように文字列切り取り
+//                        if (Float.parseFloat(values[MainActivity.VIEW_LV]) < 30.0) {
+//                            if (values[MainActivity.VIEW_LV].length() >= 3) {
+//                                values[MainActivity.VIEW_LV] = values[MainActivity.VIEW_LV].substring(0, 3);
+//                            }
+//                        }
+//
+//                        else {
+//                            if (values[MainActivity.VIEW_LV].length() >= 4) {
+//                                values[MainActivity.VIEW_LV] = values[MainActivity.VIEW_LV].substring(0, 4);
+//                            }
+//                        }
+//                        SendBroadcast(MainActivity.VIEW_LV, values[MainActivity.VIEW_LV]);
+//                        AddCloud("LV", values[MainActivity.VIEW_LV]); //クラウド送信情報として登録
+//
+//
+//                    }
+//                    else {
+//                        values[MainActivity.VIEW_LV] = "-----";
+//                    }
+//                    SendBroadcast(MainActivity.VIEW_LV, values[MainActivity.VIEW_LV]); //MainActivityに送信し文字列表示
+//                }
+//                catch(Exception e){
+//                    Log.w(TAG, "LV Error");
+//                }
+//
+//                //HV解析
+//                try{
+//                    if (!values[MainActivity.VIEW_HV].contains("-")) {
+//                        SendBroadcast(MainActivity.VIEW_HV, values[MainActivity.VIEW_HV]);
+//                        AddCloud("HV", values[MainActivity.VIEW_HV]);
+//                        MainActivity.HVFlag = true; //HVONフラグをON
+//                    }
+//                    else {
+//                        MainActivity.HVFlag = false; //HVONフラグをOFF
+//                        values[MainActivity.VIEW_HV] = "-----";
+//                    }
+//                    SendBroadcast(MainActivity.VIEW_HV, values[MainActivity.VIEW_HV]);
+//                    MainActivity.HVFlag = !values[MainActivity.VIEW_HV].contains("-");
+//                }
+//                catch(Exception e){
+//                    Log.w(TAG, "HV Error");
+//                }
+//
+//                int maxMT = 0;
+//
+//                //MOTOR温度解析
+//                try{
+//                    String[] MTs;
+//                    float[] MTInt = new float[4];
+//                    final int indexNum=4;
+//                    MTs = values[MainActivity.VIEW_MT].trim().split("x", 0); //FR,FL,RR,RLの情報に分解
+//
+//                    for (int n = 0; n < indexNum; n++) {
+//                        MTInt[n] = 0;
+//                        //Log.i(TAG, "mt index=" + n);
+//                        Log.i(TAG, "mt" + n + "=" + MTs[n]);
+//
+//                        if(MTs[n].contains("-")){
+//                            MTInt[n] = 0;
+//                        }
+//                        else{
+//                            MTInt[n] = Float.valueOf(MTs[n]);
+//                        }
+//
+//                        // 画面には四輪の内の最大値のみ表示する
+//                        if (MTInt[n] >= maxMT) {
+//                            maxMT = Math.round(MTInt[n]);
+//                        }
+//
+//                        // クラウドには四輪とも送信
+//                        switch (n) {
+//                            case 0:
+//                                AddCloud("MOTOR1", MTs[0]);
+//                                break;
+//                            case 1:
+//                                AddCloud("MOTOR2", MTs[1]);
+//                                break;
+//                            case 2:
+//                                AddCloud("MOTOR3", MTs[2]);
+//                                break;
+//                            case 3:
+//                                AddCloud("MOTOR4", MTs[3]);
+//                                break;
+//                        }
+//                    }
+//
+//                    if (maxMT == 0) {
+//                        SendBroadcast(MainActivity.VIEW_MT, "-----");
+//                    }
+//                    else {
+//                        SendBroadcast(MainActivity.VIEW_MT, Integer.toString(maxMT));
+//                    }
+//                }
+//                catch(Exception e){
+//                    Log.w(TAG, "A - MOTOR Error");
+//                    e.printStackTrace();
+//                }
+//
+//                //INV温度解析
+//                try{
+//                    if (!values[MainActivity.VIEW_INV].contains("-")) {
+//                        values[MainActivity.VIEW_INV] = values[MainActivity.VIEW_INV].split("\\.", 0)[0]; //整数にする
+//                        AddCloud("INV", values[MainActivity.VIEW_INV]);
+//                    }
+//                    else {
+//                        values[MainActivity.VIEW_INV] = "-----";
+//                    }
+//                    SendBroadcast(MainActivity.VIEW_INV, values[MainActivity.VIEW_INV]);
+//                }
+//                catch(Exception e){
+//                    Log.w(TAG,"INV Error");
+//                }
+//
+//
+//
+//                // クラウドのデータストアへの登録
+//                objV.saveInBackground(new DoneCallback() {
+//                    @Override
+//                    public void done(NCMBException e) {
+//                        if (e != null) {
+//                            //保存に失敗した場合の処理
+//                            e.printStackTrace();
+//                        } else {
+//                            //保存に成功した場合の処理
+//
+//                        }
+//                    }
+//                });
+//
+//                if(maxMT >= 115){ //高温判定
+//                    if(!(MainActivity.isHITEMP)) { //高温表示
+//                        SendBroadcast(MainActivity.LAYOUT_HITEMP, "YES");
+//                        MainActivity.isHITEMP = true;
+//                    }
+//                }
+//                else if(!values[MainActivity.VIEW_INV].contains("-")){
+//                    if(Integer.parseInt(values[MainActivity.VIEW_INV]) >= 40){
+//                        if(!(MainActivity.isHITEMP)) { //高温表示
+//                            SendBroadcast(MainActivity.LAYOUT_HITEMP, "YES");
+//                            MainActivity.isHITEMP = true;
+//                        }
+//                    }
+//                    else{
+//                        if(MainActivity.isHITEMP){ //高温非表示
+//                            SendBroadcast(MainActivity.LAYOUT_HITEMP, "NO");
+//                            MainActivity.isHITEMP = false;
+//                        }
+//                    }
+//                }
+//                else{
+//                    if(MainActivity.isHITEMP){ //高温非表示
+//                        SendBroadcast(MainActivity.LAYOUT_HITEMP, "NO");
+//                        MainActivity.isHITEMP = false;
+//                    }
+//                }
+//            }
+//            catch(Exception e){
+//                e.printStackTrace();
+//            }
+//        }
+//    }
+
+    public void Write_file(String message, String filename, int n) {
+        //String baseDir = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
+        //String baseDir = "Try to put any path here";
+        //String filePath = baseDir + File.separator + filename;
+        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), filename);
+        try {
+            // Check if the parent directory exists; if not, create it
+            File parentDirectory = file.getParentFile();
+            assert parentDirectory != null;
+            if (!parentDirectory.exists() && !parentDirectory.mkdirs()) {
+                // Handle the case where directory creation fails
+                throw new IOException("Failed to create parent directory: " + parentDirectory);
+            }
+            // Create or overwrite the file
+            FileWriter writer = new FileWriter(file,true);
+
+            //for adding time stamp to each data input
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            String timestampedData = LocalDateTime.now().format(formatter) + ":";
+            writer.write(timestampedData);
+
+            // Write data to the file
+            writer.write(message + "\n");
+            /*
+            for (int i = 0; i < n-1; i++){
+                writer.write(arr[i] + "/");
+            }
+//            writer.write(message[0] + "\n");
+
+             */
+
+            // Close the FileWriter
+            writer.close();
+            System.out.println("File created or updated successfully.");
+//            Toast.makeText(this, "Data created or updated successfully!", Toast.LENGTH_SHORT).show();
+        } catch (IOException e) {
+            Log.e(TAG, "ERROR: " + e);
+            // Handle the exception
+        }
+    }
+
+    private String readFromFile(String filename) {
+        try {
+            File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), filename);
+            //FileInputStream fileInputStream = openFileInput("my_data.txt");
+            FileInputStream fileInputStream = new FileInputStream(file);
+            StringBuilder stringBuilder = new StringBuilder();
+            int c;
+            while ((c = fileInputStream.read()) != -1) {
+                stringBuilder.append((char) c);
+            }
+            fileInputStream.close();
+            return stringBuilder.toString();
+        } catch (IOException e) {
+            Log.e(TAG, "ERROR: " + e);
+            return "";
+        }
     }
 
 }

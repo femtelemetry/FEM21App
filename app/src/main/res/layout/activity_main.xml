@@ -52,15 +52,14 @@
     </ScrollView>
 
     <Button
-        android:id="@+id/testButton"
+        android:id="@+id/randomButton"
         android:layout_width="0dp"
-        android:layout_height="63dp"
-        android:layout_marginTop="23dp"
-        android:layout_marginEnd="19dp"
-        android:text="RUN NUMBER"
+        android:layout_height="57dp"
+        android:layout_marginEnd="18dp"
+        android:text="RANDOM"
+        app:layout_constraintBaseline_toBaselineOf="@+id/runButton"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/readButton"
-        app:layout_constraintTop_toBottomOf="@+id/scrollView"
+        app:layout_constraintStart_toEndOf="@+id/runButton"
         app:rippleColor="#03A9F4"
         app:strokeColor="#03A9F4" />
 
@@ -69,21 +68,22 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginEnd="45dp"
+        android:layout_marginEnd="38dp"
         android:text="SUBMIT"
-        app:layout_constraintBaseline_toBaselineOf="@+id/readButton"
-        app:layout_constraintEnd_toStartOf="@+id/readButton"
+        app:layout_constraintBaseline_toBaselineOf="@+id/runButton"
+        app:layout_constraintEnd_toStartOf="@+id/runButton"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
-        android:id="@+id/readButton"
+        android:id="@+id/runButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="19dp"
-        android:text="READ"
-        app:layout_constraintBottom_toBottomOf="@+id/testButton"
-        app:layout_constraintEnd_toStartOf="@+id/testButton"
-        app:layout_constraintStart_toEndOf="@+id/submitButton" />
+        android:layout_marginTop="29dp"
+        android:layout_marginEnd="33dp"
+        android:text="RUN"
+        app:layout_constraintEnd_toStartOf="@+id/randomButton"
+        app:layout_constraintStart_toEndOf="@+id/submitButton"
+        app:layout_constraintTop_toBottomOf="@+id/scrollView" />
 
     <Button
         android:id="@+id/signallingButton"
@@ -112,18 +112,18 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="19dp"
+        android:layout_marginEnd="20dp"
         android:text="connect"
-        app:layout_constraintEnd_toStartOf="@+id/runButton"
+        app:layout_constraintEnd_toStartOf="@+id/pauseButton"
         app:layout_constraintStart_toEndOf="@+id/bluetoothButton"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/runButton"
+        android:id="@+id/pauseButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="19dp"
+        android:layout_marginEnd="18dp"
         android:text="PAUSE"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/connectButton"
