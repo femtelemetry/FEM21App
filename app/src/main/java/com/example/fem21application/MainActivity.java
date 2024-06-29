@@ -157,8 +157,8 @@ public class MainActivity extends AppCompatActivity {
     static boolean isSleep;
     public static boolean LVFlag;
 
-    TextView ShowTxt;
-    Button bluetoothBtn, runButton, crashButton, RandomButton, submitButton, signallingBtn, connectBtn, runBtn;
+    TextView ShowTxt, ToDriverTxt;
+    Button bluetoothBtn, runButton, crashButton, RandomButton, submitButton, connectBtn;
     EditText textbox;
     ScrollView scrollView;
     Firebase firebase = new Firebase();
@@ -186,25 +186,7 @@ public class MainActivity extends AppCompatActivity {
 
         //To continuously send signal to database to keep connecting to it.
         AtomicReference<ScheduledExecutorService> executor = new AtomicReference<>(Executors.newScheduledThreadPool(1));
-        signallingBtn = findViewById(R.id.signallingButton);
-        signallingBtn.setOnClickListener(v -> {
-            Firebase firebase = new Firebase();
-            if (signalFlag == 1) {
-                signalFlag = 0;
-                signallingBtn.setText("Deactivate Signalling");
-                final int[] num = {0};
-                executor.get().scheduleAtFixedRate(() -> {      // Schedule the task to run every 10 seconds
-                    num[0]++;
-                    firebase.databaseSignaling(num[0]);
-                    System.out.println("sending signal: " + num[0]);
-                }, 0, 10, TimeUnit.SECONDS);
-            } else {
-                signallingBtn.setText("Activate Signalling");
-                signalFlag = 1;
-                executor.get().shutdown();
-                executor.set(Executors.newScheduledThreadPool(1));
-            }
-        });
+
 
 //        Firebase firebase = new Firebase();
         Intent intent = new Intent(MainActivity.this, Firebase.class);
@@ -315,10 +297,7 @@ public class MainActivity extends AppCompatActivity {
             }).start();
         });
 
-        crashButton = findViewById(R.id.crashButton);
-        crashButton.setOnClickListener(view -> {
-            throw new RuntimeException("Test Crash"); // Force a crash event
-        });
+
         Bluetooth bluetooth = new Bluetooth();
 
         scrollView = findViewById(R.id.scrollView);
@@ -436,6 +415,11 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.d("Broadcast", "Firebase receive: "+ intent.getStringExtra("message"));
+            String message = intent.getStringExtra("message");
+            int VIEW = intent.getIntExtra("VIEW", 0);
+
+            ToDriverTxt = findViewById(R.id.ToDriverText);
+            ToDriverTxt.setText(message);
         }
     };
     BroadcastReceiver rReceiver = new BroadcastReceiver() {

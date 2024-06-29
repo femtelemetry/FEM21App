@@ -48,13 +48,14 @@ public class Firebase extends Service {
 
         Log.i(TAG, "Thread ToDriver Started");
         DatabaseReference myRef = database.getReference(title + '/' + date);
+        myRef.child("ToDriver").setValue("No messages yet");
         myRef.child("ToDriver").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 // This method is called once with the initial value and again whenever data at this location is updated.
                 String message = dataSnapshot.getValue(String.class);
                 Log.d(TAG, "Message: " + message);
-                SendBroadcast(0, message);
+                SendBroadcast(0, message);      //TODO:change VIEW number to the correct one later.
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
