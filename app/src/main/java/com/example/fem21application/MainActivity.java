@@ -1,14 +1,15 @@
 package com.example.fem21application;
 
-import static android.content.ContentValues.TAG;
-
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.util.Log;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -32,7 +33,6 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class MainActivity extends AppCompatActivity {
@@ -81,6 +81,8 @@ public class MainActivity extends AppCompatActivity {
     //Action(VCMINFO)
     static final int VIEW_VCMINFO = 11;
 
+    //Action(Torques)
+    static final int VIEW_TORQ = 12;
     //Action(TSV)
     static final int VIEW_TSV = 12;
 
@@ -96,8 +98,8 @@ public class MainActivity extends AppCompatActivity {
     //Action(MAXCELLT)
     static final int VIEW_MAXCELLT = 16;
 
-    //Action(ERRORAMS)
-    static final int VIEW_ERRORAMS = 17;
+    //Action(AMS)
+    static final int VIEW_AMS = 17;
 
     //Action(ERRORCOUNT)
     static final int VIEW_ERRORCOUNT = 18;
@@ -153,21 +155,36 @@ public class MainActivity extends AppCompatActivity {
 
     static boolean btConnected = false;
 
-    boolean isRun;
+    boolean isRun = false;
     static boolean isSleep;
     public static boolean LVFlag;
+    boolean stopThread = false;
+    static boolean pauseThread = false;
+    static String GlobalMessage;
+    static String GlobalTime;
 
     TextView ShowTxt, ToDriverTxt;
-    Button bluetoothBtn, runButton, crashButton, RandomButton, submitButton, connectBtn;
+    Button bluetoothBtn, runButton, RandomButton, submitButton, connectBtn, pauseButton;
     EditText textbox;
     ScrollView scrollView;
     Firebase firebase = new Firebase();
-    Bluetooth bluetooth = new Bluetooth();
+//    Bluetooth bluetooth = new Bluetooth();
+    private Bluetooth bluetooth;
     private final int count = 0;
     private final int data_num = 100;
-    private final int time_interval = 300;
+    private final int time_interval = 100;
+    Thread firebaseThread;
+    private final ServiceConnection connection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            Bluetooth.LocalBinder binder = (Bluetooth.LocalBinder) service;
+            bluetooth = binder.getService();
+        }
 
-    IntentFilter BTIntentFilter, RDIntentFilter, mIntentFilter, fIntentFilter;
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+        }
+    };
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -262,43 +279,93 @@ public class MainActivity extends AppCompatActivity {
         //To run continuously increasing number
         runButton = findViewById(R.id.runButton);
         runButton.setOnClickListener(v -> {
-            firebase.countRun();
             Log.i("database", "The data is being sent to the database");
-            new Thread(() -> {
-                for (int i = 0; i <= data_num; i++) {
-                    long nanoTime = System.nanoTime();
-                    long micros = (nanoTime / 100000); // Extract microseconds from nanoseconds
-                    String time = new SimpleDateFormat("HH:mm:ss:" + micros, Locale.getDefault()).format(new Date()); //Use timestamp as keys
-                    boolean ran_boolean = (new Random()).nextBoolean();
-                    String set = i + "/" + Math.ceil(0.85*i) + "/" + Math.ceil(1.5*i) + "/" + Math.ceil(0.7*i);
-                    firebase.realFireStore("VELOCITY", time, i+3);
-                    firebase.realFireStore("LV", time,i -5);
-                    firebase.realFireStore("HV", time, i+2);
-                    firebase.realFireStore("TORQUE", time, set);
-//                    firebase.realFireStore("TORQUE1", time,i-10 );
-//                    firebase.realFireStore("TORQUE2", time,i +5);
-//                    firebase.realFireStore("TORQUE3", time,i -2);
-//                    firebase.realFireStore("TORQUE4", time,i );
-                    firebase.realFireStore("ACC", time, i);
-                    firebase.realFireStore("BRAKE", time, i-4);
-                    firebase.realFireStore("BATTERY_LEVEL", time, i-12);
-                    firebase.realFireStore("STATUS", "BRAKE_SW",ran_boolean );
-                    firebase.realFireStore("STATUS", "HV_STATUS",ran_boolean);
-                    firebase.realFireStore("TEMPS", "BTR_TEMP",i+3);
-                    firebase.realFireStore("TEMPS", "MOTOR_TEMP",set);
-                    firebase.realFireStore("TEMPS", "INV_TEMP",i+6);
-
+            firebase.countRun();
+            firebaseThread = new Thread(() -> {
+                while (true) {
+//                    long nanoTime = System.nanoTime();
+//                    long micros = (nanoTime / 100000); // Extract microseconds from nanoseconds
+//                    String time = new SimpleDateFormat("HH:mm:ss:" + micros, Locale.getDefault()).format(new Date()); //Use timestamp as keys
+//                    Log.i("database", GlobalMessage);
+                    //Can be replaced by actual data
+                    String[] dataPart = GlobalMessage.split("/");
+                    //Determine the data group
+                    String dataType = dataPart[0];
+//                    Log.i("database", "Datatype: " + dataType);
+                    switch (dataType) {
+                        case "A":
+                            dataA(GlobalMessage);
+//                            Log.i("database", "Sending to : " + dataType);
+                            break;
+                        case "B":
+                            dataB(GlobalMessage);
+//                            Log.i("database", "Sending to : " + dataType);
+                            break;
+                        case "C":
+                            dataC(GlobalMessage);
+//                            Log.i("database", "Sending to : " + dataType);
+                            break;
+                    }
                     try {
                         Thread.sleep(time_interval);
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     }
+
                 }
-            }).start();
+            });
+            firebaseThread.start();
+
+//            new Thread(() -> {
+//                for (int i = 0; i <= data_num; i++) {
+//                    long nanoTime = System.nanoTime();
+//                    long micros = (nanoTime / 100000); // Extract microseconds from nanoseconds
+//                    String time = new SimpleDateFormat("HH:mm:ss:" + micros, Locale.getDefault()).format(new Date()); //Use timestamp as keys
+//                    boolean ran_boolean = (new Random()).nextBoolean();
+//                    String set = i + "/" + Math.ceil(0.85*i) + "/" + Math.ceil(1.5*i) + "/" + Math.ceil(0.7*i);
+//                    firebase.realFireStore("VELOCITY", time, i+3);
+//                    firebase.realFireStore("LV", time,i -5);
+//                    firebase.realFireStore("HV", time, i+2);
+//                    firebase.realFireStore("TORQUE", time, set);
+////                    firebase.realFireStore("TORQUE1", time,i-10 );
+////                    firebase.realFireStore("TORQUE2", time,i +5);
+////                    firebase.realFireStore("TORQUE3", time,i -2);
+////                    firebase.realFireStore("TORQUE4", time,i );
+//                    firebase.realFireStore("ACC", time, i);
+//                    firebase.realFireStore("BRAKE", time, i-4);
+//                    firebase.realFireStore("BATTERY_LEVEL", time, i-12);
+//                    firebase.realFireStore("STATUS", "BRAKE_SW",ran_boolean );
+//                    firebase.realFireStore("STATUS", "HV_STATUS",ran_boolean);
+//                    firebase.realFireStore("TEMPS", "BTR_TEMP",i+3);
+//                    firebase.realFireStore("TEMPS", "MOTOR_TEMP",set);
+//                    firebase.realFireStore("TEMPS", "INV_TEMP",i+6);
+//
+//                    try {
+//                        Thread.sleep(time_interval);
+//                    } catch (InterruptedException e) {
+//                        throw new RuntimeException(e);
+//                    }
+//                }
+//            }).start();
+        });
+        pauseButton = findViewById(R.id.pauseButton);
+        pauseButton.setOnClickListener( v -> {
+            if (pauseThread){
+                pauseThread = false;
+                bluetooth.resumeConnectedThread();
+//                Log.i(bluetooth.TAG , "Resuming thread ");
+                pauseButton.setText("PAUSE");
+            } else {
+                pauseThread = true;
+                bluetooth.pauseConnectedThread();
+
+//                Log.i(bluetooth.TAG, "pausing thread ");
+                GlobalMessage = "";
+                pauseButton.setText("RESUME");
+            }
         });
 
-
-        Bluetooth bluetooth = new Bluetooth();
+//        Bluetooth bluetoothService = new Bluetooth();
 
         scrollView = findViewById(R.id.scrollView);
         ShowTxt = findViewById(R.id.InputStream);
@@ -320,9 +387,10 @@ public class MainActivity extends AppCompatActivity {
         connectBtn.setOnClickListener(v -> {
             bluetooth.BluetoothConnection(this);
 //            bluetooth.controlThread("START");
-            firebase.countRun();
+//            firebase.countRun();
 //            connectBtn.setEnabled(false);
         });
+
         /*
         runBtn = findViewById(R.id.runButton);
         runBtn.setOnClickListener(v -> {
@@ -362,6 +430,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         Log.d(TAG, "MainActivity is onStart()");
+        Intent intent = new Intent(this, Bluetooth.class);
+        bindService(intent, connection, Context.BIND_AUTO_CREATE);
         checkPermission(this);
     }
 
@@ -370,7 +440,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         Log.d(TAG, "MainActivity is onResume()");
-        LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, new IntentFilter("BLUETOOTH"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(bReceiver, new IntentFilter("BLUETOOTH"));
         LocalBroadcastManager.getInstance(this).registerReceiver(permissionReceiver, new IntentFilter("PERMISSION_REQUEST"));
         LocalBroadcastManager.getInstance(this).registerReceiver(fReceiver, new IntentFilter("FIREBASE"));
         LocalBroadcastManager.getInstance(this).registerReceiver(rReceiver, new IntentFilter("random"));
@@ -381,7 +451,7 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
         Log.d(TAG, "MainActivity is onPause()");
         LocalBroadcastManager.getInstance(this).unregisterReceiver(rReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(bReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(permissionReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(fReceiver);
     }
@@ -430,7 +500,7 @@ public class MainActivity extends AppCompatActivity {
 //            ShowTxt.setText(number);
         }
     };
-    BroadcastReceiver mReceiver = new BroadcastReceiver() {
+    BroadcastReceiver bReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             // このonReceiveでMainServiceからのIntentを受信する。
@@ -441,9 +511,26 @@ public class MainActivity extends AppCompatActivity {
             int VIEW = intent.getIntExtra("VIEW", 0);
             //ShowMessage(VIEW, message); //受信した文字列を表示 - this shows the received string characters on the screen of the phone
 //            Firebase firebase = new Firebase();
+            assert message != null;
+            GlobalMessage = message.trim();
+            GlobalTime = time;
+            ShowTxt.append(time + ":" + GlobalMessage + "\n");
+            Log.i(TAG, "receive: " + GlobalMessage);
 
-            ShowTxt.append(time + ":" + message + "\n");
-            Log.i(TAG, "receive: " + message);
+//            if (VIEW == 1) {
+//                firebase.realFireStore("LV", time, message);
+//            } else if (VIEW == 2) {
+//                firebase.realFireStore("HV", time, message);
+//            } else if (VIEW == 3) {
+//                firebase.realFireStore("TEMPS", "MOTOR_TEMP", message);
+//            } else if (VIEW == 4) {
+//                firebase.realFireStore("TEMPS", "INV_TEMP",message);
+//            } else if (VIEW == 7) {
+//                firebase.realFireStore("VELOCITY", time, message);
+//            } else if (VIEW == VIEW_TORQ) {
+//                String set = message[0] + "/" + message[1] + "/" + message[2] + "/" + message[3];
+//                firebase.realFireStore("TORQUE", time, message);
+//            }
 
 //            firebase.realFireStore("VELOCITY", time, message);
 //            bluetooth.Write_file(message, "FEM21.txt", 1);
@@ -453,6 +540,9 @@ public class MainActivity extends AppCompatActivity {
 
             // Scroll the ScrollView to the bottom
             scrollView.post(() -> scrollView.fullScroll(ScrollView.FOCUS_DOWN));
+            if (VIEW==99){
+                connectBtn.setEnabled(true);
+            }
 
         }
     };
@@ -473,6 +563,164 @@ public class MainActivity extends AppCompatActivity {
         } else {
             Log.i("permission", "CONNECT permission is granted already");
         }
+    }
+
+    //A/<low system voltage>/<high system voltage>/<motor temp[0]>x<motor temp[1]>x<motor temp[2]>x<motor temp[3]>/<inv temp>/A
+    public void dataA(String datasetA){
+        //Can be replaced by actual data
+//        String dataA = datasetA;
+//        String dataA = "A/150/300/10x20x30x40/60/A";
+        //Split the string by "/"
+        String[] partA = datasetA.split("/");
+        if (partA.length != 6) {
+            throw new IllegalArgumentException("DataA format Error");
+        }
+
+        //Extract values
+        String startA = partA[0];
+
+        //For Low System Voltage
+        int lowSystemVoltage = Integer.parseInt(partA[1]);
+
+        // For High System Voltage
+        int highSystemVoltage = Integer.parseInt(partA[2]);
+
+        //For Motor Temperature
+        //Split motor temperature by "x" for motor temperature
+        String[] motorTemps = partA[3].split("x");
+        if (motorTemps.length != 4){
+            throw new IllegalArgumentException("Motor Temperature length error");
+        }
+        int[] motorTemperature = new int[4];
+        //Convert string in motorTemps into int type
+        for (int i =0; i < motorTemps.length; i++){
+            motorTemperature[i] = Integer.parseInt(motorTemps[i]);
+        }
+        String MotorTemps = motorTemperature[0] + "/" + motorTemperature[1] + "/" + motorTemperature[2] + "/" + motorTemperature[3];
+        //For Inverter Temperature
+        int inverterTemperature = Integer.parseInt(partA[4]);
+
+        //Output the values (Can be replaced by Broadcast)
+//        System.out.println("DataGroup: " + startA);
+
+//        System.out.println("Low System Voltage: " + lowSystemVoltage + " V");
+//        System.out.println("High System Voltage: " + highSystemVoltage + " V");
+//        System.out.println("Motor Temperatures: " + motorTemperature[0] + "°C, " + motorTemperature[1] + "°C, " + motorTemperature[2] + "°C, " + motorTemperature[3] + "°C");
+//        System.out.println("Inverter Temperature: " + inverterTemperature + "°C");
+
+//        Log.i("database", "DataGroup: " + startA);
+        firebase.realFireStore("LV", GlobalTime,lowSystemVoltage);
+        firebase.realFireStore("HV", GlobalTime,highSystemVoltage);
+        firebase.realFireStore("TEMPS", "MOTOR_TEMP", MotorTemps);
+        firebase.realFireStore("TEMPS", "INV_TEMP",inverterTemperature);
+    }
+
+    //B/<RTD[0]>x<RTD[1]>x<RTD[2]>x<RTD[3]>/<vcm info>/<velocity>/<torque [0]>x<torque [1]>x<torque [2]>x<torque [3]>/B
+    public void dataB(String datasetB){
+        //Can be replaced by actual data
+        //String dataB = datasetB
+//        String dataB = "B/10x20x30x40/100/50/200x300x400x500/B";
+
+        //Split the string by "/"
+        String[] partB = datasetB.split("/");
+        if (partB.length != 6) {
+            throw new IllegalArgumentException("DataB format Error");
+        }
+
+        //Extract values
+        String startB = partB[0];
+
+        //For RTD
+        //Split RTD value by "x"
+        String[] originalRTD = partB[1].split("x");
+        if (originalRTD.length != 4) {
+            throw new IllegalArgumentException("RTD data Length error");
+        }
+        int[] RTD = new int[4];
+        //Convert to the integer type
+        for (int i =0; i < originalRTD.length; i++ ){
+            RTD[i] = Integer.parseInt(originalRTD[i]);
+        }
+
+        //For VCM
+        String VCMInfo = partB[2];
+
+        //For velocity
+        int Velocity = Integer.parseInt(partB[3]);
+
+        //For Torque
+        //Split Torque by "x"
+        String[] originalTorque = partB[4].split("x");
+        if (originalTorque.length != 4) {
+            throw new IllegalArgumentException("Torque data length error");
+        }
+        int[] Torque = new int[4];
+        //Convert to Integer
+        for (int i =0; i < originalTorque.length; i++){
+            Torque[i] = Integer.parseInt(originalTorque[i]);
+        }
+        String Torques = Torque[0] + "/" + Torque[1] + "/" + Torque[2] + "/" + Torque[3];
+
+        //Output the values (Can be replaced by Broadcast)
+//        System.out.println("DataGroup: " + startB);
+//        System.out.println("RTD: " + RTD[0] + " ?" + RTD[1] + " ?" + RTD[2] + " ?" + RTD[3] + " ?");
+//        System.out.println("VCM Info: " + VCMInfo + " !");
+//        System.out.println("Velocity: " + Velocity + "m/s?");
+//        System.out.println("Torque: " + Torque[0] + "N.m, " + Torque[1] + "N.m, " + Torque[2] + "N.m, " + Torque[3] + "N.m");
+
+        firebase.realFireStore("VELOCITY", GlobalTime, Velocity);
+        firebase.realFireStore("TORQUE", GlobalTime, Torques);
+    }
+
+    //C/<AMS>/<BSPD>/<IMD>/<TC>/<ABS>/<VDC>/<80kW>/C
+    public void dataC(String datasetC){
+        //Can be replaced by actual data
+        //String dataC = datasetC
+//        String dataC = "C/10/20/30/40/50/60/80kW/C";
+
+        //Split by "/"
+        String[] partC = datasetC.split("/");
+        if (partC.length != 9) {
+            throw new IllegalArgumentException("DataC format Error");
+        }
+
+        //Extract Values
+        String startC = partC[0];
+        //For AMS
+        int AMS = Integer.parseInt(partC[1]);
+        //For BSPD
+        int BSPD = Integer.parseInt(partC[2]);
+        //For IMD
+        int IMD = Integer.parseInt(partC[3]);
+        //For TC
+        int TC = Integer.parseInt(partC[4]);
+        //For ABS
+        int ABS = Integer.parseInt(partC[5]);
+        //For VDC
+        int VDC = Integer.parseInt(partC[6]);
+        //For a fixed 80kW
+//        int fixed80 = Integer.parseInt(partC[7]); TODO: fix this
+
+        //Output the values (Can be replaced by Broadcast)
+//        System.out.println("DataGroup: " + startC);
+//        System.out.println("AMS: " + AMS + " ?");
+//        System.out.println("BSPD: " + BSPD + " !");
+//        System.out.println("IMD: " + IMD + " #");
+//        System.out.println("TC: " + TC + " &");
+//        System.out.println("ABS: " + ABS + " %");
+//        System.out.println("VDC: " + VDC + " $");
+//        System.out.println(": " + fixed80 + " kW");
+
+        int ran_velocity = (new Random()).nextInt(120);
+        int ran_100 = (new Random()).nextInt(100);
+        boolean ran_boolean = (new Random()).nextBoolean();
+        firebase.realFireStore("ACC", GlobalTime, ran_100);
+        firebase.realFireStore("BRAKE", GlobalTime, ran_100);
+        firebase.realFireStore("BATTERY_LEVEL", GlobalTime, ran_100);
+        firebase.realFireStore("STATUS", "BRAKE_SW",ran_boolean );
+        firebase.realFireStore("STATUS", "HV_STATUS",ran_boolean);
+        firebase.realFireStore("TEMPS", "BTR_TEMP",ran_velocity);
+
     }
 
 

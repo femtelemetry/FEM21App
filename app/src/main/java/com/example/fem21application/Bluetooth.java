@@ -7,6 +7,8 @@ import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Binder;
+import android.os.Bundle;
 import android.os.Environment;
 import android.os.IBinder;
 import android.util.Log;
@@ -27,13 +29,14 @@ import java.util.UUID;
 public class Bluetooth extends Service {
     public static BluetoothAdapter bluetoothAdapter = null;
     public BluetoothDevice bluetoothDevice;
-    private final String TAG = "BLUETOOTH_SERVICE";
+    public final String TAG = "BLUETOOTH_SERVICE";
     private String macAddress = "";
     private static final UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     private static final String deviceName = "ESP32";
     public boolean stopThread;
     private ConnectingThread mConnectingThread;
     private ConnectedThread mConnectedThread;
+    private final IBinder binder = new LocalBinder();
 
     public Bluetooth(){}
     @Override
@@ -79,7 +82,7 @@ public class Bluetooth extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-        throw new UnsupportedOperationException("Not yet implemented");
+        return binder;
     }
 
     @Override
@@ -96,7 +99,11 @@ public class Bluetooth extends Service {
         Log.d(TAG, "BLUETOOTH_SERVICE is onDestroy()");
 
     }
-
+    public class LocalBinder extends Binder {
+        Bluetooth getService() {
+            return Bluetooth.this;
+        }
+    }
     public void BluetoothConnection(Context context) {
         //Proceed with querying devices
         MainActivity Main = new MainActivity();
@@ -145,42 +152,43 @@ public class Bluetooth extends Service {
         }
 
         public void run() {
-                Main.checkPermission(ThreadContext);
-                BluetoothSocket tmp = null;
-                try {
-                    tmp = bluetoothDevice.createRfcommSocketToServiceRecord(uuid);
-                    Log.d(TAG, "SOCKET CREATED:" + tmp.toString());
-                } catch (IOException e) {
-                    Log.e(TAG, "SOCKET CREATION FAILED, STOPPING SERVICE");
-                    stopSelf();
+            Main.checkPermission(ThreadContext);
+            BluetoothSocket tmp = null;
+            try {
+                tmp = bluetoothDevice.createRfcommSocketToServiceRecord(uuid);
+                Log.d(TAG, "SOCKET CREATED:" + tmp.toString());
+            } catch (IOException e) {
+                SendBroadcast(99,"SOCKET CREATION FAILED, STOPPING SERVICE");
+                Log.e(TAG, "SOCKET CREATION FAILED, STOPPING SERVICE");
+                stopSelf();
 
-                }
-                bluetoothSocket = tmp;
+            }
+            bluetoothSocket = tmp;
 
-                bluetoothAdapter.cancelDiscovery(); // Cancelling discovery as it may slow down connection
-                Log.d("Thread", "Try connecting to " + deviceName);
+            bluetoothAdapter.cancelDiscovery(); // Cancelling discovery as it may slow down connection
+            Log.d("Thread", "Try connecting to " + deviceName);
 
-                //Proceed with any task
+            //Proceed with any task
 //                BluetoothCommunication(bluetoothSocket, ThreadContext);
-                try {
-                    SendBroadcast(0,"CONNECTING TO: " + deviceName);
-                    bluetoothSocket.connect();
-                    mConnectedThread = new ConnectedThread(bluetoothSocket);
+            try {
+                SendBroadcast(0,"CONNECTING TO: " + deviceName);
+                bluetoothSocket.connect();
+                mConnectedThread = new ConnectedThread(bluetoothSocket);
 //                    Log.d("Thread", "mConnectedThread IS CREATED ");
-                    mConnectedThread.start();
-                } catch (IOException e) {
-                    SendBroadcast(0,"FAILED CONNECTING TO:" + deviceName);
-                    try {
-                        bluetoothSocket.close();
-                        Log.e("Thread", "SOCKET CONNECTION FAILED, STOPPING SERVICE");
-                        Log.e("Thread", e.toString());
-                        stopSelf();
-                    } catch (IOException e2) {
-                        Log.e("Thread", "SOCKET CLOSING FAILED, STOPPING SERVICE:");
-                        Log.e("Thread",  e2.toString());
-                        stopSelf();
-                    }
-                } catch (IllegalStateException e) {
+                mConnectedThread.start();
+            } catch (IOException e) {
+                SendBroadcast(99,"FAILED CONNECTING TO:" + deviceName);
+                try {
+                    bluetoothSocket.close();
+                    Log.e("Thread", "SOCKET CONNECTION FAILED, STOPPING SERVICE");
+                    Log.e("Thread", e.toString());
+                    stopSelf();
+                } catch (IOException e2) {
+                    Log.e("Thread", "SOCKET CLOSING FAILED, STOPPING SERVICE:");
+                    Log.e("Thread",  e2.toString());
+                    stopSelf();
+                }
+            } catch (IllegalStateException e) {
                 Log.e("Thread", "CONNECTED THREAD START FAILED, STOPPING SERVICE");
                 Log.e("Thread", e.toString());
                 stopSelf();
@@ -199,9 +207,12 @@ public class Bluetooth extends Service {
     }
 
     // New Class for Connected Thread == BluetoothConnection();
-    private class ConnectedThread extends Thread {
+     private class ConnectedThread extends Thread {
         private final InputStream inputStream;
         private final OutputStream outputStream;
+        private boolean stopThread = false;
+        private boolean pauseThread = false;
+        private final Object pauseLock = new Object();
         //creation of the connect thread
         public ConnectedThread(BluetoothSocket bluetoothSocket) {
             InputStream tmpIn = null;
@@ -223,15 +234,29 @@ public class Bluetooth extends Service {
         public void run() {
             Log.i("Thread", "START RECEIVING");
             byte[] buffer = new byte[1024];
-            // Keep looping to listen for received messages
-            while (!stopThread) {
+
+            while (true) {
+                synchronized (pauseLock) {
+                    while (pauseThread) {
+                        try {
+                            Log.d("Thread", "Thread pause");
+                            pauseLock.wait();
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                            Log.e("Thread", "Thread interrupted", e);
+                        }
+                    }
+                    if (stopThread) {
+                        break;
+                    }
+                }
+
                 try {
                     int length = inputStream.read(buffer);
                     String message = new String(buffer, 0, length);
-                    if (!message.trim().isEmpty()) {  //To skip any empty message
-                            Log.i("Thread", "receive:" + message);
-//                        categorizeMessage(message);
-//                        SendBroadcast(MainActivity.VIEW_INPUT, m);
+                    if (!message.trim().isEmpty()) {
+//                        Log.i("STREAM", "receive:" + message);
+                        SendBroadcast(0, message);
                     }
                 } catch (IOException e) {
                     Log.e("Thread", e.toString());
@@ -240,6 +265,39 @@ public class Bluetooth extends Service {
                     stopSelf();
                     break;
                 }
+            }
+        }
+
+        public void stopThread() {
+            synchronized (pauseLock) {
+                stopThread = true;
+                pauseThread = false;
+                pauseLock.notifyAll();
+            }
+        }
+
+        public void pauseThread() {
+            synchronized (pauseLock) {
+                pauseThread = true;
+                SendBroadcast(0, "Pause receiving from ESP32");
+            }
+        }
+
+        public void resumeThread() {
+            synchronized (pauseLock) {
+                pauseThread = false;
+                // Drain the InputStream
+                byte[] buffer = new byte[1024];
+                try {
+                    while (inputStream.available() > 0) {
+                        int length = inputStream.read(buffer);
+                        // Optionally, log or handle the discarded data here
+                    }
+                } catch (IOException e) {
+                    Log.e("Thread", "Failed to drain InputStream", e);
+                }
+                pauseLock.notifyAll();
+                SendBroadcast(0, "Resume receiving from ESP32");
             }
         }
 
@@ -255,7 +313,25 @@ public class Bluetooth extends Service {
             }
         }
     }
+    public void pauseConnectedThread() {
+        if (mConnectedThread != null) {
+            mConnectedThread.pauseThread();
+            Log.i(TAG, "pauseConnectedThread() is called");
+        }
+    }
 
+    public void resumeConnectedThread() {
+        if (mConnectedThread != null) {
+            mConnectedThread.resumeThread();
+            Log.i(TAG, "resumeConnectedThread() is called");
+        }
+    }
+
+    public void stopConnectedThread() {
+        if (mConnectedThread != null) {
+            mConnectedThread.stopThread();
+        }
+    }
     private void SendBroadcast(int VIEW, String message) {
         // IntentをブロードキャストすることでMainActivityへデータを送信
         Intent intent = new Intent();
@@ -263,6 +339,168 @@ public class Bluetooth extends Service {
         intent.putExtra("VIEW", VIEW);
         intent.putExtra("message", message);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
+    private void SendBroadcastInt(int VIEW, int message) {
+        // IntentをブロードキャストすることでMainActivityへデータを送信
+        Intent intent = new Intent();
+        intent.setAction("BLUETOOTH");  //Set code as BLUETOOTH for the receiver to know where the information is from
+        intent.putExtra("VIEW", VIEW);
+        intent.putExtra("message", message);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
+    private void SendBroadcastArray(int VIEW, int[] message) {
+        // IntentをブロードキャストすることでMainActivityへデータを送信
+        Intent intent = new Intent();
+        intent.setAction("BLUETOOTH");  //Set code as BLUETOOTH for the receiver to know where the information is from
+        intent.putExtra("VIEW", VIEW);
+        intent.putExtra("message", message);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
+
+    //A/<low system voltage>/<high system voltage>/<motor temp[0]>x<motor temp[1]>x<motor temp[2]>x<motor temp[3]>/<inv temp>/A
+    private void dataA(String datasetA){
+        //Can be replaced by actual data
+//        String dataA = datasetA;
+//        String dataA = "A/150/300/10x20x30x40/60/A";
+
+        //Split the string by "/"
+        String[] partA = datasetA.split("/");
+        if (partA.length != 6) {
+            throw new IllegalArgumentException("DataA format Error");
+        }
+
+        //Extract values
+        String startA = partA[0];
+
+        //For Low System Voltage
+        int lowSystemVoltage = Integer.parseInt(partA[1]);
+
+        // For High System Voltage
+        int highSystemVoltage = Integer.parseInt(partA[2]);
+
+        //For Motor Temperature
+        //Split motor temperature by "x" for motor temperature
+        String[] motorTemps = partA[3].split("x");
+        if (motorTemps.length != 4){
+            throw new IllegalArgumentException("Motor Temperature length error");
+        }
+        int[] motorTemperature = new int[4];
+        //Convert string in motorTemps into int type
+        for (int i =0; i < motorTemps.length; i++){
+            motorTemperature[i] = Integer.parseInt(motorTemps[i]);
+        }
+
+        //For Inverter Temperature
+        int inverterTemperature = Integer.parseInt(partA[4]);
+
+        //Output the values (Can be replaced by Broadcast)
+        System.out.println("DataGroup: " + startA);
+//        System.out.println("Low System Voltage: " + lowSystemVoltage + " V");
+        SendBroadcastInt(MainActivity.VIEW_LV, lowSystemVoltage);
+//        System.out.println("High System Voltage: " + highSystemVoltage + " V");
+        SendBroadcastInt(MainActivity.VIEW_LV, highSystemVoltage);
+//        System.out.println("Motor Temperatures: " + motorTemperature[0] + "°C, " + motorTemperature[1] + "°C, " + motorTemperature[2] + "°C, " + motorTemperature[3] + "°C");
+        SendBroadcastArray(MainActivity.VIEW_MT, motorTemperature);
+//        System.out.println("Inverter Temperature: " + inverterTemperature + "°C");
+        SendBroadcastInt(MainActivity.VIEW_INV, inverterTemperature);
+    }
+
+    //B/<RTD[0]>x<RTD[1]>x<RTD[2]>x<RTD[3]>/<vcm info>/<velocity>/<torque [0]>x<torque [1]>x<torque [2]>x<torque [3]>/B
+    private void dataB(String datasetB){
+        //Can be replaced by actual data
+        //String dataB = datasetB
+//        String dataB = "B/10x20x30x40/100/50/200x300x400x500/B";
+
+        //Split the string by "/"
+        String[] partB = datasetB.split("/");
+        if (partB.length != 6) {
+            throw new IllegalArgumentException("DataB format Error");
+        }
+
+        //Extract values
+        String startB = partB[0];
+
+        //For RTD
+        //Split RTD value by "x"
+        String[] originalRTD = partB[1].split("x");
+        if (originalRTD.length != 4) {
+            throw new IllegalArgumentException("RTD data Length error");
+        }
+        int[] RTD = new int[4];
+        //Convert to the integer type
+        for (int i =0; i < originalRTD.length; i++ ){
+            RTD[i] = Integer.parseInt(originalRTD[i]);
+        }
+
+        //For VCM
+        String VCMInfo = partB[2];
+
+        //For velocity
+        int Velocity = Integer.parseInt(partB[3]);
+
+        //For Torque
+        //Split Torque by "x"
+        String[] originalTorque = partB[4].split("x");
+        if (originalTorque.length != 4) {
+            throw new IllegalArgumentException("Torque data length error");
+        }
+        int[] Torque = new int[4];
+        //Convert to Integer
+        for (int i =0; i < originalTorque.length; i++){
+            Torque[i] = Integer.parseInt(originalTorque[i]);
+        }
+
+        //Output the values (Can be replaced by Broadcast)
+        System.out.println("DataGroup: " + startB);
+//        System.out.println("RTD: " + RTD[0] + " ?" + RTD[1] + " ?" + RTD[2] + " ?" + RTD[3] + " ?");
+        SendBroadcastArray(MainActivity.VIEW_RTD, RTD);
+//        System.out.println("VCM Info: " + VCMInfo + " !");
+        SendBroadcast(MainActivity.VIEW_VCMINFO, VCMInfo);
+//        System.out.println("Velocity: " + Velocity + "m/s?");
+        SendBroadcastInt(MainActivity.VIEW_VELO, Velocity);
+//        System.out.println("Torque: " + Torque[0] + "N.m, " + Torque[1] + "N.m, " + Torque[2] + "N.m, " + Torque[3] + "N.m");
+        SendBroadcastArray(MainActivity.VIEW_TORQ, Torque);
+    }
+
+    //C/<AMS>/<BSPD>/<IMD>/<TC>/<ABS>/<VDC>/<80kW>/C
+    private void dataC(String datasetC){
+        //Can be replaced by actual data
+        //String dataC = datasetC
+//        String dataC = "C/10/20/30/40/50/60/80kW/C";
+
+        //Split by "/"
+        String[] partC = datasetC.split("/");
+        if (partC.length != 9) {
+            throw new IllegalArgumentException("DataC format Error");
+        }
+
+        //Extract Values
+        String startC = partC[0];
+        //For AMS
+        int AMS = Integer.parseInt(partC[1]);
+        //For BSPD
+        int BSPD = Integer.parseInt(partC[2]);
+        //For IMD
+        int IMD = Integer.parseInt(partC[3]);
+        //For TC
+        int TC = Integer.parseInt(partC[4]);
+        //For ABS
+        int ABS = Integer.parseInt(partC[5]);
+        //For VDC
+        int VDC = Integer.parseInt(partC[6]);
+        //For a fixed 80kW
+        int fixed80 = Integer.parseInt(partC[7]);
+
+        //Output the values (Can be replaced by Broadcast)
+        System.out.println("DataGroup: " + startC);
+        System.out.println("AMS: " + AMS + " ?");
+        System.out.println("BSPD: " + BSPD + " !");
+        System.out.println("IMD: " + IMD + " #");
+        System.out.println("TC: " + TC + " &");
+        System.out.println("ABS: " + ABS + " %");
+        System.out.println("VDC: " + VDC + " $");
+        System.out.println(": " + fixed80 + " kW");
+
     }
 
 //    private void categorizeMessage(String message){
@@ -504,5 +742,6 @@ public class Bluetooth extends Service {
             return "";
         }
     }
+
 
 }
