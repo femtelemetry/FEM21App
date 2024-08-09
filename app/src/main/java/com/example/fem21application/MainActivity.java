@@ -440,7 +440,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         Log.d(TAG, "MainActivity is onResume()");
-        LocalBroadcastManager.getInstance(this).registerReceiver(bReceiver, new IntentFilter("BLUETOOTH"));
+        //LocalBroadcastManager.getInstance(this).registerReceiver(bReceiver, new IntentFilter("BLUETOOTH"));
+
+        // Register the global receiver for Bluetooth broadcasts
+        getApplicationContext().registerReceiver(bReceiver, new IntentFilter("BLUETOOTH"), Context.RECEIVER_NOT_EXPORTED);
+
+        // Register local receivers for other intents
         LocalBroadcastManager.getInstance(this).registerReceiver(permissionReceiver, new IntentFilter("PERMISSION_REQUEST"));
         LocalBroadcastManager.getInstance(this).registerReceiver(fReceiver, new IntentFilter("FIREBASE"));
         LocalBroadcastManager.getInstance(this).registerReceiver(rReceiver, new IntentFilter("random"));
@@ -451,6 +456,7 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
         Log.d(TAG, "MainActivity is onPause()");
         LocalBroadcastManager.getInstance(this).unregisterReceiver(rReceiver);
+        getApplicationContext().unregisterReceiver(bReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(bReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(permissionReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(fReceiver);
