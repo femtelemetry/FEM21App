@@ -7,6 +7,10 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.ClipDrawable;
+import android.graphics.drawable.LayerDrawable;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.RectShape;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -14,6 +18,7 @@ import android.util.Log;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -197,7 +202,7 @@ public class MainActivity extends AppCompatActivity {
         //For Firebase analytics
         FirebaseAnalytics mFirebaseAnalytics = FirebaseAnalytics.getInstance(this); //Google Analytics (Firebase) for logging specific events
 
-        setContentView(R.layout.activity_main); //sets the initial layout to "activity_main.xml"
+        setContentView(R.layout.main_disp_temp); //sets the initial layout to "activity_main.xml"
 //        Firebase firebase = new Firebase();
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON); //keeps screen on
 
@@ -408,8 +413,57 @@ public class MainActivity extends AppCompatActivity {
         });
 
          */
+        ProgressBar progressBar = findViewById(R.id.bttBar);
+        progressBar.setProgress(60); // Set initial progress
+
+        updateProgressBarColor(progressBar);
     }
 
+    private void updateProgressBarColor(ProgressBar progressBar) {
+        int progress = progressBar.getProgress();
+
+        int startColor;
+        int endColor;
+        float fraction;
+
+        if (progress >= 50) {
+            startColor = 0xFFFFFF00; // Yellow
+            endColor = 0xFF00FF00;   // Green
+            fraction = (progress - 50) / 50f; // Fraction between 50% and 100%
+        } else {
+            startColor = 0xFFFF0000; // Red
+            endColor = 0xFFFFFF00;   // Yellow
+            fraction = progress / 50f; // Fraction between 0% and 50%
+        }
+
+        int color = interpolateColor(startColor, endColor, fraction);
+
+        LayerDrawable drawable = (LayerDrawable) progressBar.getProgressDrawable();
+        ClipDrawable progressDrawable = (ClipDrawable) drawable.findDrawableByLayerId(android.R.id.progress);
+
+        // Create a new ShapeDrawable with the chosen color
+        ShapeDrawable shape = new ShapeDrawable(new RectShape());
+        shape.getPaint().setColor(color);
+
+        // Set the new ShapeDrawable as the progress drawable
+        progressDrawable.setDrawable(shape);
+    }
+
+    private int interpolateColor(int startColor, int endColor, float fraction) {
+        int startRed = (startColor >> 16) & 0xFF;
+        int startGreen = (startColor >> 8) & 0xFF;
+        int startBlue = startColor & 0xFF;
+
+        int endRed = (endColor >> 16) & 0xFF;
+        int endGreen = (endColor >> 8) & 0xFF;
+        int endBlue = endColor & 0xFF;
+
+        int red = (int) (startRed + (endRed - startRed) * fraction);
+        int green = (int) (startGreen + (endGreen - startGreen) * fraction);
+        int blue = (int) (startBlue + (endBlue - startBlue) * fraction);
+
+        return 0xFF000000 | (red << 16) | (green << 8) | blue;
+    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
