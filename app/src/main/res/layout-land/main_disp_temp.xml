@@ -150,90 +150,823 @@
         app:layout_constraintTop_toBottomOf="@+id/textBox" />
 
 
-
-
-
-    <ProgressBar
-        android:id="@+id/bttBar"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        style="@android:style/Widget.ProgressBar.Horizontal"
-        android:progressDrawable="@drawable/custom_batterybar"
-        android:max="100"
-        android:progress="50"
-        app:layout_constraintTop_toTopOf="parent"/>
-
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="5dp"
-        app:layout_constraintBottom_toBottomOf="@id/bttBar"
-        android:background="@drawable/custom_solid"
-        />
-
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/centerCell"
-        android:layout_width="250dp"
-        android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@id/bttBar"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        android:gravity="center_horizontal">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/black">
+
+        <ProgressBar
+            android:id="@+id/bttBar"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            style="@android:style/Widget.ProgressBar.Horizontal"
+            android:progressDrawable="@drawable/custom_batterybar"
+            android:max="100"
+            android:progress="50"
+            app:layout_constraintTop_toTopOf="parent"/>
 
         <ImageView
-            android:id="@+id/hvSymbol"
+            android:id="@+id/bttIcon"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:background="@drawable/battery_white"
+            android:rotation="180"
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_marginRight="14dp"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="---"
+            android:fontFamily="@font/technology"
+            android:textSize="25sp"
+            app:layout_constraintRight_toRightOf="@id/bttIcon"
+            app:layout_constraintTop_toTopOf="@id/bttIcon"
+            app:layout_constraintBottom_toBottomOf="@id/bttIcon"
+            android:layout_marginRight="10dp"/>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="5dp"
+            app:layout_constraintBottom_toBottomOf="@id/bttBar"
+            android:background="@drawable/custom_white_solid"
+            />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/centerCell"
+            android:layout_width="250dp"
+            android:layout_height="0dp"
+            app:layout_constraintTop_toBottomOf="@id/bttBar"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:layout_marginTop="20dp"
-            android:background="@drawable/hv"
-            />
+            android:gravity="center_horizontal">
 
-        <TextView
-            android:id="@+id/ignitionTitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="火入れ"
-            android:textSize="50dp"
-            android:textAlignment="center"
-            app:layout_constraintTop_toBottomOf="@id/hvSymbol"
-            />
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/ignitionPhase"
+                android:visibility="gone">
 
-        <TextView
-            android:id="@+id/fieldVCMInfo"
-            android:layout_width="match_parent"
+                <ImageView
+                    android:id="@+id/hvSymbol"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:layout_marginTop="20dp"
+                    android:background="@drawable/hv" />
+
+                <TextView
+                    android:id="@+id/ignitionTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="火入れ"
+                    android:textSize="50dp"
+                    android:textAlignment="center"
+                    app:layout_constraintTop_toBottomOf="@id/hvSymbol" />
+
+                <TextView
+                    android:id="@+id/fieldVCMInfo"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:text="VCMInfo"
+                    android:textSize="20dp"
+                    android:gravity="center"
+                    app:layout_constraintTop_toBottomOf="@id/ignitionTitle"
+                    app:layout_constraintBottom_toBottomOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/drivingPhase"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/veloText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="30dp"
+                    android:layout_marginBottom="70dp"
+                    android:background="@color/dark_grey"
+                    android:fontFamily="@font/technology"
+                    android:text="142"
+                    android:textAlignment="center"
+                    android:textSize="100sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    tools:layout_editor_absoluteX="30dp" />
+
+                <TextView
+                    android:id="@+id/veloTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="VELO"
+                    android:textStyle="bold"
+                    android:textSize="20sp"
+                    android:textAlignment="center"
+                    app:layout_constraintBottom_toTopOf="@id/veloText"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"/>
+
+                <ImageView
+                    android:id="@+id/driverSignal"
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    android:layout_marginTop="10dp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    android:background="@color/dark_grey"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/errorPhase"
+                android:background="@color/red"
+                android:layout_marginHorizontal="20dp">
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <RelativeLayout
+            android:id="@+id/leftCell"
+            android:layout_width="0dp"
             android:layout_height="0dp"
-            android:text="VCMInfo"
-            android:textSize="20dp"
-            android:gravity="center"
-            app:layout_constraintTop_toBottomOf="@id/ignitionTitle"
+            app:layout_constraintTop_toBottomOf="@id/bttBar"
             app:layout_constraintBottom_toBottomOf="parent"
-            />
+            app:layout_constraintEnd_toStartOf="@id/centerCell"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <ProgressBar
+                android:id="@+id/brakeProgressBar"
+                style="@android:style/Widget.ProgressBar.Horizontal"
+                android:layout_width="22dp"
+                android:layout_height="match_parent"
+                android:max="100"
+                android:progress="0"
+                android:progressDrawable="@drawable/brake_vertical_progress_bar"
+                android:layout_alignParentStart="true"/>
+
+            <ImageView
+                android:layout_width="5dp"
+                android:layout_height="match_parent"
+                android:layout_toRightOf="@id/brakeProgressBar"
+                android:background="@drawable/custom_white_solid"
+                />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/lcStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="100dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true">
+
+                <ImageView
+                    android:id="@+id/amsIndicator"
+                    android:layout_width="30dp"
+                    android:layout_height="8dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    android:background="@color/dead_grey"
+                    />
+
+                <TextView
+                    android:id="@+id/amsLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    app:layout_constraintLeft_toLeftOf="@id/amsIndicator"
+                    app:layout_constraintRight_toRightOf="@id/amsIndicator"
+                    app:layout_constraintBottom_toTopOf="@id/amsIndicator"
+                    android:text="AMS"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:rotation="270"
+                    android:textColor="@color/dead_grey" />
+
+                <ImageView
+                    android:id="@+id/bspdIndicator"
+                    android:layout_width="30dp"
+                    android:layout_height="8dp"
+                    app:layout_constraintBottom_toBottomOf="@id/amsIndicator"
+                    app:layout_constraintLeft_toRightOf="@id/amsIndicator"
+                    android:background="@color/dead_grey"
+                    android:layout_marginStart="13dp"
+                    />
+
+                <TextView
+                    android:id="@+id/bspdLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="15dp"
+                    app:layout_constraintLeft_toLeftOf="@id/bspdIndicator"
+                    app:layout_constraintRight_toRightOf="@id/bspdIndicator"
+                    app:layout_constraintBottom_toTopOf="@id/bspdIndicator"
+                    android:text="BSPD"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:rotation="270"
+                    android:textColor="@color/dead_grey"/>
+
+                <ImageView
+                    android:id="@+id/imdIndicator"
+                    android:layout_width="30dp"
+                    android:layout_height="8dp"
+                    app:layout_constraintBottom_toBottomOf="@id/bspdIndicator"
+                    app:layout_constraintLeft_toRightOf="@id/bspdIndicator"
+                    android:background="@color/dead_grey"
+                    android:layout_marginStart="13dp"
+                    />
+
+                <TextView
+                    android:id="@+id/imdLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    app:layout_constraintLeft_toLeftOf="@id/imdIndicator"
+                    app:layout_constraintRight_toRightOf="@id/imdIndicator"
+                    app:layout_constraintBottom_toTopOf="@id/imdIndicator"
+                    android:text="IMD"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:rotation="270"
+                    android:textColor="@color/dead_grey"/>
+
+                <ImageView
+                    android:id="@+id/lvIndicator"
+                    android:layout_width="30dp"
+                    android:layout_height="8dp"
+                    app:layout_constraintBottom_toBottomOf="@id/imdIndicator"
+                    app:layout_constraintLeft_toRightOf="@id/imdIndicator"
+                    android:background="@color/dead_grey"
+                    android:layout_marginStart="13dp"
+                    />
+
+                <TextView
+                    android:id="@+id/lvLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5dp"
+                    app:layout_constraintLeft_toLeftOf="@id/lvIndicator"
+                    app:layout_constraintRight_toRightOf="@id/lvIndicator"
+                    app:layout_constraintBottom_toTopOf="@id/lvIndicator"
+                    android:text="LV"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:rotation="270"
+                    android:textColor="@color/dead_grey"/>
+
+                <ImageView
+                    android:id="@+id/hvIndicator"
+                    android:layout_width="30dp"
+                    android:layout_height="8dp"
+                    app:layout_constraintBottom_toBottomOf="@id/lvIndicator"
+                    app:layout_constraintLeft_toRightOf="@id/lvIndicator"
+                    android:background="@color/dead_grey"
+                    android:layout_marginStart="13dp"
+                    />
+
+                <TextView
+                    android:id="@+id/hvLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5dp"
+                    app:layout_constraintLeft_toLeftOf="@id/hvIndicator"
+                    app:layout_constraintRight_toRightOf="@id/hvIndicator"
+                    app:layout_constraintBottom_toTopOf="@id/hvIndicator"
+                    android:text="HV"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:rotation="270"
+                    android:textColor="@color/dead_grey"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/leftGrid"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_alignParentRight="true"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/invTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="INVTemp"
+                    android:textStyle="bold"
+                    android:textSize="20sp"
+                    android:textAlignment="center"
+                    app:layout_constraintTop_toTopOf="parent"/>
+
+                <ImageView
+                    android:id="@+id/invFL"
+                    android:layout_width="92dp"
+                    android:layout_height="80dp"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/invTitle"
+                    android:background="@color/dead_grey"/>
+
+                <TextView
+                    android:id="@+id/invFLtext"
+                    android:layout_width="70dp"
+                    android:layout_height="58dp"
+                    app:layout_constraintLeft_toLeftOf="@id/invFL"
+                    app:layout_constraintRight_toRightOf="@id/invFL"
+                    app:layout_constraintTop_toTopOf="@id/invFL"
+                    app:layout_constraintBottom_toBottomOf="@id/invFL"
+                    android:background="@color/black"
+                    android:text="--"
+                    android:textSize="65dp"
+                    android:gravity="center"
+                    android:fontFamily="@font/technology"/>
+
+                <ImageView
+                    android:id="@+id/invFR"
+                    android:layout_width="92dp"
+                    android:layout_height="80dp"
+                    app:layout_constraintTop_toTopOf="@id/invFL"
+                    app:layout_constraintLeft_toRightOf="@id/invFL"
+                    android:layout_marginStart="15dp"
+                    android:background="@color/dead_grey"/>
+
+                <TextView
+                    android:id="@+id/invFRtext"
+                    android:layout_width="70dp"
+                    android:layout_height="58dp"
+                    app:layout_constraintLeft_toLeftOf="@id/invFR"
+                    app:layout_constraintRight_toRightOf="@id/invFR"
+                    app:layout_constraintTop_toTopOf="@id/invFR"
+                    app:layout_constraintBottom_toBottomOf="@id/invFR"
+                    android:background="@color/black"
+                    android:text="--"
+                    android:textSize="65dp"
+                    android:gravity="center"
+                    android:fontFamily="@font/technology"/>
+
+                <ImageView
+                    android:id="@+id/invRL"
+                    android:layout_width="92dp"
+                    android:layout_height="80dp"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/invFL"
+                    android:layout_marginTop="15dp"
+                    android:background="@color/dead_grey"/>
+
+                <TextView
+                    android:id="@+id/invRLtext"
+                    android:layout_width="70dp"
+                    android:layout_height="58dp"
+                    app:layout_constraintLeft_toLeftOf="@id/invRL"
+                    app:layout_constraintRight_toRightOf="@id/invRL"
+                    app:layout_constraintTop_toTopOf="@id/invRL"
+                    app:layout_constraintBottom_toBottomOf="@id/invRL"
+                    android:background="@color/black"
+                    android:text="--"
+                    android:textSize="65dp"
+                    android:gravity="center"
+                    android:fontFamily="@font/technology"/>
+
+                <ImageView
+                    android:id="@+id/invRR"
+                    android:layout_width="92dp"
+                    android:layout_height="80dp"
+                    app:layout_constraintLeft_toLeftOf="@id/invFR"
+                    app:layout_constraintTop_toBottomOf="@id/invFR"
+                    android:layout_marginTop="15dp"
+                    android:background="@color/dead_grey"/>
+
+                <TextView
+                    android:id="@+id/invRRtext"
+                    android:layout_width="70dp"
+                    android:layout_height="58dp"
+                    app:layout_constraintLeft_toLeftOf="@id/invRR"
+                    app:layout_constraintRight_toRightOf="@id/invRR"
+                    app:layout_constraintTop_toTopOf="@id/invRR"
+                    app:layout_constraintBottom_toBottomOf="@id/invRR"
+                    android:background="@color/black"
+                    android:text="--"
+                    android:textSize="65dp"
+                    android:gravity="center"
+                    android:fontFamily="@font/technology"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/leftData"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_alignParentRight="true">
+
+                <TextView
+                    android:id="@+id/bttTitle"
+                    android:layout_width="199dp"
+                    android:layout_height="wrap_content"
+                    android:text="Battery Data"
+                    android:textStyle="bold"
+                    android:textSize="20sp"
+                    android:textAlignment="center"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"/>
+
+                <TextView
+                    android:id="@+id/hvDataLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/bttTitle"
+                    android:layout_marginTop="15dp"
+                    android:text="HV Max\nTemp"
+                    android:paddingVertical="8dp"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:rotation="270" />
+
+                <ImageView
+                    android:id="@+id/hvDataLine"
+                    android:layout_width="8dp"
+                    android:layout_height="80dp"
+                    app:layout_constraintRight_toLeftOf="@id/hvDataLabel"
+                    app:layout_constraintTop_toTopOf="@id/hvDataLabel"
+                    app:layout_constraintBottom_toBottomOf="@id/hvDataLabel"
+                    android:background="@color/good_green"/>
+
+                <TextView
+                    android:id="@+id/hvData"
+                    android:layout_width="wrap_content"
+                    android:layout_height="58dp"
+                    app:layout_constraintRight_toLeftOf="@id/hvDataLine"
+                    app:layout_constraintTop_toTopOf="@id/hvDataLine"
+                    app:layout_constraintBottom_toBottomOf="@id/hvDataLine"
+                    android:layout_marginRight="20dp"
+                    android:text="--.-"
+                    android:textSize="65dp"
+                    android:fontFamily="@font/technology"/>
+
+                <TextView
+                    android:id="@+id/lvDataLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintLeft_toLeftOf="@id/hvDataLabel"
+                    app:layout_constraintTop_toBottomOf="@id/hvDataLabel"
+                    android:layout_marginTop="45dp"
+                    android:layout_marginLeft="10dp"
+                    android:text="LV"
+                    android:paddingVertical="8dp"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:rotation="270" />
+
+                <ImageView
+                    android:id="@+id/lvDataLine"
+                    android:layout_width="8dp"
+                    android:layout_height="80dp"
+                    app:layout_constraintRight_toLeftOf="@id/hvDataLabel"
+                    app:layout_constraintTop_toTopOf="@id/lvDataLabel"
+                    app:layout_constraintBottom_toBottomOf="@id/lvDataLabel"
+                    android:background="@color/good_green"/>
+
+                <TextView
+                    android:id="@+id/lvData"
+                    android:layout_width="wrap_content"
+                    android:layout_height="58dp"
+                    app:layout_constraintRight_toLeftOf="@id/lvDataLine"
+                    app:layout_constraintTop_toTopOf="@id/lvDataLine"
+                    app:layout_constraintBottom_toBottomOf="@id/lvDataLine"
+                    android:layout_marginRight="20dp"
+                    android:text="--.-"
+                    android:textSize="65dp"
+                    android:fontFamily="@font/technology"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/rightCell"
+            android:layout_width="250dp"
+            android:layout_height="0dp"
+            app:layout_constraintTop_toBottomOf="@id/bttBar"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/centerCell"
+            android:paddingEnd="14dp">
+
+            <ProgressBar
+                android:id="@+id/accelProgressBar"
+                style="@android:style/Widget.ProgressBar.Horizontal"
+                android:layout_width="22dp"
+                android:layout_height="match_parent"
+                android:max="100"
+                android:progress="0"
+                android:progressDrawable="@drawable/accel_vertical_progress_bar"
+                android:layout_alignParentEnd="true"/>
+
+            <ImageView
+                android:layout_width="5dp"
+                android:layout_height="match_parent"
+                android:layout_toLeftOf="@id/accelProgressBar"
+                android:background="@drawable/custom_white_solid"
+                />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/rcStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="100dp"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentBottom="true">
+
+                <ImageView
+                    android:id="@+id/appsIndicator"
+                    android:layout_width="30dp"
+                    android:layout_height="8dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    android:background="@color/dead_grey"
+                    />
+
+                <TextView
+                    android:id="@+id/appsLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="15dp"
+                    app:layout_constraintLeft_toLeftOf="@id/appsIndicator"
+                    app:layout_constraintRight_toRightOf="@id/appsIndicator"
+                    app:layout_constraintBottom_toTopOf="@id/appsIndicator"
+                    android:text="APPS"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:rotation="270"
+                    android:textColor="@color/dead_grey"/>
+
+                <ImageView
+                    android:id="@+id/tcIndicator"
+                    android:layout_width="30dp"
+                    android:layout_height="8dp"
+                    app:layout_constraintBottom_toBottomOf="@id/appsIndicator"
+                    app:layout_constraintLeft_toRightOf="@id/appsIndicator"
+                    android:background="@color/dead_grey"
+                    android:layout_marginStart="13dp"
+                    />
+
+                <TextView
+                    android:id="@+id/tcLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5dp"
+                    app:layout_constraintLeft_toLeftOf="@id/tcIndicator"
+                    app:layout_constraintRight_toRightOf="@id/tcIndicator"
+                    app:layout_constraintBottom_toTopOf="@id/tcIndicator"
+                    android:text="TC"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:rotation="270"
+                    android:textColor="@color/dead_grey"/>
+
+                <ImageView
+                    android:id="@+id/absIndicator"
+                    android:layout_width="30dp"
+                    android:layout_height="8dp"
+                    app:layout_constraintBottom_toBottomOf="@id/tcIndicator"
+                    app:layout_constraintLeft_toRightOf="@id/tcIndicator"
+                    android:background="@color/dead_grey"
+                    android:layout_marginStart="13dp"
+                    />
+
+                <TextView
+                    android:id="@+id/absLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    app:layout_constraintLeft_toLeftOf="@id/absIndicator"
+                    app:layout_constraintRight_toRightOf="@id/absIndicator"
+                    app:layout_constraintBottom_toTopOf="@id/absIndicator"
+                    android:text="ABS"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:rotation="270"
+                    android:textColor="@color/dead_grey"/>
+
+                <ImageView
+                    android:id="@+id/vdcIndicator"
+                    android:layout_width="30dp"
+                    android:layout_height="8dp"
+                    app:layout_constraintBottom_toBottomOf="@id/absIndicator"
+                    app:layout_constraintLeft_toRightOf="@id/absIndicator"
+                    android:background="@color/dead_grey"
+                    android:layout_marginStart="13dp"
+                    />
+
+                <TextView
+                    android:id="@+id/vdcLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    app:layout_constraintLeft_toLeftOf="@id/vdcIndicator"
+                    app:layout_constraintRight_toRightOf="@id/vdcIndicator"
+                    app:layout_constraintBottom_toTopOf="@id/vdcIndicator"
+                    android:text="VDC"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:rotation="270"
+                    android:textColor="@color/dead_grey"/>
+
+                <ImageView
+                    android:id="@+id/energylimitIndicator"
+                    android:layout_width="30dp"
+                    android:layout_height="8dp"
+                    app:layout_constraintBottom_toBottomOf="@id/vdcIndicator"
+                    app:layout_constraintLeft_toRightOf="@id/vdcIndicator"
+                    android:background="@color/dead_grey"
+                    android:layout_marginStart="13dp"
+                    />
+
+                <TextView
+                    android:id="@+id/energylimitLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="15dp"
+                    app:layout_constraintLeft_toLeftOf="@id/energylimitIndicator"
+                    app:layout_constraintRight_toRightOf="@id/energylimitIndicator"
+                    app:layout_constraintBottom_toTopOf="@id/energylimitIndicator"
+                    android:text="80kW"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:rotation="270"
+                    android:textColor="@color/dead_grey"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/rightGrid"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_alignParentLeft="true">
+
+                <TextView
+                    android:id="@+id/rtodTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="RtoD + MtrTemp"
+                    android:textStyle="bold"
+                    android:textSize="20sp"
+                    android:textAlignment="center"
+                    app:layout_constraintTop_toTopOf="parent"/>
+
+                <TextView
+                    android:id="@+id/mtrTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="MtrTemp"
+                    android:textStyle="bold"
+                    android:textSize="20sp"
+                    android:textAlignment="center"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:visibility="invisible"/>
+
+                <ImageView
+                    android:id="@+id/rtodFL"
+                    android:layout_width="92dp"
+                    android:layout_height="80dp"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/rtodTitle"
+                    android:background="@color/dead_grey"/>
+
+                <ImageView
+                    android:id="@+id/mtrFL"
+                    android:layout_width="92dp"
+                    android:layout_height="80dp"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/rtodTitle"
+                    android:background="@color/dead_grey"
+                    android:visibility="invisible"/>
+
+                <TextView
+                    android:id="@+id/mtrFLtext"
+                    android:layout_width="70dp"
+                    android:layout_height="58dp"
+                    app:layout_constraintLeft_toLeftOf="@id/rtodFL"
+                    app:layout_constraintRight_toRightOf="@id/rtodFL"
+                    app:layout_constraintTop_toTopOf="@id/rtodFL"
+                    app:layout_constraintBottom_toBottomOf="@id/rtodFL"
+                    android:background="@color/black"
+                    android:text="--"
+                    android:textSize="65dp"
+                    android:gravity="center"
+                    android:fontFamily="@font/technology"/>
+
+                <ImageView
+                    android:id="@+id/rtodFR"
+                    android:layout_width="92dp"
+                    android:layout_height="80dp"
+                    app:layout_constraintTop_toTopOf="@id/rtodFL"
+                    app:layout_constraintLeft_toRightOf="@id/rtodFL"
+                    android:layout_marginStart="15dp"
+                    android:background="@color/dead_grey"/>
+
+                <ImageView
+                    android:id="@+id/mtrFR"
+                    android:layout_width="92dp"
+                    android:layout_height="80dp"
+                    app:layout_constraintTop_toTopOf="@id/rtodFL"
+                    app:layout_constraintLeft_toRightOf="@id/rtodFL"
+                    android:layout_marginStart="15dp"
+                    android:background="@color/dead_grey"
+                    android:visibility="invisible"/>
+
+                <TextView
+                    android:id="@+id/mtrFRtext"
+                    android:layout_width="70dp"
+                    android:layout_height="58dp"
+                    app:layout_constraintLeft_toLeftOf="@id/rtodFR"
+                    app:layout_constraintRight_toRightOf="@id/rtodFR"
+                    app:layout_constraintTop_toTopOf="@id/rtodFR"
+                    app:layout_constraintBottom_toBottomOf="@id/rtodFR"
+                    android:background="@color/black"
+                    android:text="--"
+                    android:textSize="65dp"
+                    android:gravity="center"
+                    android:fontFamily="@font/technology"/>
+
+                <ImageView
+                    android:id="@+id/rtodRL"
+                    android:layout_width="92dp"
+                    android:layout_height="80dp"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/rtodFL"
+                    android:layout_marginTop="15dp"
+                    android:background="@color/dead_grey"/>
+
+                <ImageView
+                    android:id="@+id/mtrRL"
+                    android:layout_width="92dp"
+                    android:layout_height="80dp"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/rtodFL"
+                    android:layout_marginTop="15dp"
+                    android:background="@color/dead_grey"
+                    android:visibility="invisible"/>
+
+                <TextView
+                    android:id="@+id/mtrRLtext"
+                    android:layout_width="70dp"
+                    android:layout_height="58dp"
+                    app:layout_constraintLeft_toLeftOf="@id/rtodRL"
+                    app:layout_constraintRight_toRightOf="@id/rtodRL"
+                    app:layout_constraintTop_toTopOf="@id/rtodRL"
+                    app:layout_constraintBottom_toBottomOf="@id/rtodRL"
+                    android:background="@color/black"
+                    android:text="--"
+                    android:textSize="65dp"
+                    android:gravity="center"
+                    android:fontFamily="@font/technology"/>
+
+                <ImageView
+                    android:id="@+id/rtodRR"
+                    android:layout_width="92dp"
+                    android:layout_height="80dp"
+                    app:layout_constraintLeft_toLeftOf="@id/rtodFR"
+                    app:layout_constraintTop_toBottomOf="@id/rtodFR"
+                    android:layout_marginTop="15dp"
+                    android:background="@color/dead_grey"/>
+
+                <ImageView
+                    android:id="@+id/mtrRR"
+                    android:layout_width="92dp"
+                    android:layout_height="80dp"
+                    app:layout_constraintLeft_toLeftOf="@id/rtodFR"
+                    app:layout_constraintTop_toBottomOf="@id/rtodFR"
+                    android:layout_marginTop="15dp"
+                    android:background="@color/dead_grey"
+                    android:visibility="invisible"/>
+
+                <TextView
+                    android:id="@+id/mtrRRtext"
+                    android:layout_width="70dp"
+                    android:layout_height="58dp"
+                    app:layout_constraintLeft_toLeftOf="@id/rtodRR"
+                    app:layout_constraintRight_toRightOf="@id/rtodRR"
+                    app:layout_constraintTop_toTopOf="@id/rtodRR"
+                    app:layout_constraintBottom_toBottomOf="@id/rtodRR"
+                    android:background="@color/black"
+                    android:text="--"
+                    android:textSize="65dp"
+                    android:gravity="center"
+                    android:fontFamily="@font/technology"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </RelativeLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <RelativeLayout
-        android:id="@+id/leftCell"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@id/bttBar"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/centerCell"
-        app:layout_constraintStart_toStartOf="parent">
-
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:id="@+id/rightCell"
-        android:layout_width="250dp"
-        android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@id/bttBar"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/centerCell">
-
-    </RelativeLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
