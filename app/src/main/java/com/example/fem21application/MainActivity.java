@@ -1,5 +1,6 @@
 package com.example.fem21application;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -168,6 +169,9 @@ public class MainActivity extends AppCompatActivity {
     static String GlobalMessage;
     static String GlobalTime;
 
+    TextView mLV;
+
+
     TextView ShowTxt, ToDriverTxt;
     Button bluetoothBtn, runButton, RandomButton, submitButton, connectBtn, pauseButton;
     EditText textbox;
@@ -208,6 +212,8 @@ public class MainActivity extends AppCompatActivity {
 
         //To continuously send signal to database to keep connecting to it.
         AtomicReference<ScheduledExecutorService> executor = new AtomicReference<>(Executors.newScheduledThreadPool(1));
+
+        FindID(); //TODO: 8/27
 
 
 //        Firebase firebase = new Firebase();
@@ -413,10 +419,12 @@ public class MainActivity extends AppCompatActivity {
         });
 
          */
-        ProgressBar progressBar = findViewById(R.id.bttBar);
-        progressBar.setProgress(60); // Set initial progress
 
-        updateProgressBarColor(progressBar);
+        //TODO: ProgressBar Code
+        //ProgressBar progressBar = findViewById(R.id.bttBar);
+        //progressBar.setProgress(60); // Set initial progress
+
+        //updateProgressBarColor(progressBar);
     }
 
     private void updateProgressBarColor(ProgressBar progressBar) {
@@ -487,17 +495,17 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, Bluetooth.class);
         bindService(intent, connection, Context.BIND_AUTO_CREATE);
         checkPermission(this);
+        checkPermissionSCAN(this);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
     @Override
     protected void onResume() {
         super.onResume();
         Log.d(TAG, "MainActivity is onResume()");
-        //LocalBroadcastManager.getInstance(this).registerReceiver(bReceiver, new IntentFilter("BLUETOOTH"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(bReceiver, new IntentFilter("BLUETOOTH"));
 
         // Register the global receiver for Bluetooth broadcasts
-        getApplicationContext().registerReceiver(bReceiver, new IntentFilter("BLUETOOTH"), Context.RECEIVER_NOT_EXPORTED);
+        //getApplicationContext().registerReceiver(bReceiver, new IntentFilter("BLUETOOTH"), Context.RECEIVER_NOT_EXPORTED);
 
         // Register local receivers for other intents
         LocalBroadcastManager.getInstance(this).registerReceiver(permissionReceiver, new IntentFilter("PERMISSION_REQUEST"));
@@ -510,7 +518,7 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
         Log.d(TAG, "MainActivity is onPause()");
         LocalBroadcastManager.getInstance(this).unregisterReceiver(rReceiver);
-        getApplicationContext().unregisterReceiver(bReceiver);
+        //getApplicationContext().unregisterReceiver(bReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(bReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(permissionReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(fReceiver);
@@ -558,12 +566,14 @@ public class MainActivity extends AppCompatActivity {
             Log.i("Broadcast", "receive: " + intent.getIntExtra("message", 0));
 //            ShowTxt = findViewById(R.id.InputStream);
 //            ShowTxt.setText(number);
+
         }
     };
     BroadcastReceiver bReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             // このonReceiveでMainServiceからのIntentを受信する。
+
             long nanoTime = System.nanoTime();
             long micros = (nanoTime / 1000000); // Extract microseconds from nanoseconds
             String time = new SimpleDateFormat("HH:mm:ss:" + micros, Locale.getDefault()).format(new Date()); //Use timestamp as keys
@@ -571,11 +581,12 @@ public class MainActivity extends AppCompatActivity {
             int VIEW = intent.getIntExtra("VIEW", 0);
             //ShowMessage(VIEW, message); //受信した文字列を表示 - this shows the received string characters on the screen of the phone
 //            Firebase firebase = new Firebase();
+            //Log.i(TAG, "receive: " + message);
             assert message != null;
             GlobalMessage = message.trim();
             GlobalTime = time;
             ShowTxt.append(time + ":" + GlobalMessage + "\n");
-            Log.i(TAG, "receive: " + GlobalMessage);
+            //Log.i(TAG, "receive: " + GlobalMessage);
 
 //            if (VIEW == 1) {
 //                firebase.realFireStore("LV", time, message);
@@ -624,8 +635,17 @@ public class MainActivity extends AppCompatActivity {
             Log.i("permission", "CONNECT permission is granted already");
         }
     }
+    public void checkPermissionSCAN(Context context){
+        if (ActivityCompat.checkSelfPermission(context, android.Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
+            Log.e("permission", "SCAN permission is not yet granted");
+            ActivityCompat.requestPermissions( MainActivity.this , new String[]{android.Manifest.permission.BLUETOOTH_SCAN}, 100);
+        } else {
+            Log.i("permission", "SCAN permission is granted already");
+        }
+    }
 
     //A/<low system voltage>/<high system voltage>/<motor temp[0]>x<motor temp[1]>x<motor temp[2]>x<motor temp[3]>/<inv temp>/A
+    @SuppressLint("SetTextI18n")
     public void dataA(String datasetA){
         //Can be replaced by actual data
 //        String dataA = datasetA;
@@ -667,9 +687,10 @@ public class MainActivity extends AppCompatActivity {
 //        System.out.println("High System Voltage: " + highSystemVoltage + " V");
 //        System.out.println("Motor Temperatures: " + motorTemperature[0] + "°C, " + motorTemperature[1] + "°C, " + motorTemperature[2] + "°C, " + motorTemperature[3] + "°C");
 //        System.out.println("Inverter Temperature: " + inverterTemperature + "°C");
-
+        FindID();
 //        Log.i("database", "DataGroup: " + startA);
         firebase.realFireStore("LV", GlobalTime,lowSystemVoltage);
+        mLV.append(""+ lowSystemVoltage); //TODO: 8/27
         firebase.realFireStore("HV", GlobalTime,highSystemVoltage);
         firebase.realFireStore("TEMPS", "MOTOR_TEMP", MotorTemps);
         firebase.realFireStore("TEMPS", "INV_TEMP",inverterTemperature);
@@ -783,5 +804,8 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private void FindID(){
+        mLV = findViewById(R.id.lvData);
+    }
 
 }

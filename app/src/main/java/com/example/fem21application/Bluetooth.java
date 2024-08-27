@@ -153,6 +153,7 @@ public class Bluetooth extends Service {
 
         public void run() {
             Main.checkPermission(ThreadContext);
+            Main.checkPermissionSCAN(ThreadContext);
             BluetoothSocket tmp = null;
             try {
                 tmp = bluetoothDevice.createRfcommSocketToServiceRecord(uuid);
@@ -255,7 +256,7 @@ public class Bluetooth extends Service {
                     int length = inputStream.read(buffer);
                     String message = new String(buffer, 0, length);
                     if (!message.trim().isEmpty()) {
-//                        Log.i("STREAM", "receive:" + message);
+                        Log.i("STREAM", "receive:" + message);
                         SendBroadcast(0, message);
                     }
                 } catch (IOException e) {
