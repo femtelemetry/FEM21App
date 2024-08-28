@@ -64,7 +64,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:id="@+id/ignitionPhase"
-                android:visibility="visible">
+                android:visibility="gone">
 
                 <ImageView
                     android:id="@+id/hvSymbol"
@@ -101,7 +101,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:id="@+id/drivingPhase"
-                android:visibility="gone">
+                android:visibility="visible">
 
                 <TextView
                     android:id="@+id/veloText"
@@ -111,7 +111,7 @@
                     android:layout_marginBottom="70dp"
                     android:background="@color/dark_grey"
                     android:fontFamily="@font/technology"
-                    android:text="142"
+                    android:text="---"
                     android:textAlignment="center"
                     android:textSize="100sp"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -825,23 +825,6 @@
 
         </RelativeLayout>
 
-        <Button
-            android:id="@+id/connectButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="connect"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:layout_editor_absoluteX="281dp" />
-
-        <Button
-            android:id="@+id/bluetoothButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Bluetooth"
-            android:visibility="visible"
-            tools:layout_editor_absoluteX="123dp"
-            tools:layout_editor_absoluteY="3dp" />
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -993,5 +976,22 @@
         android:layout_marginEnd="33dp"
         android:text="RUN"
         />
+
+    <Button
+        android:id="@+id/connectButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="connect"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@id/bluetoothButton"/>
+
+    <Button
+        android:id="@+id/bluetoothButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Bluetooth"
+        android:visibility="visible"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@id/runButton" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

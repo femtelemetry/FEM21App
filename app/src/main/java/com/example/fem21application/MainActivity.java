@@ -14,7 +14,10 @@ import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -170,7 +173,11 @@ public class MainActivity extends AppCompatActivity {
     static String GlobalTime;
 
     TextView mLV;
+    TextView vMtr1, vMtr2, vMtr3, vMtr4;
+    TextView vVelo;
+    ProgressBar bttBar, accelBar, brakeBar;
 
+    private Handler handler;
 
     TextView ShowTxt, ToDriverTxt;
     Button bluetoothBtn, runButton, RandomButton, submitButton, connectBtn, pauseButton;
@@ -209,6 +216,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.main_disp_temp); //sets the initial layout to "activity_main.xml"
 //        Firebase firebase = new Firebase();
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON); //keeps screen on
+
+        // Initialize the Handler using the main thread's Looper
+        handler = new Handler(Looper.getMainLooper());
 
         //To continuously send signal to database to keep connecting to it.
         AtomicReference<ScheduledExecutorService> executor = new AtomicReference<>(Executors.newScheduledThreadPool(1));
@@ -420,11 +430,6 @@ public class MainActivity extends AppCompatActivity {
 
          */
 
-        //TODO: ProgressBar Code
-        //ProgressBar progressBar = findViewById(R.id.bttBar);
-        //progressBar.setProgress(60); // Set initial progress
-
-        //updateProgressBarColor(progressBar);
     }
 
     private void updateProgressBarColor(ProgressBar progressBar) {
@@ -653,7 +658,7 @@ public class MainActivity extends AppCompatActivity {
         //Split the string by "/"
         String[] partA = datasetA.split("/");
         if (partA.length != 6) {
-            throw new IllegalArgumentException("DataA format Error");
+            //throw new IllegalArgumentException("DataA format Error");
         }
 
         //Extract values
@@ -690,10 +695,24 @@ public class MainActivity extends AppCompatActivity {
         FindID();
 //        Log.i("database", "DataGroup: " + startA);
         firebase.realFireStore("LV", GlobalTime,lowSystemVoltage);
-        mLV.append(""+ lowSystemVoltage); //TODO: 8/27
         firebase.realFireStore("HV", GlobalTime,highSystemVoltage);
         firebase.realFireStore("TEMPS", "MOTOR_TEMP", MotorTemps);
         firebase.realFireStore("TEMPS", "INV_TEMP",inverterTemperature);
+
+        // Use the Handler to update the TextView on the main thread
+        //TODO 8/29
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                mLV.setText(String.valueOf(lowSystemVoltage));
+                vMtr1.setText(String.valueOf(motorTemperature[0]));
+                vMtr2.setText(String.valueOf(motorTemperature[1]));
+                vMtr3.setText(String.valueOf(motorTemperature[2]));
+                vMtr4.setText(String.valueOf(motorTemperature[3]));
+                bttBar.setProgress(60); // Set initial progress
+                updateProgressBarColor(bttBar);
+            }
+        });
     }
 
     //B/<RTD[0]>x<RTD[1]>x<RTD[2]>x<RTD[3]>/<vcm info>/<velocity>/<torque [0]>x<torque [1]>x<torque [2]>x<torque [3]>/B
@@ -705,7 +724,7 @@ public class MainActivity extends AppCompatActivity {
         //Split the string by "/"
         String[] partB = datasetB.split("/");
         if (partB.length != 6) {
-            throw new IllegalArgumentException("DataB format Error");
+            //throw new IllegalArgumentException("DataB format Error");
         }
 
         //Extract values
@@ -751,6 +770,15 @@ public class MainActivity extends AppCompatActivity {
 
         firebase.realFireStore("VELOCITY", GlobalTime, Velocity);
         firebase.realFireStore("TORQUE", GlobalTime, Torques);
+
+        // Use the Handler to update the TextView on the main thread
+        //TODO 8/29
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                vVelo.setText(String.valueOf(Velocity));
+            }
+        });
     }
 
     //C/<AMS>/<BSPD>/<IMD>/<TC>/<ABS>/<VDC>/<80kW>/C
@@ -762,7 +790,7 @@ public class MainActivity extends AppCompatActivity {
         //Split by "/"
         String[] partC = datasetC.split("/");
         if (partC.length != 9) {
-            throw new IllegalArgumentException("DataC format Error");
+            //throw new IllegalArgumentException("DataC format Error");
         }
 
         //Extract Values
@@ -802,10 +830,18 @@ public class MainActivity extends AppCompatActivity {
         firebase.realFireStore("STATUS", "HV_STATUS",ran_boolean);
         firebase.realFireStore("TEMPS", "BTR_TEMP",ran_velocity);
 
+
     }
 
     private void FindID(){
         mLV = findViewById(R.id.lvData);
+        vMtr1 = findViewById(R.id.mtrFLtext);
+        vMtr2 = findViewById(R.id.mtrFRtext);
+        vMtr3 = findViewById(R.id.mtrRLtext);
+        vMtr4 = findViewById(R.id.mtrRRtext);
+        vVelo = findViewById(R.id.veloText);
+        bttBar = findViewById(R.id.bttBar);
     }
+
 
 }
