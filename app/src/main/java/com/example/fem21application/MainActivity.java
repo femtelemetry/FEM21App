@@ -386,6 +386,7 @@ public class MainActivity extends AppCompatActivity {
         connectBtn = findViewById(R.id.connectButton);
         connectBtn.setOnClickListener(v -> {
             bluetooth.BluetoothConnection(this);
+            connectBtn.setEnabled(false);
 //            bluetooth.controlThread("START");
 //            firebase.countRun();
 //            connectBtn.setEnabled(false);
@@ -426,6 +427,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
     @Override
     protected void onStart() {
         super.onStart();
@@ -433,6 +435,8 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, Bluetooth.class);
         bindService(intent, connection, Context.BIND_AUTO_CREATE);
         checkPermission(this);
+        checkPermissionSCAN(this);
+        //getApplicationContext().registerReceiver(bReceiver, new IntentFilter("BLUETOOTH"), Context.RECEIVER_NOT_EXPORTED);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
@@ -440,10 +444,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         Log.d(TAG, "MainActivity is onResume()");
-        //LocalBroadcastManager.getInstance(this).registerReceiver(bReceiver, new IntentFilter("BLUETOOTH"));
-
+        LocalBroadcastManager.getInstance(this).registerReceiver(bReceiver, new IntentFilter("BLUETOOTH"));
         // Register the global receiver for Bluetooth broadcasts
-        getApplicationContext().registerReceiver(bReceiver, new IntentFilter("BLUETOOTH"), Context.RECEIVER_NOT_EXPORTED);
+        //getApplicationContext().registerReceiver(bReceiver, new IntentFilter("BLUETOOTH"), Context.RECEIVER_NOT_EXPORTED);
 
         // Register local receivers for other intents
         LocalBroadcastManager.getInstance(this).registerReceiver(permissionReceiver, new IntentFilter("PERMISSION_REQUEST"));
@@ -456,7 +459,7 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
         Log.d(TAG, "MainActivity is onPause()");
         LocalBroadcastManager.getInstance(this).unregisterReceiver(rReceiver);
-        getApplicationContext().unregisterReceiver(bReceiver);
+//        getApplicationContext().unregisterReceiver(bReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(bReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(permissionReceiver);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(fReceiver);
@@ -467,7 +470,7 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         Log.d(TAG, "MainActivity is onDestroy()");
 //        unregisterReceiver(mReceiver);
-//        LocalBroadcastManager.getInstance(this).unregisterReceiver(rReceiver);
+        //LocalBroadcastManager.getInstance(this).unregisterReceiver(bReceiver);
     }
 
     //TODO: Copy and revise previous code
@@ -522,6 +525,9 @@ public class MainActivity extends AppCompatActivity {
             GlobalTime = time;
             ShowTxt.append(time + ":" + GlobalMessage + "\n");
             Log.i(TAG, "receive: " + GlobalMessage);
+            if (VIEW==404){
+                bluetooth.BluetoothConnection(getApplicationContext());
+            }
 
 //            if (VIEW == 1) {
 //                firebase.realFireStore("LV", time, message);
@@ -568,6 +574,14 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions( MainActivity.this , new String[]{android.Manifest.permission.BLUETOOTH_CONNECT}, 100);
         } else {
             Log.i("permission", "CONNECT permission is granted already");
+        }
+    }
+    public void checkPermissionSCAN(Context context){
+        if (ActivityCompat.checkSelfPermission(context, android.Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
+            Log.e("permission", "SCAN permission is not yet granted");
+            ActivityCompat.requestPermissions( MainActivity.this , new String[]{android.Manifest.permission.BLUETOOTH_SCAN}, 100);
+        } else {
+            Log.i("permission", "SCAN permission is granted already");
         }
     }
 
