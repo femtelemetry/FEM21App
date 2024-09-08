@@ -108,7 +108,7 @@ public class Bluetooth extends Service {
         //Proceed with querying devices
         MainActivity Main = new MainActivity();
         Log.i(TAG, "BluetoothConnection() IS STARTING");
-        Main.checkPermission(context);
+//        Main.checkPermission(context);
         if (bluetoothAdapter!=null){
             Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
             Log.d(TAG, "getting paired devices:" + pairedDevices);
@@ -166,7 +166,7 @@ public class Bluetooth extends Service {
             bluetoothSocket = tmp;
 
             bluetoothAdapter.cancelDiscovery(); // Cancelling discovery as it may slow down connection
-            Log.d("Thread", "Try connecting to " + deviceName);
+            Log.d("THREAD", "Try connecting to " + deviceName);
 
             //Proceed with any task
 //                BluetoothCommunication(bluetoothSocket, ThreadContext);
@@ -174,23 +174,23 @@ public class Bluetooth extends Service {
                 SendBroadcast(0,"CONNECTING TO: " + deviceName);
                 bluetoothSocket.connect();
                 mConnectedThread = new ConnectedThread(bluetoothSocket);
-//                    Log.d("Thread", "mConnectedThread IS CREATED ");
+//                    Log.d("THREAD", "mConnectedThread IS CREATED ");
                 mConnectedThread.start();
             } catch (IOException e) {
                 SendBroadcast(404,"FAILED CONNECTING TO:" + deviceName);
                 try {
                     bluetoothSocket.close();
-                    Log.e("Thread", "SOCKET CONNECTION FAILED, STOPPING SERVICE", e);
-//                    Log.e("Thread", e.toString());
+                    Log.e("THREAD", "SOCKET CONNECTION FAILED, STOPPING SERVICE", e);
+//                    Log.e("THREAD", e.toString());
                     stopSelf();
                 } catch (IOException e2) {
-                    Log.e("Thread", "SOCKET CLOSING FAILED, STOPPING SERVICE:", e2);
-//                    Log.e("Thread",  e2.toString());
+                    Log.e("THREAD", "SOCKET CLOSING FAILED, STOPPING SERVICE:", e2);
+//                    Log.e("THREAD",  e2.toString());
                     stopSelf();
                 }
             } catch (IllegalStateException e) {
-                Log.e("Thread", "CONNECTED THREAD START FAILED, STOPPING SERVICE", e);
-//                Log.e("Thread", e.toString());
+                Log.e("THREAD", "CONNECTED THREAD START FAILED, STOPPING SERVICE", e);
+//                Log.e("THREAD", e.toString());
                 stopSelf();
             }
         }
@@ -199,8 +199,8 @@ public class Bluetooth extends Service {
                 //Don't leave Bluetooth sockets open when leaving activity
                 bluetoothSocket.close();
             } catch (IOException e) {
-                Log.e("Thread", "SOCKET CLOSING FAILED, STOPPING SERVICE", e);
-//                Log.e("Thread", e.toString());
+                Log.e("THREAD", "SOCKET CLOSING FAILED, STOPPING SERVICE", e);
+//                Log.e("THREAD", e.toString());
                 stopSelf();
             }
         }
@@ -223,7 +223,7 @@ public class Bluetooth extends Service {
                 tmpIn = bluetoothSocket.getInputStream();
                 tmpOut = bluetoothSocket.getOutputStream();
             } catch (IOException e) {
-                Log.d("Thread", "UNABLE TO READ/WRITE, STOPPING SERVICE");
+                Log.d("THREAD", "UNABLE TO READ/WRITE, STOPPING SERVICE");
                 SendBroadcast(404, "RESTART BLUETOOTH CONNECTION");
                 stopSelf();
             }
@@ -233,18 +233,18 @@ public class Bluetooth extends Service {
         }
 
         public void run() {
-            Log.i("Thread", "START RECEIVING");
+            Log.i("THREAD", "START RECEIVING");
             byte[] buffer = new byte[1024];
 
             while (true) {
                 synchronized (pauseLock) {
                     while (pauseThread) {
                         try {
-                            Log.d("Thread", "Thread pause");
+                            Log.d("THREAD", "Thread pause");
                             pauseLock.wait();
                         } catch (InterruptedException e) {
                             Thread.currentThread().interrupt();
-                            Log.e("Thread", "Thread interrupted:", e);
+                            Log.e("THREAD", "Thread interrupted:", e);
                         }
                     }
                     if (stopThread) {
@@ -256,12 +256,12 @@ public class Bluetooth extends Service {
                     int length = inputStream.read(buffer);
                     String message = new String(buffer, 0, length);
                     if (!message.trim().isEmpty()) {
-                        Log.i("Thread", "receive:" + message);
+                        Log.i("THREAD", "receive:" + message);
                         SendBroadcast(0, message);
                     }
                 } catch (IOException e) {
-//                    Log.e("Thread", e.toString());
-                    Log.e("Thread", "UNABLE TO READ/WRITE, STOPPING SERVICE", e);
+//                    Log.e("THREAD", e.toString());
+                    Log.e("THREAD", "UNABLE TO READ/WRITE, STOPPING SERVICE", e);
                     SendBroadcast(404,"UNABLE TO READ/WRITE, STOPPING SERVICE, RESTARTING BLUETOOTH CONNECTION");
                     stopSelf();
                     break;
@@ -295,7 +295,7 @@ public class Bluetooth extends Service {
                         // Optionally, log or handle the discarded data here
                     }
                 } catch (IOException e) {
-                    Log.e("Thread", "Failed to drain InputStream", e);
+                    Log.e("THREAD", "Failed to drain InputStream", e);
                 }
                 pauseLock.notifyAll();
                 SendBroadcast(0, "Resume receiving from ESP32");
@@ -309,7 +309,7 @@ public class Bluetooth extends Service {
                 outputStream.close();
             } catch (IOException e) {
                 //insert code to deal with this
-                Log.d("Thread", "STREAM CLOSING FAILED, STOPPING SERVICE");
+                Log.d("THREAD", "STREAM CLOSING FAILED, STOPPING SERVICE");
                 stopSelf();
             }
         }

@@ -206,8 +206,11 @@ public class MainActivity extends AppCompatActivity {
 
 
 //        Firebase firebase = new Firebase();
-        Intent intent = new Intent(MainActivity.this, Firebase.class);
-        startService(intent);
+        Intent FirebaseIntent = new Intent(MainActivity.this, Firebase.class);
+        Intent BluetoothIntent = new Intent(MainActivity.this, Bluetooth.class);
+        startService(FirebaseIntent);
+        startService(BluetoothIntent);
+
         //To submit any input text to the databases
         submitButton = findViewById(R.id.submitButton);
         textbox = findViewById(R.id.textBox);
@@ -231,7 +234,7 @@ public class MainActivity extends AppCompatActivity {
 //            Firebase firebase = new Firebase();
             Toast.makeText(this, "The number is running now...", Toast.LENGTH_SHORT).show();
             firebase.countRun();
-            Log.i("database", "The data is being sent to the database");
+            Log.i("DATABASE", "The data is being sent to the database");
             new Thread(() -> {
                 for (int i = 0; i <= 80; i++) {
                     long nanoTime = System.nanoTime();
@@ -266,7 +269,7 @@ public class MainActivity extends AppCompatActivity {
                     firebase.realFireStore("TEMPS", "MOTOR_TEMP",set);
                     firebase.realFireStore("TEMPS", "INV_TEMP",ran_LV);
 
-//                Log.i("database", time + ":" + i);
+//                Log.i("DATABASE", time + ":" + i);
                     try {
                         Thread.sleep(time_interval);
                     } catch (InterruptedException e) {
@@ -279,31 +282,31 @@ public class MainActivity extends AppCompatActivity {
         //To run continuously increasing number
         runButton = findViewById(R.id.runButton);
         runButton.setOnClickListener(v -> {
-            Log.i("database", "The data is being sent to the database");
+            Log.i("DATABASE", "The data is being sent to the database");
             firebase.countRun();
             firebaseThread = new Thread(() -> {
                 while (true) {
 //                    long nanoTime = System.nanoTime();
 //                    long micros = (nanoTime / 100000); // Extract microseconds from nanoseconds
 //                    String time = new SimpleDateFormat("HH:mm:ss:" + micros, Locale.getDefault()).format(new Date()); //Use timestamp as keys
-//                    Log.i("database", GlobalMessage);
+//                    Log.i("DATABASE", GlobalMessage);
                     //Can be replaced by actual data
                     String[] dataPart = GlobalMessage.split("/");
                     //Determine the data group
                     String dataType = dataPart[0];
-//                    Log.i("database", "Datatype: " + dataType);
+//                    Log.i("DATABASE", "Datatype: " + dataType);
                     switch (dataType) {
                         case "A":
                             dataA(GlobalMessage);
-//                            Log.i("database", "Sending to : " + dataType);
+//                            Log.i("DATABASE", "Sending to : " + dataType);
                             break;
                         case "B":
                             dataB(GlobalMessage);
-//                            Log.i("database", "Sending to : " + dataType);
+//                            Log.i("DATABASE", "Sending to : " + dataType);
                             break;
                         case "C":
                             dataC(GlobalMessage);
-//                            Log.i("database", "Sending to : " + dataType);
+//                            Log.i("DATABASE", "Sending to : " + dataType);
                             break;
                     }
                     try {
@@ -418,10 +421,10 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == 100) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Permission granted, perform the desired action
-                Log.e("Permission", "BLUETOOTH_CONNECT permission is granted");
+                Log.e("PERMISSION", "BLUETOOTH_CONNECT permission is granted");
             } else {
                 // Permission denied, handle accordingly
-                Log.e("Permission", "BLUETOOTH_CONNECT permission is denied");
+                Log.e("PERMISSION", "BLUETOOTH_CONNECT permission is denied");
 //                ActivityCompat.requestPermissions( this, new String[]{android.Manifest.permission.}, 100);
             }
         }
@@ -436,6 +439,8 @@ public class MainActivity extends AppCompatActivity {
         bindService(intent, connection, Context.BIND_AUTO_CREATE);
         checkPermission(this);
         checkPermissionSCAN(this);
+//        startService(new Intent(MainActivity.this, Bluetooth.class));
+//        bluetooth.BluetoothConnection(this);
         //getApplicationContext().registerReceiver(bReceiver, new IntentFilter("BLUETOOTH"), Context.RECEIVER_NOT_EXPORTED);
     }
 
@@ -444,6 +449,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         Log.d(TAG, "MainActivity is onResume()");
+
         LocalBroadcastManager.getInstance(this).registerReceiver(bReceiver, new IntentFilter("BLUETOOTH"));
         // Register the global receiver for Bluetooth broadcasts
         //getApplicationContext().registerReceiver(bReceiver, new IntentFilter("BLUETOOTH"), Context.RECEIVER_NOT_EXPORTED);
@@ -493,7 +499,7 @@ public class MainActivity extends AppCompatActivity {
     BroadcastReceiver fReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d("Broadcast", "Firebase receive: "+ intent.getStringExtra("message"));
+            Log.d("BROADCAST", "Firebase receive: "+ intent.getStringExtra("message"));
             String message = intent.getStringExtra("message");
             int VIEW = intent.getIntExtra("VIEW", 0);
 
@@ -504,7 +510,7 @@ public class MainActivity extends AppCompatActivity {
     BroadcastReceiver rReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.i("Broadcast", "receive: " + intent.getIntExtra("message", 0));
+            Log.i("BROADCAST", "receive: " + intent.getIntExtra("message", 0));
 //            ShowTxt = findViewById(R.id.InputStream);
 //            ShowTxt.setText(number);
         }
@@ -524,6 +530,7 @@ public class MainActivity extends AppCompatActivity {
             GlobalMessage = message.trim();
             GlobalTime = time;
             ShowTxt.append(time + ":" + GlobalMessage + "\n");
+//            bluetooth.Write_file(GlobalMessage, "FEM21.csv", 1);
             Log.i(TAG, "receive: " + GlobalMessage);
             if (VIEW==404){
                 bluetooth.BluetoothConnection(getApplicationContext());
@@ -562,26 +569,26 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (Objects.equals(intent.getAction(), "com.example.PERMISSION_REQUEST")) {
-                String permission = intent.getStringExtra("permission"); //permission should be android.Manifest.permission.BLUETOOTH_CONNECT
+                String permission = intent.getStringExtra("PERMISSION"); //permission should be android.Manifest.permission.BLUETOOTH_CONNECT
                 ActivityCompat.requestPermissions(MainActivity.this, new String[]{permission}, 100);
-                Log.i("permission", permission + "is being requested");
+                Log.i("PERMISSION", permission + "is being requested");
             }
         }
     };
     public void checkPermission(Context context){
         if (ActivityCompat.checkSelfPermission(context, android.Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-            Log.e("permission", "CONNECT permission is not yet granted");
+            Log.e("PERMISSION", "CONNECT permission is not yet granted");
             ActivityCompat.requestPermissions( MainActivity.this , new String[]{android.Manifest.permission.BLUETOOTH_CONNECT}, 100);
         } else {
-            Log.i("permission", "CONNECT permission is granted already");
+            Log.i("PERMISSION", "CONNECT permission is granted already");
         }
     }
     public void checkPermissionSCAN(Context context){
         if (ActivityCompat.checkSelfPermission(context, android.Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
-            Log.e("permission", "SCAN permission is not yet granted");
+            Log.e("PERMISSION", "SCAN permission is not yet granted");
             ActivityCompat.requestPermissions( MainActivity.this , new String[]{android.Manifest.permission.BLUETOOTH_SCAN}, 100);
         } else {
-            Log.i("permission", "SCAN permission is granted already");
+            Log.i("PERMISSION", "SCAN permission is granted already");
         }
     }
 
@@ -628,7 +635,7 @@ public class MainActivity extends AppCompatActivity {
 //        System.out.println("Motor Temperatures: " + motorTemperature[0] + "°C, " + motorTemperature[1] + "°C, " + motorTemperature[2] + "°C, " + motorTemperature[3] + "°C");
 //        System.out.println("Inverter Temperature: " + inverterTemperature + "°C");
 
-//        Log.i("database", "DataGroup: " + startA);
+//        Log.i("DATABASE", "DataGroup: " + startA);
         firebase.realFireStore("LV", GlobalTime,lowSystemVoltage);
         firebase.realFireStore("HV", GlobalTime,highSystemVoltage);
         firebase.realFireStore("TEMPS", "MOTOR_TEMP", MotorTemps);
