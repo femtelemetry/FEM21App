@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.graphics.drawable.ClipDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.ShapeDrawable;
@@ -18,7 +17,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
-import android.os.Message;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -27,7 +26,6 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -38,10 +36,11 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicReference;
@@ -173,6 +172,8 @@ public class MainActivity extends AppCompatActivity {
     static boolean pauseThread = false;
     static String GlobalMessage;
     static String GlobalTime;
+    static int ERROR_CODE = 404;
+    private List<String> messages = new ArrayList<>();
 
     TextView m_lv_voltage;
     TextView vMtr1, vMtr2, vMtr3, vMtr4;
@@ -202,7 +203,8 @@ public class MainActivity extends AppCompatActivity {
     private Handler handler;
 
     TextView ShowTxt, ToDriverTxt;
-    Button bluetoothBtn, runButton, RandomButton, submitButton, connectBtn, pauseButton;
+    Button connectBtn;
+    Button DisconnectBtn;
     EditText textbox;
     ScrollView scrollView;
     Firebase firebase = new Firebase();
@@ -247,102 +249,46 @@ public class MainActivity extends AppCompatActivity {
 
         FindID(); //TODO: 8/27
 
-
 //        Firebase firebase = new Firebase();
-        Intent intent = new Intent(MainActivity.this, Firebase.class);
-        startService(intent);
-        //To submit any input text to the databases
-        submitButton = findViewById(R.id.submitButton);
+        Intent FirebaseIntent = new Intent(MainActivity.this, Firebase.class);
+        Intent BluetoothIntent = new Intent(MainActivity.this, Bluetooth.class);
+        startService(FirebaseIntent);
+        startService(BluetoothIntent);
+
         textbox = findViewById(R.id.textBox);
-        submitButton.setOnClickListener(v -> {
-//            Firebase firebase = new Firebase();
-            String time = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date()); //Use timestamp as keys
-            String text = textbox.getText().toString();
-            // Write a message to the Realtime database (RealFireStore) and Cloud database (CloudFireStore)
-            firebase.countRun();
-            firebase.realFireStore("VCMINFO", time, text);  //type of stored data can be anything simple.
-            firebase.realFireStore("ERROR", time, text);  //type of stored data can be anything simple.
-//            Map<String, Object> data = new HashMap<>();  //For Cloud Firebase, the data needs to be of HashMap.
-//            data.put(time, text);
-//            CloudFireStore(date, data);
-            Toast.makeText(this, "The message is sent to the database...", Toast.LENGTH_SHORT).show();
-        });
 
-        //To run number infinitely
-        RandomButton = findViewById(R.id.randomButton);
-        RandomButton.setOnClickListener(v -> {
-//            Firebase firebase = new Firebase();
-            Toast.makeText(this, "The number is running now...", Toast.LENGTH_SHORT).show();
-            firebase.countRun();
-            Log.i("database", "The data is being sent to the database");
-            new Thread(() -> {
-                for (int i = 0; i <= 80; i++) {
-                    long nanoTime = System.nanoTime();
-                    long micros = (nanoTime / 100000); // Extract microseconds from nanoseconds
-                    String time = new SimpleDateFormat("HH:mm:ss:" + micros, Locale.getDefault()).format(new Date()); //Use timestamp as keys
-                    //Map<String, Object> data = new HashMap<>();  //For Cloud Firebase, the data needs to be of HashMap.
-                    //data.put(time, i);
-                    //CloudFireStore(date, data);
-//                Random random = new Random();
-//                Generate a random integer between 0 and 120
-                    int ran_LV = (new Random()).nextInt(30);
-                    int ran_velocity = (new Random()).nextInt(120);
-                    int ran_HV = (new Random()).nextInt(600);
-                    int ran_torque = (new Random()).nextInt(200);
-                    int ran_100 = (new Random()).nextInt(100);
-                    boolean ran_boolean = (new Random()).nextBoolean();
-                    String set = ran_torque + "/" + ran_100 + "/" + ran_velocity + "/" + ran_LV;
-                    firebase.realFireStore("VELOCITY", time, ran_velocity);
-                    firebase.realFireStore("LV", time,ran_LV );
-                    firebase.realFireStore("HV", time, ran_HV);
-                    firebase.realFireStore("TORQUE", time, set );
-//                    firebase.realFireStore("TORQUE1", time, ran_torque);
-//                    firebase.realFireStore("TORQUE2", time, ran_100);
-//                    firebase.realFireStore("TORQUE3", time, ran_velocity);
-//                    firebase.realFireStore("TORQUE4", time, ran_LV);
-                    firebase.realFireStore("ACC", time, ran_100);
-                    firebase.realFireStore("BRAKE", time, ran_100);
-                    firebase.realFireStore("BATTERY_LEVEL", time, ran_100);
-                    firebase.realFireStore("STATUS", "BRAKE_SW",ran_boolean );
-                    firebase.realFireStore("STATUS", "HV_STATUS",ran_boolean);
-                    firebase.realFireStore("TEMPS", "BTR_TEMP",ran_velocity);
-                    firebase.realFireStore("TEMPS", "MOTOR_TEMP",set);
-                    firebase.realFireStore("TEMPS", "INV_TEMP",ran_LV);
+        scrollView = findViewById(R.id.scrollView);
+        ShowTxt = findViewById(R.id.InputStream);
 
-//                Log.i("database", time + ":" + i);
-                    try {
-                        Thread.sleep(time_interval);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            }).start();
-        });
-
-        //To run continuously increasing number
-        runButton = findViewById(R.id.runButton);
-        runButton.setOnClickListener(v -> {
-            Log.i("database", "The data is being sent to the database");
+        connectBtn = findViewById(R.id.ConnectButton);
+        DisconnectBtn = findViewById(R.id.DisconnectButton);
+        DisconnectBtn.setEnabled(false);
+        connectBtn.setOnClickListener(v -> {
+            startService(BluetoothIntent);
+            bluetooth.BluetoothConnection(this);
+            connectBtn.setEnabled(false);
+            Log.i("DATABASE", "The data is being sent to the database");
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             firebase.countRun();
             firebaseThread = new Thread(() -> {
                 while (true) {
-//                    long nanoTime = System.nanoTime();
-//                    long micros = (nanoTime / 100000); // Extract microseconds from nanoseconds
-//                    String time = new SimpleDateFormat("HH:mm:ss:" + micros, Locale.getDefault()).format(new Date()); //Use timestamp as keys
-//                    Log.i("database", GlobalMessage);
                     //Can be replaced by actual data
                     String[] dataPart = GlobalMessage.split("/");
                     //Determine the data group
                     String dataType = dataPart[0];
-//                    Log.i("database", "Datatype: " + dataType);
+//                    Log.i("DATABASE", "Datatype: " + dataType);
                     switch (dataType) {
                         case "A":
                             dataA(GlobalMessage);
-//                            Log.i("database", "Sending to : " + dataType);
+//                            Log.i("DATABASE", "Sending to : " + dataType);
                             break;
                         case "B":
                             dataB(GlobalMessage);
-//                            Log.i("database", "Sending to : " + dataType);
+//                            Log.i("DATABASE", "Sending to : " + dataType);
                             break;
                         case "C":
                             dataC(GlobalMessage);
@@ -357,111 +303,25 @@ public class MainActivity extends AppCompatActivity {
 //                            Log.i("database", "Sending to : " + dataType);
                             break;
                     }
-                    try {
-                        Thread.sleep(time_interval);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-
                 }
             });
             firebaseThread.start();
-
-//            new Thread(() -> {
-//                for (int i = 0; i <= data_num; i++) {
-//                    long nanoTime = System.nanoTime();
-//                    long micros = (nanoTime / 100000); // Extract microseconds from nanoseconds
-//                    String time = new SimpleDateFormat("HH:mm:ss:" + micros, Locale.getDefault()).format(new Date()); //Use timestamp as keys
-//                    boolean ran_boolean = (new Random()).nextBoolean();
-//                    String set = i + "/" + Math.ceil(0.85*i) + "/" + Math.ceil(1.5*i) + "/" + Math.ceil(0.7*i);
-//                    firebase.realFireStore("VELOCITY", time, i+3);
-//                    firebase.realFireStore("LV", time,i -5);
-//                    firebase.realFireStore("HV", time, i+2);
-//                    firebase.realFireStore("TORQUE", time, set);
-////                    firebase.realFireStore("TORQUE1", time,i-10 );
-////                    firebase.realFireStore("TORQUE2", time,i +5);
-////                    firebase.realFireStore("TORQUE3", time,i -2);
-////                    firebase.realFireStore("TORQUE4", time,i );
-//                    firebase.realFireStore("ACC", time, i);
-//                    firebase.realFireStore("BRAKE", time, i-4);
-//                    firebase.realFireStore("BATTERY_LEVEL", time, i-12);
-//                    firebase.realFireStore("STATUS", "BRAKE_SW",ran_boolean );
-//                    firebase.realFireStore("STATUS", "HV_STATUS",ran_boolean);
-//                    firebase.realFireStore("TEMPS", "BTR_TEMP",i+3);
-//                    firebase.realFireStore("TEMPS", "MOTOR_TEMP",set);
-//                    firebase.realFireStore("TEMPS", "INV_TEMP",i+6);
-//
-//                    try {
-//                        Thread.sleep(time_interval);
-//                    } catch (InterruptedException e) {
-//                        throw new RuntimeException(e);
-//                    }
-//                }
-//            }).start();
-        });
-        pauseButton = findViewById(R.id.pauseButton);
-        pauseButton.setOnClickListener( v -> {
-            if (pauseThread){
-                pauseThread = false;
-                bluetooth.resumeConnectedThread();
-//                Log.i(bluetooth.TAG , "Resuming thread ");
-                pauseButton.setText("PAUSE");
-            } else {
-                pauseThread = true;
-                bluetooth.pauseConnectedThread();
-
-//                Log.i(bluetooth.TAG, "pausing thread ");
-                GlobalMessage = "";
-                pauseButton.setText("RESUME");
-            }
+            Log.d(TAG, "CONNECTING WITH BLUETOOTH DEVICE");
+            DisconnectBtn.setEnabled(true);
+            ERROR_CODE = 404;
         });
 
-//        Bluetooth bluetoothService = new Bluetooth();
-
-        scrollView = findViewById(R.id.scrollView);
-        ShowTxt = findViewById(R.id.InputStream);
-        bluetoothBtn = findViewById(R.id.bluetoothButton);
-        bluetoothBtn.setOnClickListener(v -> {
-            //Toast.makeText(MainActivity.this, "Bluetooth is starting...", Toast.LENGTH_SHORT).show();
-            Log.d(TAG, "Bluetooth is starting...");
-//            ActivityCompat.requestPermissions( this , new String[]{android.Manifest.permission.BLUETOOTH_CONNECT}, 100);
-            bluetoothBtn.setEnabled(false);
-//            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.BLUETOOTH_SCAN}, 100);
-            startService(new Intent(MainActivity.this, Bluetooth.class));
-
-//           bluetooth.BluetoothEnable((BluetoothManager) this.getSystemService(Context.BLUETOOTH_SERVICE));
-//            setContentView(R.layout.page2);
-
+        DisconnectBtn.setOnClickListener(v -> {
+            Log.d(TAG, "DISCONNECTING WITH BLUETOOTH DEVICE");
+//            Intent BluetoothIntent = new Intent(MainActivity.this, Bluetooth.class);
+            stopService(BluetoothIntent);
+            bluetooth.closeStream();
+            connectBtn.setEnabled(true);
+            DisconnectBtn.setEnabled(false);
+            ERROR_CODE = 405;
         });
-
-        connectBtn = findViewById(R.id.connectButton);
-        connectBtn.setOnClickListener(v -> {
-            bluetooth.BluetoothConnection(this);
-            connectBtn.setEnabled(false);
-//            bluetooth.controlThread("START");
-//            firebase.countRun();
-//            connectBtn.setEnabled(false);
-        });
-
-        /*
-        runBtn = findViewById(R.id.runButton);
-        runBtn.setOnClickListener(v -> {
-            if (count == 1){
-                runBtn.setText("PAUSE");
-                bluetooth.controlThread("RESUME");
-                firebase.countRun();
-                count = 0;
-            } else if (count == 0) {
-                runBtn.setText("RESUME");
-                bluetooth.controlThread("PAUSE");
-                count = 1;
-
-            }
-        });
-
-         */
-
     }
+
 
     private void updateProgressBarColor(ProgressBar progressBar) {
         int progress = progressBar.getProgress();
@@ -515,15 +375,16 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == 100) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Permission granted, perform the desired action
-                Log.e("Permission", "BLUETOOTH_CONNECT permission is granted");
+                Log.e("PERMISSION", "BLUETOOTH_CONNECT permission is granted");
             } else {
                 // Permission denied, handle accordingly
-                Log.e("Permission", "BLUETOOTH_CONNECT permission is denied");
+                Log.e("PERMISSION", "BLUETOOTH_CONNECT permission is denied");
 //                ActivityCompat.requestPermissions( this, new String[]{android.Manifest.permission.}, 100);
             }
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
     @Override
     protected void onStart() {
         super.onStart();
@@ -588,10 +449,10 @@ public class MainActivity extends AppCompatActivity {
     BroadcastReceiver fReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d("Broadcast", "Firebase receive: "+ intent.getStringExtra("message"));
+            Log.d("BROADCAST", "Firebase receive: "+ intent.getStringExtra("message"));
             String message = intent.getStringExtra("message");
-            int VIEW = intent.getIntExtra("VIEW", 0);
-
+//            int VIEW = intent.getIntExtra("VIEW", 0);
+            //TODO: 9/8 use this message
             ToDriverTxt = findViewById(R.id.ToDriverText);
             ToDriverTxt.setText(message);
         }
@@ -599,7 +460,7 @@ public class MainActivity extends AppCompatActivity {
     BroadcastReceiver rReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.i("Broadcast", "receive: " + intent.getIntExtra("message", 0));
+            Log.i("BROADCAST", "receive: " + intent.getIntExtra("message", 0));
 //            ShowTxt = findViewById(R.id.InputStream);
 //            ShowTxt.setText(number);
 
@@ -621,65 +482,47 @@ public class MainActivity extends AppCompatActivity {
             assert message != null;
             GlobalMessage = message.trim();
             GlobalTime = time;
-            ShowTxt.append(time + ":" + GlobalMessage + "\n");
+//            ShowTxt.append(time + ":" + GlobalMessage + "\n");
+            String formattedMessage = time + ":" + GlobalMessage;
+            messages.add(formattedMessage);
+            // If the number of messages exceeds the limit, remove the oldest one
+            if (messages.size() > 20) {
+                messages.remove(0); // Remove the first (oldest) message
+            }
+            // Update the TextView with the current messages
+            ShowTxt.setText(TextUtils.join("\n", messages));
             //Log.i(TAG, "receive: " + GlobalMessage);
-            if (VIEW==404){
+            if (VIEW==ERROR_CODE){
                 bluetooth.BluetoothConnection(getApplicationContext());
             }
-
-//            if (VIEW == 1) {
-//                firebase.realFireStore("LV", time, message);
-//            } else if (VIEW == 2) {
-//                firebase.realFireStore("HV", time, message);
-//            } else if (VIEW == 3) {
-//                firebase.realFireStore("TEMPS", "MOTOR_TEMP", message);
-//            } else if (VIEW == 4) {
-//                firebase.realFireStore("TEMPS", "INV_TEMP",message);
-//            } else if (VIEW == 7) {
-//                firebase.realFireStore("VELOCITY", time, message);
-//            } else if (VIEW == VIEW_TORQ) {
-//                String set = message[0] + "/" + message[1] + "/" + message[2] + "/" + message[3];
-//                firebase.realFireStore("TORQUE", time, message);
-//            }sww
-
-//            firebase.realFireStore("VELOCITY", time, message);
-//            bluetooth.Write_file(message, "FEM21.txt", 1);
-//            bluetooth.Write_file(message, "FEM21.csv", 1);
-
-//            ShowTxt.setMovementMethod(new ScrollingMovementMethod());
-
             // Scroll the ScrollView to the bottom
             scrollView.post(() -> scrollView.fullScroll(ScrollView.FOCUS_DOWN));
-            if (VIEW==99){
-                connectBtn.setEnabled(true);
-            }
-
         }
     };
     BroadcastReceiver permissionReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (Objects.equals(intent.getAction(), "com.example.PERMISSION_REQUEST")) {
-                String permission = intent.getStringExtra("permission"); //permission should be android.Manifest.permission.BLUETOOTH_CONNECT
+                String permission = intent.getStringExtra("PERMISSION"); //permission should be android.Manifest.permission.BLUETOOTH_CONNECT
                 ActivityCompat.requestPermissions(MainActivity.this, new String[]{permission}, 100);
-                Log.i("permission", permission + "is being requested");
+                Log.i("PERMISSION", permission + "is being requested");
             }
         }
     };
     public void checkPermission(Context context){
         if (ActivityCompat.checkSelfPermission(context, android.Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-            Log.e("permission", "CONNECT permission is not yet granted");
+            Log.e("PERMISSION", "CONNECT permission is not yet granted");
             ActivityCompat.requestPermissions( MainActivity.this , new String[]{android.Manifest.permission.BLUETOOTH_CONNECT}, 100);
         } else {
-            Log.i("permission", "CONNECT permission is granted already");
+            Log.i("PERMISSION", "CONNECT permission is granted already");
         }
     }
     public void checkPermissionSCAN(Context context){
         if (ActivityCompat.checkSelfPermission(context, android.Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
-            Log.e("permission", "SCAN permission is not yet granted");
+            Log.e("PERMISSION", "SCAN permission is not yet granted");
             ActivityCompat.requestPermissions( MainActivity.this , new String[]{android.Manifest.permission.BLUETOOTH_SCAN}, 100);
         } else {
-            Log.i("permission", "SCAN permission is granted already");
+            Log.i("PERMISSION", "SCAN permission is granted already");
         }
     }
 
@@ -692,7 +535,7 @@ public class MainActivity extends AppCompatActivity {
         //Split the string by "/"
         String[] partA = datasetA.split("/");
         if (partA.length != 6) {
-            //throw new IllegalArgumentException("DataA format Error");
+//            Log.e(TAG, "DataA format Error");
         }
 
         //Extract values
@@ -703,7 +546,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             lowSystemVoltage = Double.parseDouble(partA[1]);
         }catch(Exception e){
-            Log.e("DATAErr", "LV Electrical System Voltage failed to parse.");
+//            Log.e("DATAErr", "LV Electrical System Voltage failed to parse.");
         }
         double finalLowSystemVoltage = lowSystemVoltage;
 
@@ -713,7 +556,7 @@ public class MainActivity extends AppCompatActivity {
             batterySOC = Double.parseDouble(partA[2]);
         }
         catch(Exception e){
-            Log.e("DATAErr", "HV Electrical System Charge failed to parse.");
+//            Log.e("DATAErr", "HV Electrical System Charge failed to parse.");
         }
 
         double hv_maxtemp234 = 0.0;
@@ -721,7 +564,7 @@ public class MainActivity extends AppCompatActivity {
             hv_maxtemp234 = Double.parseDouble(partA[4]);
         }
         catch(Exception e){
-            Log.e("DATAErr", "HV Electrical System Max Temperature failed to parse.");
+//            Log.e("DATAErr", "HV Electrical System Max Temperature failed to parse.");
         }
 
         double powerConsumption = 0.0;
@@ -730,7 +573,7 @@ public class MainActivity extends AppCompatActivity {
             powerConsumption = Double.parseDouble(partA[6]);
         }
         catch(Exception e){
-            Log.e("DATAErr", "Power Consumption failed to parse.");
+//            Log.e("DATAErr", "Power Consumption failed to parse.");
         }
 
         /*
@@ -816,7 +659,7 @@ public class MainActivity extends AppCompatActivity {
         //Split the string by "/"
         String[] partB = datasetB.split("/");
         if (partB.length != 6) {
-            //throw new IllegalArgumentException("DataB format Error");
+//            Log.e(TAG, "DataB format Error");
         }
 
         //Extract values
@@ -835,7 +678,7 @@ public class MainActivity extends AppCompatActivity {
                 motor_temp[i] = Double.parseDouble(received_motortemp[i]);
             }
             catch (Exception e){
-                Log.e("DATAErr", "Motor Temperature failed to parse.");
+//                Log.e("DATAErr", "Motor Temperature failed to parse.");
             }
         }
 
@@ -857,7 +700,7 @@ public class MainActivity extends AppCompatActivity {
                 inv_temp[i] = Double.parseDouble(received_invtemp[i]);
             }
             catch(Exception e) {
-                Log.e("DATAErr", "Cold Plate Temperature failed to parse.");
+//                Log.e("DATAErr", "Cold Plate Temperature failed to parse.");
             }
         }
 
@@ -957,7 +800,7 @@ public class MainActivity extends AppCompatActivity {
         //Split by "/"
         String[] partC = datasetC.split("/");
         if (partC.length != 9) {
-            //throw new IllegalArgumentException("DataC format Error");
+//            Log.e(TAG, "DataC format Error");
         }
 
         //Extract Values
@@ -968,7 +811,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             velocity = Double.parseDouble(partC[1]);
         }catch(Exception e){
-            Log.e("DATAErr", "Velocity failed to parse.");
+//            Log.e("DATAErr", "Velocity failed to parse.");
         }
 
         int final_velocity = (int) velocity;
@@ -1030,7 +873,7 @@ public class MainActivity extends AppCompatActivity {
         //Split by "/"
         String[] partD = datasetD.split("/");
         if (partD.length != 9) {
-            //throw new IllegalArgumentException("DataC format Error");
+//            Log.e(TAG, "DataD format Error");
         }
 
         //Extract Values
@@ -1041,7 +884,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             throttle_percentage = Double.parseDouble(partD[1]);
         }catch(Exception e){
-            Log.e("DATAErr", "Throttle percentage failed to parse.");
+//            Log.e("DATAErr", "Throttle percentage failed to parse.");
         }
 
         int final_throttle_percentage = (int) throttle_percentage;
@@ -1103,7 +946,7 @@ public class MainActivity extends AppCompatActivity {
         //Split by "/"
         String[] partE = datasetE.split("/");
         if (partE.length != 9) {
-            //throw new IllegalArgumentException("DataE format Error");
+//            Log.e(TAG, "DataE format Error");
         }
 
         //Extract Values
@@ -1122,7 +965,7 @@ public class MainActivity extends AppCompatActivity {
                 ready_to_drive[i] = Integer.parseInt(received_RToD[i]);
             }
             catch(Exception e){
-                Log.e("DATAErr", "Ready-to-Drive failed to parse.");
+//                Log.e("DATAErr", "Ready-to-Drive failed to parse.");
             }
         }
 
