@@ -7,6 +7,7 @@
     tools:context=".MainActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/black"
@@ -14,94 +15,94 @@
 
         <ProgressBar
             android:id="@+id/bttBar"
+            style="@android:style/Widget.ProgressBar.Horizontal"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            style="@android:style/Widget.ProgressBar.Horizontal"
-            android:progressDrawable="@drawable/custom_batterybar"
             android:max="100"
             android:progress="50"
-            app:layout_constraintTop_toTopOf="parent"/>
+            android:progressDrawable="@drawable/custom_batterybar"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
             android:id="@+id/bttIcon"
             android:layout_width="60dp"
             android:layout_height="60dp"
+            android:layout_marginRight="14dp"
             android:background="@drawable/battery_white"
             android:rotation="180"
             app:layout_constraintRight_toRightOf="parent"
-            android:layout_marginRight="14dp"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/bttText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="---"
+            android:layout_marginRight="10dp"
             android:fontFamily="@font/technology"
+            android:text="---"
             android:textSize="25sp"
-            app:layout_constraintRight_toRightOf="@id/bttIcon"
-            app:layout_constraintTop_toTopOf="@id/bttIcon"
             app:layout_constraintBottom_toBottomOf="@id/bttIcon"
-            android:layout_marginRight="10dp"/>
+            app:layout_constraintRight_toRightOf="@id/bttIcon"
+            app:layout_constraintTop_toTopOf="@id/bttIcon" />
 
         <ImageView
+            android:id="@+id/imageView"
             android:layout_width="match_parent"
             android:layout_height="5dp"
-            app:layout_constraintBottom_toBottomOf="@id/bttBar"
             android:background="@drawable/custom_white_solid"
-            />
+            app:layout_constraintBottom_toBottomOf="@id/bttBar" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/centerCell"
             android:layout_width="250dp"
             android:layout_height="0dp"
-            app:layout_constraintTop_toBottomOf="@id/bttBar"
+            android:gravity="center_horizontal"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            android:gravity="center_horizontal">
+            app:layout_constraintTop_toBottomOf="@id/bttBar">
 
             <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/ignitionPhase"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:id="@+id/ignitionPhase"
                 android:visibility="gone">
 
                 <ImageView
                     android:id="@+id/hvSymbol"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:background="@drawable/hv"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    android:layout_marginTop="20dp"
-                    android:background="@drawable/hv" />
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:id="@+id/ignitionTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="火入れ"
-                    android:textSize="50dp"
                     android:textAlignment="center"
+                    android:textSize="50dp"
                     app:layout_constraintTop_toBottomOf="@id/hvSymbol" />
 
                 <TextView
                     android:id="@+id/fieldVCMInfo"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
+                    android:gravity="center"
                     android:text="VCMInfo"
                     android:textSize="20dp"
-                    android:gravity="center"
-                    app:layout_constraintTop_toBottomOf="@id/ignitionTitle"
-                    app:layout_constraintBottom_toBottomOf="parent" />
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/ignitionTitle" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/drivingPhase"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:id="@+id/drivingPhase"
                 android:visibility="gone">
 
                 <TextView
@@ -123,31 +124,31 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="VELO"
-                    android:textStyle="bold"
-                    android:textSize="20sp"
                     android:textAlignment="center"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
                     app:layout_constraintBottom_toTopOf="@id/veloText"
                     app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toRightOf="parent"/>
+                    app:layout_constraintRight_toRightOf="parent" />
 
                 <ImageView
                     android:id="@+id/driverSignal"
                     android:layout_width="72dp"
                     android:layout_height="72dp"
                     android:layout_marginTop="10dp"
-                    app:layout_constraintTop_toTopOf="parent"
+                    android:background="@color/dark_grey"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
-                    android:background="@color/dark_grey"/>
+                    app:layout_constraintTop_toTopOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/errorPhase"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:id="@+id/errorPhase"
-                android:background="@color/red"
-                android:layout_marginHorizontal="20dp">
+                android:layout_marginHorizontal="20dp"
+                android:background="@color/red">
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -157,27 +158,26 @@
             android:id="@+id/leftCell"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            app:layout_constraintTop_toBottomOf="@id/bttBar"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/centerCell"
-            app:layout_constraintStart_toStartOf="parent">
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/bttBar">
 
             <ProgressBar
                 android:id="@+id/brakeProgressBar"
                 style="@android:style/Widget.ProgressBar.Horizontal"
                 android:layout_width="22dp"
                 android:layout_height="match_parent"
+                android:layout_alignParentStart="true"
                 android:max="100"
                 android:progress="0"
-                android:progressDrawable="@drawable/brake_vertical_progress_bar"
-                android:layout_alignParentStart="true"/>
+                android:progressDrawable="@drawable/brake_vertical_progress_bar" />
 
             <ImageView
                 android:layout_width="5dp"
                 android:layout_height="match_parent"
                 android:layout_toRightOf="@id/brakeProgressBar"
-                android:background="@drawable/custom_white_solid"
-                />
+                android:background="@drawable/custom_white_solid" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/lcStatus"
@@ -190,120 +190,115 @@
                     android:id="@+id/amsIndicator"
                     android:layout_width="30dp"
                     android:layout_height="8dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintLeft_toLeftOf="parent"
                     android:background="@color/dead_grey"
-                    />
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent" />
 
                 <TextView
                     android:id="@+id/amsLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
-                    app:layout_constraintLeft_toLeftOf="@id/amsIndicator"
-                    app:layout_constraintRight_toRightOf="@id/amsIndicator"
-                    app:layout_constraintBottom_toTopOf="@id/amsIndicator"
+                    android:rotation="270"
                     android:text="AMS"
+                    android:textColor="@color/dead_grey"
                     android:textSize="15sp"
                     android:textStyle="bold"
-                    android:rotation="270"
-                    android:textColor="@color/dead_grey" />
+                    app:layout_constraintBottom_toTopOf="@id/amsIndicator"
+                    app:layout_constraintLeft_toLeftOf="@id/amsIndicator"
+                    app:layout_constraintRight_toRightOf="@id/amsIndicator" />
 
                 <ImageView
                     android:id="@+id/bspdIndicator"
                     android:layout_width="30dp"
                     android:layout_height="8dp"
-                    app:layout_constraintBottom_toBottomOf="@id/amsIndicator"
-                    app:layout_constraintLeft_toRightOf="@id/amsIndicator"
-                    android:background="@color/dead_grey"
                     android:layout_marginStart="13dp"
-                    />
+                    android:background="@color/dead_grey"
+                    app:layout_constraintBottom_toBottomOf="@id/amsIndicator"
+                    app:layout_constraintLeft_toRightOf="@id/amsIndicator" />
 
                 <TextView
                     android:id="@+id/bspdLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="15dp"
-                    app:layout_constraintLeft_toLeftOf="@id/bspdIndicator"
-                    app:layout_constraintRight_toRightOf="@id/bspdIndicator"
-                    app:layout_constraintBottom_toTopOf="@id/bspdIndicator"
+                    android:rotation="270"
                     android:text="BSPD"
+                    android:textColor="@color/dead_grey"
                     android:textSize="15sp"
                     android:textStyle="bold"
-                    android:rotation="270"
-                    android:textColor="@color/dead_grey"/>
+                    app:layout_constraintBottom_toTopOf="@id/bspdIndicator"
+                    app:layout_constraintLeft_toLeftOf="@id/bspdIndicator"
+                    app:layout_constraintRight_toRightOf="@id/bspdIndicator" />
 
                 <ImageView
                     android:id="@+id/imdIndicator"
                     android:layout_width="30dp"
                     android:layout_height="8dp"
-                    app:layout_constraintBottom_toBottomOf="@id/bspdIndicator"
-                    app:layout_constraintLeft_toRightOf="@id/bspdIndicator"
-                    android:background="@color/dead_grey"
                     android:layout_marginStart="13dp"
-                    />
+                    android:background="@color/dead_grey"
+                    app:layout_constraintBottom_toBottomOf="@id/bspdIndicator"
+                    app:layout_constraintLeft_toRightOf="@id/bspdIndicator" />
 
                 <TextView
                     android:id="@+id/imdLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
-                    app:layout_constraintLeft_toLeftOf="@id/imdIndicator"
-                    app:layout_constraintRight_toRightOf="@id/imdIndicator"
-                    app:layout_constraintBottom_toTopOf="@id/imdIndicator"
+                    android:rotation="270"
                     android:text="IMD"
+                    android:textColor="@color/dead_grey"
                     android:textSize="15sp"
                     android:textStyle="bold"
-                    android:rotation="270"
-                    android:textColor="@color/dead_grey"/>
+                    app:layout_constraintBottom_toTopOf="@id/imdIndicator"
+                    app:layout_constraintLeft_toLeftOf="@id/imdIndicator"
+                    app:layout_constraintRight_toRightOf="@id/imdIndicator" />
 
                 <ImageView
                     android:id="@+id/lvIndicator"
                     android:layout_width="30dp"
                     android:layout_height="8dp"
-                    app:layout_constraintBottom_toBottomOf="@id/imdIndicator"
-                    app:layout_constraintLeft_toRightOf="@id/imdIndicator"
-                    android:background="@color/dead_grey"
                     android:layout_marginStart="13dp"
-                    />
+                    android:background="@color/dead_grey"
+                    app:layout_constraintBottom_toBottomOf="@id/imdIndicator"
+                    app:layout_constraintLeft_toRightOf="@id/imdIndicator" />
 
                 <TextView
                     android:id="@+id/lvLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="5dp"
-                    app:layout_constraintLeft_toLeftOf="@id/lvIndicator"
-                    app:layout_constraintRight_toRightOf="@id/lvIndicator"
-                    app:layout_constraintBottom_toTopOf="@id/lvIndicator"
+                    android:rotation="270"
                     android:text="LV"
+                    android:textColor="@color/dead_grey"
                     android:textSize="15sp"
                     android:textStyle="bold"
-                    android:rotation="270"
-                    android:textColor="@color/dead_grey"/>
+                    app:layout_constraintBottom_toTopOf="@id/lvIndicator"
+                    app:layout_constraintLeft_toLeftOf="@id/lvIndicator"
+                    app:layout_constraintRight_toRightOf="@id/lvIndicator" />
 
                 <ImageView
                     android:id="@+id/hvIndicator"
                     android:layout_width="30dp"
                     android:layout_height="8dp"
-                    app:layout_constraintBottom_toBottomOf="@id/lvIndicator"
-                    app:layout_constraintLeft_toRightOf="@id/lvIndicator"
-                    android:background="@color/dead_grey"
                     android:layout_marginStart="13dp"
-                    />
+                    android:background="@color/dead_grey"
+                    app:layout_constraintBottom_toBottomOf="@id/lvIndicator"
+                    app:layout_constraintLeft_toRightOf="@id/lvIndicator" />
 
                 <TextView
                     android:id="@+id/hvLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="5dp"
-                    app:layout_constraintLeft_toLeftOf="@id/hvIndicator"
-                    app:layout_constraintRight_toRightOf="@id/hvIndicator"
-                    app:layout_constraintBottom_toTopOf="@id/hvIndicator"
+                    android:rotation="270"
                     android:text="HV"
+                    android:textColor="@color/dead_grey"
                     android:textSize="15sp"
                     android:textStyle="bold"
-                    android:rotation="270"
-                    android:textColor="@color/dead_grey"/>
+                    app:layout_constraintBottom_toTopOf="@id/hvIndicator"
+                    app:layout_constraintLeft_toLeftOf="@id/hvIndicator"
+                    app:layout_constraintRight_toRightOf="@id/hvIndicator" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -311,8 +306,8 @@
                 android:id="@+id/leftGrid"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
                 android:layout_alignParentRight="true"
+                android:layout_marginTop="10dp"
                 android:visibility="gone">
 
                 <TextView
@@ -320,101 +315,101 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="INVTemp"
-                    android:textStyle="bold"
-                    android:textSize="20sp"
                     android:textAlignment="center"
-                    app:layout_constraintTop_toTopOf="parent"/>
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <ImageView
                     android:id="@+id/invFL"
                     android:layout_width="92dp"
                     android:layout_height="80dp"
+                    android:background="@color/dead_grey"
                     app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/invTitle"
-                    android:background="@color/dead_grey"/>
+                    app:layout_constraintTop_toBottomOf="@id/invTitle" />
 
                 <TextView
                     android:id="@+id/invFLtext"
                     android:layout_width="70dp"
                     android:layout_height="58dp"
-                    app:layout_constraintLeft_toLeftOf="@id/invFL"
-                    app:layout_constraintRight_toRightOf="@id/invFL"
-                    app:layout_constraintTop_toTopOf="@id/invFL"
-                    app:layout_constraintBottom_toBottomOf="@id/invFL"
                     android:background="@color/black"
+                    android:fontFamily="@font/technology"
+                    android:gravity="center"
                     android:text="--"
                     android:textSize="65dp"
-                    android:gravity="center"
-                    android:fontFamily="@font/technology"/>
+                    app:layout_constraintBottom_toBottomOf="@id/invFL"
+                    app:layout_constraintLeft_toLeftOf="@id/invFL"
+                    app:layout_constraintRight_toRightOf="@id/invFL"
+                    app:layout_constraintTop_toTopOf="@id/invFL" />
 
                 <ImageView
                     android:id="@+id/invFR"
                     android:layout_width="92dp"
                     android:layout_height="80dp"
-                    app:layout_constraintTop_toTopOf="@id/invFL"
-                    app:layout_constraintLeft_toRightOf="@id/invFL"
                     android:layout_marginStart="15dp"
-                    android:background="@color/dead_grey"/>
+                    android:background="@color/dead_grey"
+                    app:layout_constraintLeft_toRightOf="@id/invFL"
+                    app:layout_constraintTop_toTopOf="@id/invFL" />
 
                 <TextView
                     android:id="@+id/invFRtext"
                     android:layout_width="70dp"
                     android:layout_height="58dp"
-                    app:layout_constraintLeft_toLeftOf="@id/invFR"
-                    app:layout_constraintRight_toRightOf="@id/invFR"
-                    app:layout_constraintTop_toTopOf="@id/invFR"
-                    app:layout_constraintBottom_toBottomOf="@id/invFR"
                     android:background="@color/black"
+                    android:fontFamily="@font/technology"
+                    android:gravity="center"
                     android:text="--"
                     android:textSize="65dp"
-                    android:gravity="center"
-                    android:fontFamily="@font/technology"/>
+                    app:layout_constraintBottom_toBottomOf="@id/invFR"
+                    app:layout_constraintLeft_toLeftOf="@id/invFR"
+                    app:layout_constraintRight_toRightOf="@id/invFR"
+                    app:layout_constraintTop_toTopOf="@id/invFR" />
 
                 <ImageView
                     android:id="@+id/invRL"
                     android:layout_width="92dp"
                     android:layout_height="80dp"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/invFL"
                     android:layout_marginTop="15dp"
-                    android:background="@color/dead_grey"/>
+                    android:background="@color/dead_grey"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/invFL" />
 
                 <TextView
                     android:id="@+id/invRLtext"
                     android:layout_width="70dp"
                     android:layout_height="58dp"
-                    app:layout_constraintLeft_toLeftOf="@id/invRL"
-                    app:layout_constraintRight_toRightOf="@id/invRL"
-                    app:layout_constraintTop_toTopOf="@id/invRL"
-                    app:layout_constraintBottom_toBottomOf="@id/invRL"
                     android:background="@color/black"
+                    android:fontFamily="@font/technology"
+                    android:gravity="center"
                     android:text="--"
                     android:textSize="65dp"
-                    android:gravity="center"
-                    android:fontFamily="@font/technology"/>
+                    app:layout_constraintBottom_toBottomOf="@id/invRL"
+                    app:layout_constraintLeft_toLeftOf="@id/invRL"
+                    app:layout_constraintRight_toRightOf="@id/invRL"
+                    app:layout_constraintTop_toTopOf="@id/invRL" />
 
                 <ImageView
                     android:id="@+id/invRR"
                     android:layout_width="92dp"
                     android:layout_height="80dp"
-                    app:layout_constraintLeft_toLeftOf="@id/invFR"
-                    app:layout_constraintTop_toBottomOf="@id/invFR"
                     android:layout_marginTop="15dp"
-                    android:background="@color/dead_grey"/>
+                    android:background="@color/dead_grey"
+                    app:layout_constraintLeft_toLeftOf="@id/invFR"
+                    app:layout_constraintTop_toBottomOf="@id/invFR" />
 
                 <TextView
                     android:id="@+id/invRRtext"
                     android:layout_width="70dp"
                     android:layout_height="58dp"
-                    app:layout_constraintLeft_toLeftOf="@id/invRR"
-                    app:layout_constraintRight_toRightOf="@id/invRR"
-                    app:layout_constraintTop_toTopOf="@id/invRR"
-                    app:layout_constraintBottom_toBottomOf="@id/invRR"
                     android:background="@color/black"
+                    android:fontFamily="@font/technology"
+                    android:gravity="center"
                     android:text="--"
                     android:textSize="65dp"
-                    android:gravity="center"
-                    android:fontFamily="@font/technology"/>
+                    app:layout_constraintBottom_toBottomOf="@id/invRR"
+                    app:layout_constraintLeft_toLeftOf="@id/invRR"
+                    app:layout_constraintRight_toRightOf="@id/invRR"
+                    app:layout_constraintTop_toTopOf="@id/invRR" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -422,88 +417,88 @@
                 android:id="@+id/leftData"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:layout_alignParentRight="true">
+                android:layout_alignParentRight="true"
+                android:layout_marginTop="10dp">
 
                 <TextView
                     android:id="@+id/bttTitle"
                     android:layout_width="199dp"
                     android:layout_height="wrap_content"
                     android:text="Battery Data"
-                    android:textStyle="bold"
-                    android:textSize="20sp"
                     android:textAlignment="center"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintRight_toRightOf="parent"/>
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:id="@+id/hvDataLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/bttTitle"
                     android:layout_marginTop="15dp"
-                    android:text="HV Max\nTemp"
                     android:paddingVertical="8dp"
+                    android:rotation="270"
+                    android:text="HV Max\nTemp"
                     android:textSize="18sp"
                     android:textStyle="bold"
-                    android:rotation="270" />
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/bttTitle" />
 
                 <ImageView
                     android:id="@+id/hvDataLine"
                     android:layout_width="8dp"
                     android:layout_height="80dp"
-                    app:layout_constraintRight_toLeftOf="@id/hvDataLabel"
-                    app:layout_constraintTop_toTopOf="@id/hvDataLabel"
+                    android:background="@color/good_green"
                     app:layout_constraintBottom_toBottomOf="@id/hvDataLabel"
-                    android:background="@color/good_green"/>
+                    app:layout_constraintRight_toLeftOf="@id/hvDataLabel"
+                    app:layout_constraintTop_toTopOf="@id/hvDataLabel" />
 
                 <TextView
                     android:id="@+id/hvData"
                     android:layout_width="wrap_content"
                     android:layout_height="58dp"
-                    app:layout_constraintRight_toLeftOf="@id/hvDataLine"
-                    app:layout_constraintTop_toTopOf="@id/hvDataLine"
-                    app:layout_constraintBottom_toBottomOf="@id/hvDataLine"
                     android:layout_marginRight="20dp"
+                    android:fontFamily="@font/technology"
                     android:text="--.-"
                     android:textSize="65dp"
-                    android:fontFamily="@font/technology"/>
+                    app:layout_constraintBottom_toBottomOf="@id/hvDataLine"
+                    app:layout_constraintRight_toLeftOf="@id/hvDataLine"
+                    app:layout_constraintTop_toTopOf="@id/hvDataLine" />
 
                 <TextView
                     android:id="@+id/lvDataLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:layout_constraintLeft_toLeftOf="@id/hvDataLabel"
-                    app:layout_constraintTop_toBottomOf="@id/hvDataLabel"
-                    android:layout_marginTop="45dp"
                     android:layout_marginLeft="10dp"
-                    android:text="LV"
+                    android:layout_marginTop="45dp"
                     android:paddingVertical="8dp"
+                    android:rotation="270"
+                    android:text="LV"
                     android:textSize="18sp"
                     android:textStyle="bold"
-                    android:rotation="270" />
+                    app:layout_constraintLeft_toLeftOf="@id/hvDataLabel"
+                    app:layout_constraintTop_toBottomOf="@id/hvDataLabel" />
 
                 <ImageView
                     android:id="@+id/lvDataLine"
                     android:layout_width="8dp"
                     android:layout_height="80dp"
-                    app:layout_constraintRight_toLeftOf="@id/hvDataLabel"
-                    app:layout_constraintTop_toTopOf="@id/lvDataLabel"
+                    android:background="@color/good_green"
                     app:layout_constraintBottom_toBottomOf="@id/lvDataLabel"
-                    android:background="@color/good_green"/>
+                    app:layout_constraintRight_toLeftOf="@id/hvDataLabel"
+                    app:layout_constraintTop_toTopOf="@id/lvDataLabel" />
 
                 <TextView
                     android:id="@+id/lvData"
                     android:layout_width="wrap_content"
                     android:layout_height="58dp"
-                    app:layout_constraintRight_toLeftOf="@id/lvDataLine"
-                    app:layout_constraintTop_toTopOf="@id/lvDataLine"
-                    app:layout_constraintBottom_toBottomOf="@id/lvDataLine"
                     android:layout_marginRight="20dp"
+                    android:fontFamily="@font/technology"
                     android:text="--.-"
                     android:textSize="65dp"
-                    android:fontFamily="@font/technology"/>
+                    app:layout_constraintBottom_toBottomOf="@id/lvDataLine"
+                    app:layout_constraintRight_toLeftOf="@id/lvDataLine"
+                    app:layout_constraintTop_toTopOf="@id/lvDataLine" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -513,27 +508,26 @@
             android:id="@+id/rightCell"
             android:layout_width="250dp"
             android:layout_height="0dp"
-            app:layout_constraintTop_toBottomOf="@id/bttBar"
+            android:paddingEnd="14dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/centerCell"
-            android:paddingEnd="14dp">
+            app:layout_constraintTop_toBottomOf="@id/bttBar">
 
             <ProgressBar
                 android:id="@+id/accelProgressBar"
                 style="@android:style/Widget.ProgressBar.Horizontal"
                 android:layout_width="22dp"
                 android:layout_height="match_parent"
+                android:layout_alignParentEnd="true"
                 android:max="100"
                 android:progress="0"
-                android:progressDrawable="@drawable/accel_vertical_progress_bar"
-                android:layout_alignParentEnd="true"/>
+                android:progressDrawable="@drawable/accel_vertical_progress_bar" />
 
             <ImageView
                 android:layout_width="5dp"
                 android:layout_height="match_parent"
                 android:layout_toLeftOf="@id/accelProgressBar"
-                android:background="@drawable/custom_white_solid"
-                />
+                android:background="@drawable/custom_white_solid" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/rcStatus"
@@ -546,120 +540,115 @@
                     android:id="@+id/appsIndicator"
                     android:layout_width="30dp"
                     android:layout_height="8dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintLeft_toLeftOf="parent"
                     android:background="@color/dead_grey"
-                    />
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent" />
 
                 <TextView
                     android:id="@+id/appsLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="15dp"
-                    app:layout_constraintLeft_toLeftOf="@id/appsIndicator"
-                    app:layout_constraintRight_toRightOf="@id/appsIndicator"
-                    app:layout_constraintBottom_toTopOf="@id/appsIndicator"
+                    android:rotation="270"
                     android:text="APPS"
+                    android:textColor="@color/dead_grey"
                     android:textSize="15sp"
                     android:textStyle="bold"
-                    android:rotation="270"
-                    android:textColor="@color/dead_grey"/>
+                    app:layout_constraintBottom_toTopOf="@id/appsIndicator"
+                    app:layout_constraintLeft_toLeftOf="@id/appsIndicator"
+                    app:layout_constraintRight_toRightOf="@id/appsIndicator" />
 
                 <ImageView
                     android:id="@+id/tcIndicator"
                     android:layout_width="30dp"
                     android:layout_height="8dp"
-                    app:layout_constraintBottom_toBottomOf="@id/appsIndicator"
-                    app:layout_constraintLeft_toRightOf="@id/appsIndicator"
-                    android:background="@color/dead_grey"
                     android:layout_marginStart="13dp"
-                    />
+                    android:background="@color/dead_grey"
+                    app:layout_constraintBottom_toBottomOf="@id/appsIndicator"
+                    app:layout_constraintLeft_toRightOf="@id/appsIndicator" />
 
                 <TextView
                     android:id="@+id/tcLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="5dp"
-                    app:layout_constraintLeft_toLeftOf="@id/tcIndicator"
-                    app:layout_constraintRight_toRightOf="@id/tcIndicator"
-                    app:layout_constraintBottom_toTopOf="@id/tcIndicator"
+                    android:rotation="270"
                     android:text="TC"
+                    android:textColor="@color/dead_grey"
                     android:textSize="15sp"
                     android:textStyle="bold"
-                    android:rotation="270"
-                    android:textColor="@color/dead_grey"/>
+                    app:layout_constraintBottom_toTopOf="@id/tcIndicator"
+                    app:layout_constraintLeft_toLeftOf="@id/tcIndicator"
+                    app:layout_constraintRight_toRightOf="@id/tcIndicator" />
 
                 <ImageView
                     android:id="@+id/absIndicator"
                     android:layout_width="30dp"
                     android:layout_height="8dp"
-                    app:layout_constraintBottom_toBottomOf="@id/tcIndicator"
-                    app:layout_constraintLeft_toRightOf="@id/tcIndicator"
-                    android:background="@color/dead_grey"
                     android:layout_marginStart="13dp"
-                    />
+                    android:background="@color/dead_grey"
+                    app:layout_constraintBottom_toBottomOf="@id/tcIndicator"
+                    app:layout_constraintLeft_toRightOf="@id/tcIndicator" />
 
                 <TextView
                     android:id="@+id/absLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
-                    app:layout_constraintLeft_toLeftOf="@id/absIndicator"
-                    app:layout_constraintRight_toRightOf="@id/absIndicator"
-                    app:layout_constraintBottom_toTopOf="@id/absIndicator"
+                    android:rotation="270"
                     android:text="ABS"
+                    android:textColor="@color/dead_grey"
                     android:textSize="15sp"
                     android:textStyle="bold"
-                    android:rotation="270"
-                    android:textColor="@color/dead_grey"/>
+                    app:layout_constraintBottom_toTopOf="@id/absIndicator"
+                    app:layout_constraintLeft_toLeftOf="@id/absIndicator"
+                    app:layout_constraintRight_toRightOf="@id/absIndicator" />
 
                 <ImageView
                     android:id="@+id/vdcIndicator"
                     android:layout_width="30dp"
                     android:layout_height="8dp"
-                    app:layout_constraintBottom_toBottomOf="@id/absIndicator"
-                    app:layout_constraintLeft_toRightOf="@id/absIndicator"
-                    android:background="@color/dead_grey"
                     android:layout_marginStart="13dp"
-                    />
+                    android:background="@color/dead_grey"
+                    app:layout_constraintBottom_toBottomOf="@id/absIndicator"
+                    app:layout_constraintLeft_toRightOf="@id/absIndicator" />
 
                 <TextView
                     android:id="@+id/vdcLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
-                    app:layout_constraintLeft_toLeftOf="@id/vdcIndicator"
-                    app:layout_constraintRight_toRightOf="@id/vdcIndicator"
-                    app:layout_constraintBottom_toTopOf="@id/vdcIndicator"
+                    android:rotation="270"
                     android:text="VDC"
+                    android:textColor="@color/dead_grey"
                     android:textSize="15sp"
                     android:textStyle="bold"
-                    android:rotation="270"
-                    android:textColor="@color/dead_grey"/>
+                    app:layout_constraintBottom_toTopOf="@id/vdcIndicator"
+                    app:layout_constraintLeft_toLeftOf="@id/vdcIndicator"
+                    app:layout_constraintRight_toRightOf="@id/vdcIndicator" />
 
                 <ImageView
                     android:id="@+id/energylimitIndicator"
                     android:layout_width="30dp"
                     android:layout_height="8dp"
-                    app:layout_constraintBottom_toBottomOf="@id/vdcIndicator"
-                    app:layout_constraintLeft_toRightOf="@id/vdcIndicator"
-                    android:background="@color/dead_grey"
                     android:layout_marginStart="13dp"
-                    />
+                    android:background="@color/dead_grey"
+                    app:layout_constraintBottom_toBottomOf="@id/vdcIndicator"
+                    app:layout_constraintLeft_toRightOf="@id/vdcIndicator" />
 
                 <TextView
                     android:id="@+id/energylimitLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="15dp"
-                    app:layout_constraintLeft_toLeftOf="@id/energylimitIndicator"
-                    app:layout_constraintRight_toRightOf="@id/energylimitIndicator"
-                    app:layout_constraintBottom_toTopOf="@id/energylimitIndicator"
+                    android:rotation="270"
                     android:text="80kW"
+                    android:textColor="@color/dead_grey"
                     android:textSize="15sp"
                     android:textStyle="bold"
-                    android:rotation="270"
-                    android:textColor="@color/dead_grey"/>
+                    app:layout_constraintBottom_toTopOf="@id/energylimitIndicator"
+                    app:layout_constraintLeft_toLeftOf="@id/energylimitIndicator"
+                    app:layout_constraintRight_toRightOf="@id/energylimitIndicator" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -667,159 +656,159 @@
                 android:id="@+id/rightGrid"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:layout_alignParentLeft="true">
+                android:layout_alignParentLeft="true"
+                android:layout_marginTop="10dp">
 
                 <TextView
                     android:id="@+id/rtodTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="RtoD + MtrTemp"
-                    android:textStyle="bold"
-                    android:textSize="20sp"
                     android:textAlignment="center"
-                    app:layout_constraintTop_toTopOf="parent"/>
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:id="@+id/mtrTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="MtrTemp"
-                    android:textStyle="bold"
-                    android:textSize="20sp"
                     android:textAlignment="center"
-                    app:layout_constraintTop_toTopOf="parent"
-                    android:visibility="invisible"/>
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:visibility="invisible"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <ImageView
                     android:id="@+id/rtodFL"
                     android:layout_width="92dp"
                     android:layout_height="80dp"
+                    android:background="@color/dead_grey"
                     app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/rtodTitle"
-                    android:background="@color/dead_grey"/>
+                    app:layout_constraintTop_toBottomOf="@id/rtodTitle" />
 
                 <ImageView
                     android:id="@+id/mtrFL"
                     android:layout_width="92dp"
                     android:layout_height="80dp"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/rtodTitle"
                     android:background="@color/dead_grey"
-                    android:visibility="invisible"/>
+                    android:visibility="invisible"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/rtodTitle" />
 
                 <TextView
                     android:id="@+id/mtrFLtext"
                     android:layout_width="70dp"
                     android:layout_height="58dp"
-                    app:layout_constraintLeft_toLeftOf="@id/rtodFL"
-                    app:layout_constraintRight_toRightOf="@id/rtodFL"
-                    app:layout_constraintTop_toTopOf="@id/rtodFL"
-                    app:layout_constraintBottom_toBottomOf="@id/rtodFL"
                     android:background="@color/black"
+                    android:fontFamily="@font/technology"
+                    android:gravity="center"
                     android:text="--"
                     android:textSize="65dp"
-                    android:gravity="center"
-                    android:fontFamily="@font/technology"/>
+                    app:layout_constraintBottom_toBottomOf="@id/rtodFL"
+                    app:layout_constraintLeft_toLeftOf="@id/rtodFL"
+                    app:layout_constraintRight_toRightOf="@id/rtodFL"
+                    app:layout_constraintTop_toTopOf="@id/rtodFL" />
 
                 <ImageView
                     android:id="@+id/rtodFR"
                     android:layout_width="92dp"
                     android:layout_height="80dp"
-                    app:layout_constraintTop_toTopOf="@id/rtodFL"
-                    app:layout_constraintLeft_toRightOf="@id/rtodFL"
                     android:layout_marginStart="15dp"
-                    android:background="@color/dead_grey"/>
+                    android:background="@color/dead_grey"
+                    app:layout_constraintLeft_toRightOf="@id/rtodFL"
+                    app:layout_constraintTop_toTopOf="@id/rtodFL" />
 
                 <ImageView
                     android:id="@+id/mtrFR"
                     android:layout_width="92dp"
                     android:layout_height="80dp"
-                    app:layout_constraintTop_toTopOf="@id/rtodFL"
-                    app:layout_constraintLeft_toRightOf="@id/rtodFL"
                     android:layout_marginStart="15dp"
                     android:background="@color/dead_grey"
-                    android:visibility="invisible"/>
+                    android:visibility="invisible"
+                    app:layout_constraintLeft_toRightOf="@id/rtodFL"
+                    app:layout_constraintTop_toTopOf="@id/rtodFL" />
 
                 <TextView
                     android:id="@+id/mtrFRtext"
                     android:layout_width="70dp"
                     android:layout_height="58dp"
-                    app:layout_constraintLeft_toLeftOf="@id/rtodFR"
-                    app:layout_constraintRight_toRightOf="@id/rtodFR"
-                    app:layout_constraintTop_toTopOf="@id/rtodFR"
-                    app:layout_constraintBottom_toBottomOf="@id/rtodFR"
                     android:background="@color/black"
+                    android:fontFamily="@font/technology"
+                    android:gravity="center"
                     android:text="--"
                     android:textSize="65dp"
-                    android:gravity="center"
-                    android:fontFamily="@font/technology"/>
+                    app:layout_constraintBottom_toBottomOf="@id/rtodFR"
+                    app:layout_constraintLeft_toLeftOf="@id/rtodFR"
+                    app:layout_constraintRight_toRightOf="@id/rtodFR"
+                    app:layout_constraintTop_toTopOf="@id/rtodFR" />
 
                 <ImageView
                     android:id="@+id/rtodRL"
                     android:layout_width="92dp"
                     android:layout_height="80dp"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/rtodFL"
                     android:layout_marginTop="15dp"
-                    android:background="@color/dead_grey"/>
+                    android:background="@color/dead_grey"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/rtodFL" />
 
                 <ImageView
                     android:id="@+id/mtrRL"
                     android:layout_width="92dp"
                     android:layout_height="80dp"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/rtodFL"
                     android:layout_marginTop="15dp"
                     android:background="@color/dead_grey"
-                    android:visibility="invisible"/>
+                    android:visibility="invisible"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/rtodFL" />
 
                 <TextView
                     android:id="@+id/mtrRLtext"
                     android:layout_width="70dp"
                     android:layout_height="58dp"
-                    app:layout_constraintLeft_toLeftOf="@id/rtodRL"
-                    app:layout_constraintRight_toRightOf="@id/rtodRL"
-                    app:layout_constraintTop_toTopOf="@id/rtodRL"
-                    app:layout_constraintBottom_toBottomOf="@id/rtodRL"
                     android:background="@color/black"
+                    android:fontFamily="@font/technology"
+                    android:gravity="center"
                     android:text="--"
                     android:textSize="65dp"
-                    android:gravity="center"
-                    android:fontFamily="@font/technology"/>
+                    app:layout_constraintBottom_toBottomOf="@id/rtodRL"
+                    app:layout_constraintLeft_toLeftOf="@id/rtodRL"
+                    app:layout_constraintRight_toRightOf="@id/rtodRL"
+                    app:layout_constraintTop_toTopOf="@id/rtodRL" />
 
                 <ImageView
                     android:id="@+id/rtodRR"
                     android:layout_width="92dp"
                     android:layout_height="80dp"
-                    app:layout_constraintLeft_toLeftOf="@id/rtodFR"
-                    app:layout_constraintTop_toBottomOf="@id/rtodFR"
                     android:layout_marginTop="15dp"
-                    android:background="@color/dead_grey"/>
+                    android:background="@color/dead_grey"
+                    app:layout_constraintLeft_toLeftOf="@id/rtodFR"
+                    app:layout_constraintTop_toBottomOf="@id/rtodFR" />
 
                 <ImageView
                     android:id="@+id/mtrRR"
                     android:layout_width="92dp"
                     android:layout_height="80dp"
-                    app:layout_constraintLeft_toLeftOf="@id/rtodFR"
-                    app:layout_constraintTop_toBottomOf="@id/rtodFR"
                     android:layout_marginTop="15dp"
                     android:background="@color/dead_grey"
-                    android:visibility="invisible"/>
+                    android:visibility="invisible"
+                    app:layout_constraintLeft_toLeftOf="@id/rtodFR"
+                    app:layout_constraintTop_toBottomOf="@id/rtodFR" />
 
                 <TextView
                     android:id="@+id/mtrRRtext"
                     android:layout_width="70dp"
                     android:layout_height="58dp"
-                    app:layout_constraintLeft_toLeftOf="@id/rtodRR"
-                    app:layout_constraintRight_toRightOf="@id/rtodRR"
-                    app:layout_constraintTop_toTopOf="@id/rtodRR"
-                    app:layout_constraintBottom_toBottomOf="@id/rtodRR"
                     android:background="@color/black"
+                    android:fontFamily="@font/technology"
+                    android:gravity="center"
                     android:text="--"
                     android:textSize="65dp"
-                    android:gravity="center"
-                    android:fontFamily="@font/technology"/>
+                    app:layout_constraintBottom_toBottomOf="@id/rtodRR"
+                    app:layout_constraintLeft_toLeftOf="@id/rtodRR"
+                    app:layout_constraintRight_toRightOf="@id/rtodRR"
+                    app:layout_constraintTop_toTopOf="@id/rtodRR" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -827,25 +816,12 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <EditText
-        android:id="@+id/textBox"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="84dp"
-        android:layout_marginBottom="424dp"
-        android:autofillHints="Any Text"
-        android:hint="Put anything Here!"
-        android:inputType="text"
-        app:layout_constraintBottom_toTopOf="@+id/textView2"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
     <ScrollView
         android:id="@+id/scrollView"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="320dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="184dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -863,99 +839,45 @@
     </ScrollView>
 
     <Button
-        android:id="@+id/randomButton"
-        android:layout_width="0dp"
-        android:layout_height="57dp"
-        android:layout_marginEnd="18dp"
-        android:text="RANDOM"
-        app:layout_constraintBaseline_toBaselineOf="@+id/runButton"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/runButton"
-        app:rippleColor="#03A9F4"
-        app:strokeColor="#03A9F4" />
-
-    <Button
-        android:id="@+id/submitButton"
+        android:id="@+id/ConnectButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="38dp"
-        android:text="SUBMIT"
-        app:layout_constraintBaseline_toBaselineOf="@+id/runButton"
-        app:layout_constraintEnd_toStartOf="@+id/runButton"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <Button
-        android:id="@+id/runButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="29dp"
-        android:layout_marginEnd="33dp"
-        android:text="RUN"
-        app:layout_constraintEnd_toStartOf="@+id/randomButton"
-        app:layout_constraintStart_toEndOf="@+id/submitButton"
-        app:layout_constraintTop_toBottomOf="@+id/scrollView" />
-
-    <Button
-        android:id="@+id/bluetoothButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:text="Bluetooth"
-        app:layout_constraintEnd_toStartOf="@+id/connectButton"
-        app:layout_constraintHorizontal_chainStyle="spread_inside"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/connectButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="20dp"
+        android:layout_marginStart="84dp"
+        android:layout_marginTop="68dp"
         android:text="connect"
-        app:layout_constraintEnd_toStartOf="@+id/pauseButton"
-        app:layout_constraintStart_toEndOf="@+id/bluetoothButton"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/pauseButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="18dp"
-        android:text="PAUSE"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/connectButton"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/ToDriverText"
         android:layout_width="333dp"
         android:layout_height="78dp"
-        android:layout_marginStart="39dp"
-        android:layout_marginEnd="39dp"
-        android:layout_marginBottom="4dp"
+        android:layout_marginStart="36dp"
+        android:layout_marginTop="28dp"
         android:text="..."
         android:textAlignment="center"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView2" />
 
     <TextView
         android:id="@+id/textView2"
         android:layout_width="283dp"
         android:layout_height="25dp"
-        android:layout_marginStart="65dp"
-        android:layout_marginEnd="65dp"
-        android:layout_marginBottom="95dp"
+        android:layout_marginStart="64dp"
+        android:layout_marginTop="40dp"
         android:text="ToDriver text will be shown here."
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textBox" />
+        app:layout_constraintTop_toBottomOf="@+id/scrollView" />
+
+    <Button
+        android:id="@+id/DisconnectButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="68dp"
+        android:text="Disconnect"
+        app:layout_constraintStart_toEndOf="@+id/ConnectButton"
+        app:layout_constraintTop_toTopOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -82,13 +82,13 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:text="Bluetooth"
-        app:layout_constraintEnd_toStartOf="@+id/connectButton"
+        app:layout_constraintEnd_toStartOf="@+id/ConnectButton"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/connectButton"
+        android:id="@+id/ConnectButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
@@ -106,7 +106,7 @@
         android:layout_marginEnd="18dp"
         android:text="PAUSE"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/connectButton"
+        app:layout_constraintStart_toEndOf="@+id/ConnectButton"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
