@@ -437,6 +437,7 @@ public class MainActivity extends AppCompatActivity {
         connectBtn = findViewById(R.id.connectButton);
         connectBtn.setOnClickListener(v -> {
             bluetooth.BluetoothConnection(this);
+            connectBtn.setEnabled(false);
 //            bluetooth.controlThread("START");
 //            firebase.countRun();
 //            connectBtn.setEnabled(false);
@@ -622,6 +623,9 @@ public class MainActivity extends AppCompatActivity {
             GlobalTime = time;
             ShowTxt.append(time + ":" + GlobalMessage + "\n");
             //Log.i(TAG, "receive: " + GlobalMessage);
+            if (VIEW==404){
+                bluetooth.BluetoothConnection(getApplicationContext());
+            }
 
 //            if (VIEW == 1) {
 //                firebase.realFireStore("LV", time, message);
@@ -636,7 +640,7 @@ public class MainActivity extends AppCompatActivity {
 //            } else if (VIEW == VIEW_TORQ) {
 //                String set = message[0] + "/" + message[1] + "/" + message[2] + "/" + message[3];
 //                firebase.realFireStore("TORQUE", time, message);
-//            }
+//            }sww
 
 //            firebase.realFireStore("VELOCITY", time, message);
 //            bluetooth.Write_file(message, "FEM21.txt", 1);
@@ -774,12 +778,13 @@ public class MainActivity extends AppCompatActivity {
         FindID();
 //        Log.i("database", "DataGroup: " + startA);
         firebase.realFireStore("LV", GlobalTime,lowSystemVoltage);
-        //firebase.realFireStore("HV", GlobalTime,batterySOC);
+        firebase.realFireStore("BATT", GlobalTime,batterySOC);
         //firebase.realFireStore("TEMPS", "MOTOR_TEMP", MotorTemps);
         //firebase.realFireStore("TEMPS", "INV_TEMP",inverterTemperature);
 
         // Use the Handler to update the TextView on the main thread
         //TODO 8/29
+
 
         int finalBatterySOC = (int) Math.round(batterySOC);
         double final_hv_maxtemp234 = hv_maxtemp234;
@@ -793,7 +798,9 @@ public class MainActivity extends AppCompatActivity {
                 //vMtr2.setText(String.valueOf(motorTemperature[1]));
                 //vMtr3.setText(String.valueOf(motorTemperature[2]));
                 //vMtr4.setText(String.valueOf(motorTemperature[3]));
-                bttBar.setProgress(finalBatterySOC); // Set initial progress
+                if(finalBatterySOC > 0){
+                    bttBar.setProgress(finalBatterySOC); // Set initial progress
+                }
                 updateProgressBarColor(bttBar);
                 vBattCharge.setText(String.valueOf(finalBatterySOC));
             }
@@ -839,7 +846,7 @@ public class MainActivity extends AppCompatActivity {
 
         //For InvTemp
         //Split inverter cold plate temperature by "x"
-        String[] received_invtemp = partB[1].split("x");
+        String[] received_invtemp = partB[3].split("x");
         if (received_invtemp.length != 4) {
             //throw new IllegalArgumentException("RTD data Length error");
         }
@@ -913,10 +920,30 @@ public class MainActivity extends AppCompatActivity {
                 m_motor_temp_fr.setText(String.valueOf(final_motortemp_fr));
                 m_motor_temp_rr.setText(String.valueOf(final_motortemp_rr));
                 m_motor_temp_rl.setText(String.valueOf(final_motortemp_rl));
-                m_cp_temp_fl.setText(String.valueOf(final_invtemp_fl));
-                m_cp_temp_fr.setText(String.valueOf(final_invtemp_fr));
-                m_cp_temp_rr.setText(String.valueOf(final_invtemp_rr));
-                m_cp_temp_rl.setText(String.valueOf(final_invtemp_rl));
+                if(final_invtemp_fl > 0){
+                    m_cp_temp_fl.setText(String.valueOf(final_invtemp_fl));
+                }
+                else{
+                    m_cp_temp_fl.setText("-");
+                }
+                if(final_invtemp_fr > 0){
+                    m_cp_temp_fr.setText(String.valueOf(final_invtemp_fr));
+                }
+                else{
+                    m_cp_temp_fr.setText("-");
+                }
+                if(final_invtemp_rr > 0){
+                    m_cp_temp_rr.setText(String.valueOf(final_invtemp_rr));
+                }
+                else{
+                    m_cp_temp_rr.setText("-");
+                }
+                if(final_invtemp_rl > 0){
+                    m_cp_temp_rl.setText(String.valueOf(final_invtemp_rl));
+                }
+                else{
+                    m_cp_temp_rl.setText("-");
+                }
             }
         });
     }

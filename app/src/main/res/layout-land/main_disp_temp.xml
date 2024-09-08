@@ -186,7 +186,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="100dp"
                 android:layout_alignParentEnd="true"
-                android:layout_alignParentBottom="true">
+                android:layout_alignParentBottom="true"
+                android:visibility="invisible">
 
                 <ImageView
                     android:id="@+id/amsIndicator"
@@ -318,31 +319,31 @@
                 android:visibility="gone">
 
                 <TextView
-                    android:id="@+id/invTitle"
+                    android:id="@+id/mtrTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="INVTemp"
+                    android:text="MtrTemp"
                     android:textStyle="bold"
                     android:textSize="20sp"
                     android:textAlignment="center"
                     app:layout_constraintTop_toTopOf="parent"/>
 
                 <ImageView
-                    android:id="@+id/invFL"
+                    android:id="@+id/mtrFL"
                     android:layout_width="92dp"
                     android:layout_height="80dp"
                     app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/invTitle"
+                    app:layout_constraintTop_toBottomOf="@id/mtrTitle"
                     android:background="@color/dead_grey"/>
 
                 <TextView
-                    android:id="@+id/invFLtext"
+                    android:id="@+id/mtrFLtext"
                     android:layout_width="70dp"
                     android:layout_height="58dp"
-                    app:layout_constraintLeft_toLeftOf="@id/invFL"
-                    app:layout_constraintRight_toRightOf="@id/invFL"
-                    app:layout_constraintTop_toTopOf="@id/invFL"
-                    app:layout_constraintBottom_toBottomOf="@id/invFL"
+                    app:layout_constraintLeft_toLeftOf="@id/mtrFL"
+                    app:layout_constraintRight_toRightOf="@id/mtrFL"
+                    app:layout_constraintTop_toTopOf="@id/mtrFL"
+                    app:layout_constraintBottom_toBottomOf="@id/mtrFL"
                     android:background="@color/black"
                     android:text="--"
                     android:textSize="65dp"
@@ -350,22 +351,22 @@
                     android:fontFamily="@font/technology"/>
 
                 <ImageView
-                    android:id="@+id/invFR"
+                    android:id="@+id/mtrFR"
                     android:layout_width="92dp"
                     android:layout_height="80dp"
-                    app:layout_constraintTop_toTopOf="@id/invFL"
-                    app:layout_constraintLeft_toRightOf="@id/invFL"
+                    app:layout_constraintTop_toTopOf="@id/mtrFL"
+                    app:layout_constraintLeft_toRightOf="@id/mtrFL"
                     android:layout_marginStart="15dp"
                     android:background="@color/dead_grey"/>
 
                 <TextView
-                    android:id="@+id/invFRtext"
+                    android:id="@+id/mtrFRtext"
                     android:layout_width="70dp"
                     android:layout_height="58dp"
-                    app:layout_constraintLeft_toLeftOf="@id/invFR"
-                    app:layout_constraintRight_toRightOf="@id/invFR"
-                    app:layout_constraintTop_toTopOf="@id/invFR"
-                    app:layout_constraintBottom_toBottomOf="@id/invFR"
+                    app:layout_constraintLeft_toLeftOf="@id/mtrFR"
+                    app:layout_constraintRight_toRightOf="@id/mtrFR"
+                    app:layout_constraintTop_toTopOf="@id/mtrFR"
+                    app:layout_constraintBottom_toBottomOf="@id/mtrFR"
                     android:background="@color/black"
                     android:text="--"
                     android:textSize="65dp"
@@ -373,22 +374,22 @@
                     android:fontFamily="@font/technology"/>
 
                 <ImageView
-                    android:id="@+id/invRL"
+                    android:id="@+id/mtrRL"
                     android:layout_width="92dp"
                     android:layout_height="80dp"
                     app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/invFL"
+                    app:layout_constraintTop_toBottomOf="@id/mtrFL"
                     android:layout_marginTop="15dp"
                     android:background="@color/dead_grey"/>
 
                 <TextView
-                    android:id="@+id/invRLtext"
+                    android:id="@+id/mtrRLtext"
                     android:layout_width="70dp"
                     android:layout_height="58dp"
-                    app:layout_constraintLeft_toLeftOf="@id/invRL"
-                    app:layout_constraintRight_toRightOf="@id/invRL"
-                    app:layout_constraintTop_toTopOf="@id/invRL"
-                    app:layout_constraintBottom_toBottomOf="@id/invRL"
+                    app:layout_constraintLeft_toLeftOf="@id/mtrRL"
+                    app:layout_constraintRight_toRightOf="@id/mtrRL"
+                    app:layout_constraintTop_toTopOf="@id/mtrRL"
+                    app:layout_constraintBottom_toBottomOf="@id/mtrRL"
                     android:background="@color/black"
                     android:text="--"
                     android:textSize="65dp"
@@ -396,22 +397,22 @@
                     android:fontFamily="@font/technology"/>
 
                 <ImageView
-                    android:id="@+id/invRR"
+                    android:id="@+id/mtrRR"
                     android:layout_width="92dp"
                     android:layout_height="80dp"
-                    app:layout_constraintLeft_toLeftOf="@id/invFR"
-                    app:layout_constraintTop_toBottomOf="@id/invFR"
+                    app:layout_constraintLeft_toLeftOf="@id/mtrFR"
+                    app:layout_constraintTop_toBottomOf="@id/mtrFR"
                     android:layout_marginTop="15dp"
                     android:background="@color/dead_grey"/>
 
                 <TextView
-                    android:id="@+id/invRRtext"
+                    android:id="@+id/mtrRRtext"
                     android:layout_width="70dp"
                     android:layout_height="58dp"
-                    app:layout_constraintLeft_toLeftOf="@id/invRR"
-                    app:layout_constraintRight_toRightOf="@id/invRR"
-                    app:layout_constraintTop_toTopOf="@id/invRR"
-                    app:layout_constraintBottom_toBottomOf="@id/invRR"
+                    app:layout_constraintLeft_toLeftOf="@id/mtrRR"
+                    app:layout_constraintRight_toRightOf="@id/mtrRR"
+                    app:layout_constraintTop_toTopOf="@id/mtrRR"
+                    app:layout_constraintBottom_toBottomOf="@id/mtrRR"
                     android:background="@color/black"
                     android:text="--"
                     android:textSize="65dp"
@@ -542,7 +543,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="100dp"
                 android:layout_alignParentStart="true"
-                android:layout_alignParentBottom="true">
+                android:layout_alignParentBottom="true"
+                android:visibility="invisible">
 
                 <ImageView
                     android:id="@+id/appsIndicator"
@@ -676,17 +678,17 @@
                     android:id="@+id/rtodTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="RtoD + MtrTemp"
+                    android:text="RtoD + CPTemp"
                     android:textStyle="bold"
                     android:textSize="20sp"
                     android:textAlignment="center"
                     app:layout_constraintTop_toTopOf="parent"/>
 
                 <TextView
-                    android:id="@+id/mtrTitle"
+                    android:id="@+id/invTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="MtrTemp"
+                    android:text="InvTemp"
                     android:textStyle="bold"
                     android:textSize="20sp"
                     android:textAlignment="center"
@@ -702,7 +704,7 @@
                     android:background="@color/dead_grey"/>
 
                 <ImageView
-                    android:id="@+id/mtrFL"
+                    android:id="@+id/invFL"
                     android:layout_width="92dp"
                     android:layout_height="80dp"
                     app:layout_constraintLeft_toLeftOf="parent"
@@ -711,7 +713,7 @@
                     android:visibility="invisible"/>
 
                 <TextView
-                    android:id="@+id/mtrFLtext"
+                    android:id="@+id/invFLtext"
                     android:layout_width="70dp"
                     android:layout_height="58dp"
                     app:layout_constraintLeft_toLeftOf="@id/rtodFL"
@@ -734,7 +736,7 @@
                     android:background="@color/dead_grey"/>
 
                 <ImageView
-                    android:id="@+id/mtrFR"
+                    android:id="@+id/invFR"
                     android:layout_width="92dp"
                     android:layout_height="80dp"
                     app:layout_constraintTop_toTopOf="@id/rtodFL"
@@ -744,7 +746,7 @@
                     android:visibility="invisible"/>
 
                 <TextView
-                    android:id="@+id/mtrFRtext"
+                    android:id="@+id/invFRtext"
                     android:layout_width="70dp"
                     android:layout_height="58dp"
                     app:layout_constraintLeft_toLeftOf="@id/rtodFR"
@@ -767,7 +769,7 @@
                     android:background="@color/dead_grey"/>
 
                 <ImageView
-                    android:id="@+id/mtrRL"
+                    android:id="@+id/invRL"
                     android:layout_width="92dp"
                     android:layout_height="80dp"
                     app:layout_constraintLeft_toLeftOf="parent"
@@ -777,7 +779,7 @@
                     android:visibility="invisible"/>
 
                 <TextView
-                    android:id="@+id/mtrRLtext"
+                    android:id="@+id/invRLtext"
                     android:layout_width="70dp"
                     android:layout_height="58dp"
                     app:layout_constraintLeft_toLeftOf="@id/rtodRL"
@@ -800,7 +802,7 @@
                     android:background="@color/dead_grey"/>
 
                 <ImageView
-                    android:id="@+id/mtrRR"
+                    android:id="@+id/invRR"
                     android:layout_width="92dp"
                     android:layout_height="80dp"
                     app:layout_constraintLeft_toLeftOf="@id/rtodFR"
@@ -810,7 +812,7 @@
                     android:visibility="invisible"/>
 
                 <TextView
-                    android:id="@+id/mtrRRtext"
+                    android:id="@+id/invRRtext"
                     android:layout_width="70dp"
                     android:layout_height="58dp"
                     app:layout_constraintLeft_toLeftOf="@id/rtodRR"

@@ -153,7 +153,6 @@ public class Bluetooth extends Service {
 
         public void run() {
             Main.checkPermission(ThreadContext);
-            Main.checkPermissionSCAN(ThreadContext);
             BluetoothSocket tmp = null;
             try {
                 tmp = bluetoothDevice.createRfcommSocketToServiceRecord(uuid);
@@ -178,20 +177,20 @@ public class Bluetooth extends Service {
 //                    Log.d("Thread", "mConnectedThread IS CREATED ");
                 mConnectedThread.start();
             } catch (IOException e) {
-                SendBroadcast(99,"FAILED CONNECTING TO:" + deviceName);
+                SendBroadcast(404,"FAILED CONNECTING TO:" + deviceName);
                 try {
                     bluetoothSocket.close();
-                    Log.e("Thread", "SOCKET CONNECTION FAILED, STOPPING SERVICE");
-                    Log.e("Thread", e.toString());
+                    Log.e("Thread", "SOCKET CONNECTION FAILED, STOPPING SERVICE", e);
+//                    Log.e("Thread", e.toString());
                     stopSelf();
                 } catch (IOException e2) {
-                    Log.e("Thread", "SOCKET CLOSING FAILED, STOPPING SERVICE:");
-                    Log.e("Thread",  e2.toString());
+                    Log.e("Thread", "SOCKET CLOSING FAILED, STOPPING SERVICE:", e2);
+//                    Log.e("Thread",  e2.toString());
                     stopSelf();
                 }
             } catch (IllegalStateException e) {
-                Log.e("Thread", "CONNECTED THREAD START FAILED, STOPPING SERVICE");
-                Log.e("Thread", e.toString());
+                Log.e("Thread", "CONNECTED THREAD START FAILED, STOPPING SERVICE", e);
+//                Log.e("Thread", e.toString());
                 stopSelf();
             }
         }
@@ -200,15 +199,15 @@ public class Bluetooth extends Service {
                 //Don't leave Bluetooth sockets open when leaving activity
                 bluetoothSocket.close();
             } catch (IOException e) {
-                Log.e("Thread", "SOCKET CLOSING FAILED, STOPPING SERVICE");
-                Log.e("Thread", e.toString());
+                Log.e("Thread", "SOCKET CLOSING FAILED, STOPPING SERVICE", e);
+//                Log.e("Thread", e.toString());
                 stopSelf();
             }
         }
     }
 
     // New Class for Connected Thread == BluetoothConnection();
-     private class ConnectedThread extends Thread {
+    private class ConnectedThread extends Thread {
         private final InputStream inputStream;
         private final OutputStream outputStream;
         private boolean stopThread = false;
@@ -225,6 +224,7 @@ public class Bluetooth extends Service {
                 tmpOut = bluetoothSocket.getOutputStream();
             } catch (IOException e) {
                 Log.d("Thread", "UNABLE TO READ/WRITE, STOPPING SERVICE");
+                SendBroadcast(404, "RESTART BLUETOOTH CONNECTION");
                 stopSelf();
             }
 
@@ -244,7 +244,7 @@ public class Bluetooth extends Service {
                             pauseLock.wait();
                         } catch (InterruptedException e) {
                             Thread.currentThread().interrupt();
-                            Log.e("Thread", "Thread interrupted", e);
+                            Log.e("Thread", "Thread interrupted:", e);
                         }
                     }
                     if (stopThread) {
@@ -256,13 +256,13 @@ public class Bluetooth extends Service {
                     int length = inputStream.read(buffer);
                     String message = new String(buffer, 0, length);
                     if (!message.trim().isEmpty()) {
-                        Log.i("STREAM", "receive:" + message);
+                        Log.i("Thread", "receive:" + message);
                         SendBroadcast(0, message);
                     }
                 } catch (IOException e) {
-                    Log.e("Thread", e.toString());
-                    Log.e("Thread", "UNABLE TO READ/WRITE, STOPPING SERVICE");
-                    SendBroadcast(0,"UNABLE TO READ/WRITE, STOPPING SERVICE");
+//                    Log.e("Thread", e.toString());
+                    Log.e("Thread", "UNABLE TO READ/WRITE, STOPPING SERVICE", e);
+                    SendBroadcast(404,"UNABLE TO READ/WRITE, STOPPING SERVICE, RESTARTING BLUETOOTH CONNECTION");
                     stopSelf();
                     break;
                 }
@@ -339,7 +339,7 @@ public class Bluetooth extends Service {
         intent.setAction("BLUETOOTH");  //Set code as BLUETOOTH for the receiver to know where the information is from
         intent.putExtra("VIEW", VIEW);
         intent.putExtra("message", message);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
     }
     private void SendBroadcastInt(int VIEW, int message) {
         // IntentをブロードキャストすることでMainActivityへデータを送信
