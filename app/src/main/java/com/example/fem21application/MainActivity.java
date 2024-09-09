@@ -154,6 +154,8 @@ public class MainActivity extends AppCompatActivity {
 
     static final int CHECK_RTOD = 102;
 
+    boolean rtod_flag = false;
+
     //Showmessageする文字列の受け渡し用
     static String msg;
 
@@ -621,7 +623,9 @@ public class MainActivity extends AppCompatActivity {
         FindID();
 //        Log.i("database", "DataGroup: " + startA);
         firebase.realFireStore("LV", GlobalTime,lowSystemVoltage);
-        firebase.realFireStore("BATT", GlobalTime,batterySOC);
+        firebase.realFireStore("HV", GlobalTime,batterySOC);
+        firebase.realFireStore("HV", GlobalTime,hv_maxtemp234);
+        firebase.realFireStore("PWT", GlobalTime,powerConsumption);
         //firebase.realFireStore("TEMPS", "MOTOR_TEMP", MotorTemps);
         //firebase.realFireStore("TEMPS", "INV_TEMP",inverterTemperature);
 
@@ -750,6 +754,10 @@ public class MainActivity extends AppCompatActivity {
 //        System.out.println("Velocity: " + Velocity + "m/s?");
 //        System.out.println("Torque: " + Torque[0] + "N.m, " + Torque[1] + "N.m, " + Torque[2] + "N.m, " + Torque[3] + "N.m");
 
+        String MotorTemps = motor_temp[0] + "/" + motor_temp[1] + "/" + motor_temp[2] + "/" + motor_temp[3];
+        firebase.realFireStore("PWT", "MOTOR_TEMP", MotorTemps);
+        String InvTemps = inv_temp[0] + "/" + inv_temp[1] + "/" + inv_temp[2] + "/" + inv_temp[3];
+        firebase.realFireStore("PWT", "INV_TEMP", InvTemps);
         //firebase.realFireStore("VELOCITY", GlobalTime, Velocity);
         //firebase.realFireStore("TORQUE", GlobalTime, Torques);
 
@@ -973,6 +981,10 @@ public class MainActivity extends AppCompatActivity {
         int final_RtoD_fr = ready_to_drive[1];
         int final_RtoD_rr = ready_to_drive[2];
         int final_RtoD_rl = ready_to_drive[3];
+
+        if(final_RtoD_fl == 1 && final_RtoD_fr == 1 && final_RtoD_rr == 1 && final_RtoD_rl == 1){
+            rtod_flag = true;
+        }
         /*
         //For AMS
         int AMS = Integer.parseInt(partC[1]);
