@@ -205,8 +205,7 @@ public class MainActivity extends AppCompatActivity {
     private Handler handler;
 
     TextView ShowTxt, ToDriverTxt;
-    Button connectBtn;
-    Button DisconnectBtn;
+    Button connectBtn, DisconnectBtn, runButton;
     EditText textbox;
     ScrollView scrollView;
     Firebase firebase = new Firebase();
@@ -263,18 +262,20 @@ public class MainActivity extends AppCompatActivity {
         ShowTxt = findViewById(R.id.InputStream);
 
         connectBtn = findViewById(R.id.ConnectButton);
-        DisconnectBtn = findViewById(R.id.DisconnectButton);
-        DisconnectBtn.setEnabled(false);
+//        DisconnectBtn = findViewById(R.id.RunButton);
+//        DisconnectBtn.setEnabled(false);
         connectBtn.setOnClickListener(v -> {
-            startService(BluetoothIntent);
+//            startService(BluetoothIntent);
             bluetooth.BluetoothConnection(this);
             connectBtn.setEnabled(false);
+            Log.d(TAG, "CONNECTING WITH BLUETOOTH DEVICE");
+//            DisconnectBtn.setEnabled(true);
+            ERROR_CODE = 404;
+        });
+        //To run continuously increasing number
+        runButton = findViewById(R.id.RunButton);
+        runButton.setOnClickListener(v -> {
             Log.i("DATABASE", "The data is being sent to the database");
-            try {
-                Thread.sleep(3000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
             firebase.countRun();
             firebaseThread = new Thread(() -> {
                 while (true) {
@@ -308,20 +309,16 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
             firebaseThread.start();
-            Log.d(TAG, "CONNECTING WITH BLUETOOTH DEVICE");
-            DisconnectBtn.setEnabled(true);
-            ERROR_CODE = 404;
         });
-
-        DisconnectBtn.setOnClickListener(v -> {
-            Log.d(TAG, "DISCONNECTING WITH BLUETOOTH DEVICE");
-//            Intent BluetoothIntent = new Intent(MainActivity.this, Bluetooth.class);
-            stopService(BluetoothIntent);
-            bluetooth.closeStream();
-            connectBtn.setEnabled(true);
-            DisconnectBtn.setEnabled(false);
-            ERROR_CODE = 405;
-        });
+//        DisconnectBtn.setOnClickListener(v -> {
+//            Log.d(TAG, "DISCONNECTING WITH BLUETOOTH DEVICE");
+////            Intent BluetoothIntent = new Intent(MainActivity.this, Bluetooth.class);
+//            stopService(BluetoothIntent);
+//            bluetooth.closeStream();
+//            connectBtn.setEnabled(true);
+//            DisconnectBtn.setEnabled(false);
+//            ERROR_CODE = 405;
+//        });
     }
 
 
@@ -613,18 +610,10 @@ public class MainActivity extends AppCompatActivity {
         }
         */
 
-        //Output the values (Can be replaced by Broadcast)
-//        System.out.println("DataGroup: " + startA);
-
-//        System.out.println("Low System Voltage: " + lowSystemVoltage + " V");
-//        System.out.println("High System Voltage: " + highSystemVoltage + " V");
-//        System.out.println("Motor Temperatures: " + motorTemperature[0] + "°C, " + motorTemperature[1] + "°C, " + motorTemperature[2] + "°C, " + motorTemperature[3] + "°C");
-//        System.out.println("Inverter Temperature: " + inverterTemperature + "°C");
         FindID();
-//        Log.i("database", "DataGroup: " + startA);
-        firebase.realFireStore("LV", GlobalTime,lowSystemVoltage);
-        firebase.realFireStore("HV", GlobalTime,batterySOC);
-        firebase.realFireStore("HV", GlobalTime,hv_maxtemp234);
+        firebase.realFireStore("LV", "LV",lowSystemVoltage);
+        firebase.realFireStore("HV", "BTR",batterySOC);
+        firebase.realFireStore("HV", "TEMP",hv_maxtemp234);
         firebase.realFireStore("PWT", GlobalTime,powerConsumption);
         //firebase.realFireStore("TEMPS", "MOTOR_TEMP", MotorTemps);
         //firebase.realFireStore("TEMPS", "INV_TEMP",inverterTemperature);
@@ -755,9 +744,9 @@ public class MainActivity extends AppCompatActivity {
 //        System.out.println("Torque: " + Torque[0] + "N.m, " + Torque[1] + "N.m, " + Torque[2] + "N.m, " + Torque[3] + "N.m");
 
         String MotorTemps = motor_temp[0] + "/" + motor_temp[1] + "/" + motor_temp[2] + "/" + motor_temp[3];
-        firebase.realFireStore("PWT", "MOTOR_TEMP", MotorTemps);
+        firebase.realFireStore("TEMPS", "MOTOR_TEMP", MotorTemps);
         String InvTemps = inv_temp[0] + "/" + inv_temp[1] + "/" + inv_temp[2] + "/" + inv_temp[3];
-        firebase.realFireStore("PWT", "INV_TEMP", InvTemps);
+        firebase.realFireStore("TEMPS", "INV_TEMP", InvTemps);
         //firebase.realFireStore("VELOCITY", GlobalTime, Velocity);
         //firebase.realFireStore("TORQUE", GlobalTime, Torques);
 

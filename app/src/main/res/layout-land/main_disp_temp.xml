@@ -839,11 +839,11 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <Button
-            android:id="@+id/DisconnectButton"
+            android:id="@+id/RunButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
-            android:text="Disconnect"
+            android:text="RUN"
             app:layout_constraintStart_toEndOf="@+id/ConnectButton"
             app:layout_constraintTop_toTopOf="parent" />
 
