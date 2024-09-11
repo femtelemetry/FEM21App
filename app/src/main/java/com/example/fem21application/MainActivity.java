@@ -437,6 +437,7 @@ public class MainActivity extends AppCompatActivity {
         connectBtn = findViewById(R.id.connectButton);
         connectBtn.setOnClickListener(v -> {
             bluetooth.BluetoothConnection(this);
+            connectBtn.setEnabled(false);
 //            bluetooth.controlThread("START");
 //            firebase.countRun();
 //            connectBtn.setEnabled(false);
@@ -523,6 +524,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
     @Override
     protected void onStart() {
         super.onStart();
@@ -621,7 +623,10 @@ public class MainActivity extends AppCompatActivity {
             GlobalMessage = message.trim();
             GlobalTime = time;
             ShowTxt.append(time + ":" + GlobalMessage + "\n");
-            //Log.i(TAG, "receive: " + GlobalMessage);
+            Log.i(TAG, "receive: " + GlobalMessage);
+            if (VIEW==404){
+                bluetooth.BluetoothConnection(getApplicationContext());
+            }
 
 //            if (VIEW == 1) {
 //                firebase.realFireStore("LV", time, message);
@@ -688,7 +693,7 @@ public class MainActivity extends AppCompatActivity {
         //Split the string by "/"
         String[] partA = datasetA.split("/");
         if (partA.length != 6) {
-            //throw new IllegalArgumentException("DataA format Error");
+//            Log.e(TAG, "DataA format Error");
         }
 
         //Extract values
@@ -699,7 +704,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             lowSystemVoltage = Double.parseDouble(partA[1]);
         }catch(Exception e){
-            Log.e("DATAErr", "LV Electrical System Voltage failed to parse.");
+//            Log.e("DATAErr", "LV Electrical System Voltage failed to parse.");
         }
         double finalLowSystemVoltage = lowSystemVoltage;
 
@@ -709,7 +714,7 @@ public class MainActivity extends AppCompatActivity {
             batterySOC = Double.parseDouble(partA[2]);
         }
         catch(Exception e){
-            Log.e("DATAErr", "HV Electrical System Charge failed to parse.");
+//            Log.e("DATAErr", "HV Electrical System Charge failed to parse.");
         }
 
         double hv_maxtemp234 = 0.0;
@@ -717,7 +722,7 @@ public class MainActivity extends AppCompatActivity {
             hv_maxtemp234 = Double.parseDouble(partA[4]);
         }
         catch(Exception e){
-            Log.e("DATAErr", "HV Electrical System Max Temperature failed to parse.");
+//            Log.e("DATAErr", "HV Electrical System Max Temperature failed to parse.");
         }
 
         double powerConsumption = 0.0;
@@ -726,7 +731,7 @@ public class MainActivity extends AppCompatActivity {
             powerConsumption = Double.parseDouble(partA[6]);
         }
         catch(Exception e){
-            Log.e("DATAErr", "Power Consumption failed to parse.");
+//            Log.e("DATAErr", "Power Consumption failed to parse.");
         }
 
         /*
@@ -764,22 +769,17 @@ public class MainActivity extends AppCompatActivity {
         }
         */
 
-        //Output the values (Can be replaced by Broadcast)
-//        System.out.println("DataGroup: " + startA);
-
-//        System.out.println("Low System Voltage: " + lowSystemVoltage + " V");
-//        System.out.println("High System Voltage: " + highSystemVoltage + " V");
-//        System.out.println("Motor Temperatures: " + motorTemperature[0] + "°C, " + motorTemperature[1] + "°C, " + motorTemperature[2] + "°C, " + motorTemperature[3] + "°C");
-//        System.out.println("Inverter Temperature: " + inverterTemperature + "°C");
         FindID();
-//        Log.i("database", "DataGroup: " + startA);
-        firebase.realFireStore("LV", GlobalTime,lowSystemVoltage);
-        //firebase.realFireStore("HV", GlobalTime,batterySOC);
+        firebase.realFireStore("LV", "LV",lowSystemVoltage);
+        firebase.realFireStore("HV", "BTR",batterySOC);
+        firebase.realFireStore("HV", "TEMP",hv_maxtemp234);
+        firebase.realFireStore("PWT", GlobalTime,powerConsumption);
         //firebase.realFireStore("TEMPS", "MOTOR_TEMP", MotorTemps);
         //firebase.realFireStore("TEMPS", "INV_TEMP",inverterTemperature);
 
         // Use the Handler to update the TextView on the main thread
         //TODO 8/29
+
 
         int finalBatterySOC = (int) Math.round(batterySOC);
         double final_hv_maxtemp234 = hv_maxtemp234;
@@ -793,7 +793,9 @@ public class MainActivity extends AppCompatActivity {
                 //vMtr2.setText(String.valueOf(motorTemperature[1]));
                 //vMtr3.setText(String.valueOf(motorTemperature[2]));
                 //vMtr4.setText(String.valueOf(motorTemperature[3]));
-                bttBar.setProgress(finalBatterySOC); // Set initial progress
+                if(finalBatterySOC > 0){
+                    bttBar.setProgress(finalBatterySOC); // Set initial progress
+                }
                 updateProgressBarColor(bttBar);
                 vBattCharge.setText(String.valueOf(finalBatterySOC));
             }
@@ -809,7 +811,7 @@ public class MainActivity extends AppCompatActivity {
         //Split the string by "/"
         String[] partB = datasetB.split("/");
         if (partB.length != 6) {
-            //throw new IllegalArgumentException("DataB format Error");
+//            Log.e(TAG, "DataB format Error");
         }
 
         //Extract values
@@ -828,7 +830,7 @@ public class MainActivity extends AppCompatActivity {
                 motor_temp[i] = Double.parseDouble(received_motortemp[i]);
             }
             catch (Exception e){
-                Log.e("DATAErr", "Motor Temperature failed to parse.");
+//                Log.e("DATAErr", "Motor Temperature failed to parse.");
             }
         }
 
@@ -839,7 +841,7 @@ public class MainActivity extends AppCompatActivity {
 
         //For InvTemp
         //Split inverter cold plate temperature by "x"
-        String[] received_invtemp = partB[1].split("x");
+        String[] received_invtemp = partB[3].split("x");
         if (received_invtemp.length != 4) {
             //throw new IllegalArgumentException("RTD data Length error");
         }
@@ -850,7 +852,7 @@ public class MainActivity extends AppCompatActivity {
                 inv_temp[i] = Double.parseDouble(received_invtemp[i]);
             }
             catch(Exception e) {
-                Log.e("DATAErr", "Cold Plate Temperature failed to parse.");
+//                Log.e("DATAErr", "Cold Plate Temperature failed to parse.");
             }
         }
 
@@ -900,6 +902,10 @@ public class MainActivity extends AppCompatActivity {
 //        System.out.println("Velocity: " + Velocity + "m/s?");
 //        System.out.println("Torque: " + Torque[0] + "N.m, " + Torque[1] + "N.m, " + Torque[2] + "N.m, " + Torque[3] + "N.m");
 
+        String MotorTemps = motor_temp[0] + "/" + motor_temp[1] + "/" + motor_temp[2] + "/" + motor_temp[3];
+        firebase.realFireStore("TEMPS", "MOTOR_TEMP", MotorTemps);
+        String InvTemps = inv_temp[0] + "/" + inv_temp[1] + "/" + inv_temp[2] + "/" + inv_temp[3];
+        firebase.realFireStore("TEMPS", "INV_TEMP", InvTemps);
         //firebase.realFireStore("VELOCITY", GlobalTime, Velocity);
         //firebase.realFireStore("TORQUE", GlobalTime, Torques);
 
@@ -913,10 +919,30 @@ public class MainActivity extends AppCompatActivity {
                 m_motor_temp_fr.setText(String.valueOf(final_motortemp_fr));
                 m_motor_temp_rr.setText(String.valueOf(final_motortemp_rr));
                 m_motor_temp_rl.setText(String.valueOf(final_motortemp_rl));
-                m_cp_temp_fl.setText(String.valueOf(final_invtemp_fl));
-                m_cp_temp_fr.setText(String.valueOf(final_invtemp_fr));
-                m_cp_temp_rr.setText(String.valueOf(final_invtemp_rr));
-                m_cp_temp_rl.setText(String.valueOf(final_invtemp_rl));
+                if(final_invtemp_fl > 0){
+                    m_cp_temp_fl.setText(String.valueOf(final_invtemp_fl));
+                }
+                else{
+                    m_cp_temp_fl.setText("-");
+                }
+                if(final_invtemp_fr > 0){
+                    m_cp_temp_fr.setText(String.valueOf(final_invtemp_fr));
+                }
+                else{
+                    m_cp_temp_fr.setText("-");
+                }
+                if(final_invtemp_rr > 0){
+                    m_cp_temp_rr.setText(String.valueOf(final_invtemp_rr));
+                }
+                else{
+                    m_cp_temp_rr.setText("-");
+                }
+                if(final_invtemp_rl > 0){
+                    m_cp_temp_rl.setText(String.valueOf(final_invtemp_rl));
+                }
+                else{
+                    m_cp_temp_rl.setText("-");
+                }
             }
         });
     }
@@ -930,7 +956,7 @@ public class MainActivity extends AppCompatActivity {
         //Split by "/"
         String[] partC = datasetC.split("/");
         if (partC.length != 9) {
-            //throw new IllegalArgumentException("DataC format Error");
+//            Log.e(TAG, "DataC format Error");
         }
 
         //Extract Values
@@ -941,7 +967,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             velocity = Double.parseDouble(partC[1]);
         }catch(Exception e){
-            Log.e("DATAErr", "Velocity failed to parse.");
+//            Log.e("DATAErr", "Velocity failed to parse.");
         }
 
         int final_velocity = (int) velocity;
@@ -1003,7 +1029,7 @@ public class MainActivity extends AppCompatActivity {
         //Split by "/"
         String[] partD = datasetD.split("/");
         if (partD.length != 9) {
-            //throw new IllegalArgumentException("DataC format Error");
+//            Log.e(TAG, "DataD format Error");
         }
 
         //Extract Values
@@ -1014,7 +1040,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             throttle_percentage = Double.parseDouble(partD[1]);
         }catch(Exception e){
-            Log.e("DATAErr", "Throttle percentage failed to parse.");
+//            Log.e("DATAErr", "Throttle percentage failed to parse.");
         }
 
         int final_throttle_percentage = (int) throttle_percentage;
@@ -1076,7 +1102,7 @@ public class MainActivity extends AppCompatActivity {
         //Split by "/"
         String[] partE = datasetE.split("/");
         if (partE.length != 9) {
-            //throw new IllegalArgumentException("DataE format Error");
+//            Log.e(TAG, "DataE format Error");
         }
 
         //Extract Values
@@ -1095,7 +1121,7 @@ public class MainActivity extends AppCompatActivity {
                 ready_to_drive[i] = Integer.parseInt(received_RToD[i]);
             }
             catch(Exception e){
-                Log.e("DATAErr", "Ready-to-Drive failed to parse.");
+//                Log.e("DATAErr", "Ready-to-Drive failed to parse.");
             }
         }
 
@@ -1103,6 +1129,10 @@ public class MainActivity extends AppCompatActivity {
         int final_RtoD_fr = ready_to_drive[1];
         int final_RtoD_rr = ready_to_drive[2];
         int final_RtoD_rl = ready_to_drive[3];
+
+        if(final_RtoD_fl == 1 && final_RtoD_fr == 1 && final_RtoD_rr == 1 && final_RtoD_rl == 1){
+            //rtod_flag = true;
+        }
         /*
         //For AMS
         int AMS = Integer.parseInt(partC[1]);

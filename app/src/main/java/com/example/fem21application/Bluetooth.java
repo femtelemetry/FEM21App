@@ -178,7 +178,7 @@ public class Bluetooth extends Service {
 //                    Log.d("Thread", "mConnectedThread IS CREATED ");
                 mConnectedThread.start();
             } catch (IOException e) {
-                SendBroadcast(99,"FAILED CONNECTING TO:" + deviceName);
+                SendBroadcast(404,"FAILED CONNECTING TO:" + deviceName);
                 try {
                     bluetoothSocket.close();
                     Log.e("Thread", "SOCKET CONNECTION FAILED, STOPPING SERVICE");
@@ -225,6 +225,7 @@ public class Bluetooth extends Service {
                 tmpOut = bluetoothSocket.getOutputStream();
             } catch (IOException e) {
                 Log.d("Thread", "UNABLE TO READ/WRITE, STOPPING SERVICE");
+                SendBroadcast(404, "RESTART BLUETOOTH CONNECTION");
                 stopSelf();
             }
 
