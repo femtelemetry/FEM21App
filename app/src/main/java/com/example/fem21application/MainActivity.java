@@ -202,7 +202,11 @@ public class MainActivity extends AppCompatActivity {
     private Handler handler;
 
     TextView ShowTxt, ToDriverTxt;
-    Button bluetoothBtn, runButton, RandomButton, submitButton, connectBtn, pauseButton;
+    Button bluetoothBtn;
+    Button runButton;
+    Button submitButton;
+    Button connectBtn;
+    Button pauseButton;
     EditText textbox;
     ScrollView scrollView;
     Firebase firebase = new Firebase();
@@ -210,7 +214,7 @@ public class MainActivity extends AppCompatActivity {
     private Bluetooth bluetooth;
     private final int count = 0;
     private final int data_num = 100;
-    private final int time_interval = 100;
+    private final int time_interval = 1;
     Thread firebaseThread;
     private final ServiceConnection connection = new ServiceConnection() {
         @Override
@@ -247,102 +251,44 @@ public class MainActivity extends AppCompatActivity {
 
         FindID(); //TODO: 8/27
 
-
 //        Firebase firebase = new Firebase();
-        Intent intent = new Intent(MainActivity.this, Firebase.class);
-        startService(intent);
-        //To submit any input text to the databases
-        submitButton = findViewById(R.id.submitButton);
+        Intent FirebaseIntent = new Intent(MainActivity.this, Firebase.class);
+        Intent BluetoothIntent = new Intent(MainActivity.this, Bluetooth.class);
+        startService(FirebaseIntent);
+        startService(BluetoothIntent);
+
         textbox = findViewById(R.id.textBox);
-        submitButton.setOnClickListener(v -> {
-//            Firebase firebase = new Firebase();
-            String time = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date()); //Use timestamp as keys
-            String text = textbox.getText().toString();
-            // Write a message to the Realtime database (RealFireStore) and Cloud database (CloudFireStore)
-            firebase.countRun();
-            firebase.realFireStore("VCMINFO", time, text);  //type of stored data can be anything simple.
-            firebase.realFireStore("ERROR", time, text);  //type of stored data can be anything simple.
-//            Map<String, Object> data = new HashMap<>();  //For Cloud Firebase, the data needs to be of HashMap.
-//            data.put(time, text);
-//            CloudFireStore(date, data);
-            Toast.makeText(this, "The message is sent to the database...", Toast.LENGTH_SHORT).show();
-        });
 
-        //To run number infinitely
-        RandomButton = findViewById(R.id.randomButton);
-        RandomButton.setOnClickListener(v -> {
-//            Firebase firebase = new Firebase();
-            Toast.makeText(this, "The number is running now...", Toast.LENGTH_SHORT).show();
-            firebase.countRun();
-            Log.i("database", "The data is being sent to the database");
-            new Thread(() -> {
-                for (int i = 0; i <= 80; i++) {
-                    long nanoTime = System.nanoTime();
-                    long micros = (nanoTime / 100000); // Extract microseconds from nanoseconds
-                    String time = new SimpleDateFormat("HH:mm:ss:" + micros, Locale.getDefault()).format(new Date()); //Use timestamp as keys
-                    //Map<String, Object> data = new HashMap<>();  //For Cloud Firebase, the data needs to be of HashMap.
-                    //data.put(time, i);
-                    //CloudFireStore(date, data);
-//                Random random = new Random();
-//                Generate a random integer between 0 and 120
-                    int ran_LV = (new Random()).nextInt(30);
-                    int ran_velocity = (new Random()).nextInt(120);
-                    int ran_HV = (new Random()).nextInt(600);
-                    int ran_torque = (new Random()).nextInt(200);
-                    int ran_100 = (new Random()).nextInt(100);
-                    boolean ran_boolean = (new Random()).nextBoolean();
-                    String set = ran_torque + "/" + ran_100 + "/" + ran_velocity + "/" + ran_LV;
-                    firebase.realFireStore("VELOCITY", time, ran_velocity);
-                    firebase.realFireStore("LV", time,ran_LV );
-                    firebase.realFireStore("HV", time, ran_HV);
-                    firebase.realFireStore("TORQUE", time, set );
-//                    firebase.realFireStore("TORQUE1", time, ran_torque);
-//                    firebase.realFireStore("TORQUE2", time, ran_100);
-//                    firebase.realFireStore("TORQUE3", time, ran_velocity);
-//                    firebase.realFireStore("TORQUE4", time, ran_LV);
-                    firebase.realFireStore("ACC", time, ran_100);
-                    firebase.realFireStore("BRAKE", time, ran_100);
-                    firebase.realFireStore("BATTERY_LEVEL", time, ran_100);
-                    firebase.realFireStore("STATUS", "BRAKE_SW",ran_boolean );
-                    firebase.realFireStore("STATUS", "HV_STATUS",ran_boolean);
-                    firebase.realFireStore("TEMPS", "BTR_TEMP",ran_velocity);
-                    firebase.realFireStore("TEMPS", "MOTOR_TEMP",set);
-                    firebase.realFireStore("TEMPS", "INV_TEMP",ran_LV);
+        scrollView = findViewById(R.id.scrollView);
+        ShowTxt = findViewById(R.id.InputStream);
 
-//                Log.i("database", time + ":" + i);
-                    try {
-                        Thread.sleep(time_interval);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            }).start();
+        connectBtn = findViewById(R.id.connectButton);
+        connectBtn.setOnClickListener(v -> {
+            bluetooth.BluetoothConnection(this);
+            connectBtn.setEnabled(false);
+            Log.d(TAG, "CONNECTING WITH BLUETOOTH DEVICE");
         });
 
         //To run continuously increasing number
         runButton = findViewById(R.id.runButton);
         runButton.setOnClickListener(v -> {
-            Log.i("database", "The data is being sent to the database");
+            Log.i("DATABASE", "The data is being sent to the database");
             firebase.countRun();
             firebaseThread = new Thread(() -> {
                 while (true) {
-//                    long nanoTime = System.nanoTime();
-//                    long micros = (nanoTime / 100000); // Extract microseconds from nanoseconds
-//                    String time = new SimpleDateFormat("HH:mm:ss:" + micros, Locale.getDefault()).format(new Date()); //Use timestamp as keys
-//                    Log.i("database", GlobalMessage);
                     //Can be replaced by actual data
                     String[] dataPart = GlobalMessage.split("/");
                     //Determine the data group
                     String dataType = dataPart[0];
-//                    Log.i("database", "Datatype: " + dataType);
+//                    Log.i("DATABASE", "Datatype: " + dataType);
                     switch (dataType) {
                         case "A":
                             dataA(GlobalMessage);
-//                            Log.i("database", "Sending to : " + dataType);
+//                            Log.i("DATABASE", "Sending to : " + dataType);
                             break;
                         case "B":
                             dataB(GlobalMessage);
-//                            Log.i("database", "Sending to : " + dataType);
+//                            Log.i("DATABASE", "Sending to : " + dataType);
                             break;
                         case "C":
                             dataC(GlobalMessage);
@@ -366,39 +312,8 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
             firebaseThread.start();
-
-//            new Thread(() -> {
-//                for (int i = 0; i <= data_num; i++) {
-//                    long nanoTime = System.nanoTime();
-//                    long micros = (nanoTime / 100000); // Extract microseconds from nanoseconds
-//                    String time = new SimpleDateFormat("HH:mm:ss:" + micros, Locale.getDefault()).format(new Date()); //Use timestamp as keys
-//                    boolean ran_boolean = (new Random()).nextBoolean();
-//                    String set = i + "/" + Math.ceil(0.85*i) + "/" + Math.ceil(1.5*i) + "/" + Math.ceil(0.7*i);
-//                    firebase.realFireStore("VELOCITY", time, i+3);
-//                    firebase.realFireStore("LV", time,i -5);
-//                    firebase.realFireStore("HV", time, i+2);
-//                    firebase.realFireStore("TORQUE", time, set);
-////                    firebase.realFireStore("TORQUE1", time,i-10 );
-////                    firebase.realFireStore("TORQUE2", time,i +5);
-////                    firebase.realFireStore("TORQUE3", time,i -2);
-////                    firebase.realFireStore("TORQUE4", time,i );
-//                    firebase.realFireStore("ACC", time, i);
-//                    firebase.realFireStore("BRAKE", time, i-4);
-//                    firebase.realFireStore("BATTERY_LEVEL", time, i-12);
-//                    firebase.realFireStore("STATUS", "BRAKE_SW",ran_boolean );
-//                    firebase.realFireStore("STATUS", "HV_STATUS",ran_boolean);
-//                    firebase.realFireStore("TEMPS", "BTR_TEMP",i+3);
-//                    firebase.realFireStore("TEMPS", "MOTOR_TEMP",set);
-//                    firebase.realFireStore("TEMPS", "INV_TEMP",i+6);
-//
-//                    try {
-//                        Thread.sleep(time_interval);
-//                    } catch (InterruptedException e) {
-//                        throw new RuntimeException(e);
-//                    }
-//                }
-//            }).start();
         });
+
         pauseButton = findViewById(R.id.pauseButton);
         pauseButton.setOnClickListener( v -> {
             if (pauseThread){
@@ -416,50 +331,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-//        Bluetooth bluetoothService = new Bluetooth();
-
         scrollView = findViewById(R.id.scrollView);
         ShowTxt = findViewById(R.id.InputStream);
-        bluetoothBtn = findViewById(R.id.bluetoothButton);
-        bluetoothBtn.setOnClickListener(v -> {
-            //Toast.makeText(MainActivity.this, "Bluetooth is starting...", Toast.LENGTH_SHORT).show();
-            Log.d(TAG, "Bluetooth is starting...");
-//            ActivityCompat.requestPermissions( this , new String[]{android.Manifest.permission.BLUETOOTH_CONNECT}, 100);
-            bluetoothBtn.setEnabled(false);
-//            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.BLUETOOTH_SCAN}, 100);
-            startService(new Intent(MainActivity.this, Bluetooth.class));
-
-//           bluetooth.BluetoothEnable((BluetoothManager) this.getSystemService(Context.BLUETOOTH_SERVICE));
-//            setContentView(R.layout.page2);
-
-        });
-
-        connectBtn = findViewById(R.id.connectButton);
-        connectBtn.setOnClickListener(v -> {
-            bluetooth.BluetoothConnection(this);
-            connectBtn.setEnabled(false);
-//            bluetooth.controlThread("START");
-//            firebase.countRun();
-//            connectBtn.setEnabled(false);
-        });
-
-        /*
-        runBtn = findViewById(R.id.runButton);
-        runBtn.setOnClickListener(v -> {
-            if (count == 1){
-                runBtn.setText("PAUSE");
-                bluetooth.controlThread("RESUME");
-                firebase.countRun();
-                count = 0;
-            } else if (count == 0) {
-                runBtn.setText("RESUME");
-                bluetooth.controlThread("PAUSE");
-                count = 1;
-
-            }
-        });
-
-         */
 
     }
 
@@ -623,8 +496,9 @@ public class MainActivity extends AppCompatActivity {
             GlobalMessage = message.trim();
             GlobalTime = time;
             ShowTxt.append(time + ":" + GlobalMessage + "\n");
-            Log.i(TAG, "receive: " + GlobalMessage);
+//            Log.i(TAG, "receive: " + GlobalMessage);
             if (VIEW==404){
+                Log.d(bluetooth.TAG, "RESTARTING BLUETOOTH BROADCAST RECEVEIVED");
                 bluetooth.BluetoothConnection(getApplicationContext());
             }
 

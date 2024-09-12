@@ -257,13 +257,13 @@ public class Bluetooth extends Service {
                     int length = inputStream.read(buffer);
                     String message = new String(buffer, 0, length);
                     if (!message.trim().isEmpty()) {
-                        Log.i("STREAM", "receive:" + message);
+//                        Log.i("STREAM", "receive:" + message);
                         SendBroadcast(0, message);
                     }
                 } catch (IOException e) {
                     Log.e("Thread", e.toString());
                     Log.e("Thread", "UNABLE TO READ/WRITE, STOPPING SERVICE");
-                    SendBroadcast(0,"UNABLE TO READ/WRITE, STOPPING SERVICE");
+                    SendBroadcast(404,"UNABLE TO READ/WRITE, STOPPING SERVICE");
                     stopSelf();
                     break;
                 }
