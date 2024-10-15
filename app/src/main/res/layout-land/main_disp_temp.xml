@@ -16,7 +16,7 @@
             android:id="@+id/bttBar"
             style="@android:style/Widget.ProgressBar.Horizontal"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_height="80dp"
             android:max="100"
             android:progress="50"
             android:progressDrawable="@drawable/custom_batterybar"
@@ -27,10 +27,12 @@
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:background="@drawable/battery_white"
-            android:rotation="180"
+            android:rotation="270"
+            android:layout_marginTop="10dp"
             app:layout_constraintRight_toRightOf="parent"
             android:layout_marginRight="14dp"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent"
+            android:visibility="gone"/>
 
         <TextView
             android:id="@+id/bttText"
@@ -42,7 +44,8 @@
             app:layout_constraintRight_toRightOf="@id/bttIcon"
             app:layout_constraintTop_toTopOf="@id/bttIcon"
             app:layout_constraintBottom_toBottomOf="@id/bttIcon"
-            android:layout_marginRight="10dp"/>
+            android:layout_marginRight="10dp"
+            android:visibility="gone"/>
 
         <ImageView
             android:layout_width="match_parent"
@@ -50,6 +53,87 @@
             app:layout_constraintBottom_toBottomOf="@id/bttBar"
             android:background="@drawable/custom_white_solid"
             />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="400dp"
+            android:layout_height="0dp"
+            app:layout_constraintTop_toBottomOf="@id/bttBar"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:gravity="center_horizontal">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/drivingPhase2"
+                android:visibility="visible">
+
+                <ImageView
+                    android:id="@+id/driverSignal2"
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
+                    android:layout_marginTop="10dp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    android:background="@color/dark_grey"/>
+
+                <TextView
+                    android:id="@+id/bttText2"
+                    android:layout_width="250dp"
+                    android:layout_height="120dp"
+                    android:layout_marginTop="10dp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    android:text="---"
+                    android:textSize="130sp"
+                    android:textAlignment="viewEnd"
+                    android:fontFamily="@font/technology"
+                    android:background="@color/dark_grey"/>
+
+                <TextView
+                    android:id="@+id/bttTitle2"
+                    android:layout_width="0dp"
+                    android:layout_height="120dp"
+                    android:layout_marginTop="10dp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="@id/bttText2"
+                    android:text="SOC"
+                    android:rotation="270"
+                    android:textStyle="bold"
+                    android:textSize="30sp"
+                    android:textAlignment="viewEnd" />
+
+                <TextView
+                    android:id="@+id/powerconsumptiontext"
+                    android:layout_width="250dp"
+                    android:layout_height="100dp"
+                    android:layout_marginBottom="20dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    android:text="---"
+                    android:textSize="100sp"
+                    android:textAlignment="viewEnd"
+                    android:fontFamily="@font/technology"
+                    android:background="@color/dark_grey"/>
+
+                <TextView
+                    android:id="@+id/bttTitle2"
+                    android:layout_width="0dp"
+                    android:layout_height="100dp"
+                    android:layout_marginBottom="20dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="@id/powerconsumptiontext"
+                    android:text="PWR"
+                    android:rotation="270"
+                    android:textStyle="bold"
+                    android:textSize="30sp"
+                    android:textAlignment="viewEnd" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/centerCell"
@@ -102,7 +186,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:id="@+id/drivingPhase"
-                android:visibility="visible">
+                android:visibility="invisible">
 
                 <TextView
                     android:id="@+id/veloText"
@@ -186,7 +270,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="100dp"
                 android:layout_alignParentEnd="true"
-                android:layout_alignParentBottom="true">
+                android:layout_alignParentBottom="true"
+                android:visibility="gone">
 
                 <ImageView
                     android:id="@+id/amsIndicator"
@@ -425,7 +510,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:layout_alignParentRight="true">
+                android:layout_alignParentRight="true"
+                android:visibility="gone">
 
                 <TextView
                     android:id="@+id/bttTitle"
@@ -542,7 +628,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="100dp"
                 android:layout_alignParentStart="true"
-                android:layout_alignParentBottom="true">
+                android:layout_alignParentBottom="true"
+                android:visibility="gone">
 
                 <ImageView
                     android:id="@+id/appsIndicator"
@@ -670,7 +757,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:layout_alignParentLeft="true">
+                android:layout_alignParentLeft="true"
+                android:visibility="gone">
 
                 <TextView
                     android:id="@+id/rtodTitle"
@@ -974,26 +1062,24 @@
         android:id="@+id/runButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="29dp"
-        android:layout_marginEnd="33dp"
         android:text="RUN"
-        />
+        app:layout_constraintBottom_toBottomOf="parent" />
 
     <Button
         android:id="@+id/connectButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="connect"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toEndOf="@id/bluetoothButton"/>
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/bluetoothButton" />
 
     <Button
         android:id="@+id/bluetoothButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Bluetooth"
-        android:visibility="visible"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toEndOf="@id/runButton" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/runButton"
+        android:visibility="gone" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
