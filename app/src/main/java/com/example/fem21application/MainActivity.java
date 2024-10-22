@@ -173,6 +173,13 @@ public class MainActivity extends AppCompatActivity {
     static boolean pauseThread = false;
     static String GlobalMessage;
     static String GlobalTime;
+    static double G_lowSystemVoltage;
+    static double G_batterySOC;
+    static double G_hv_maxtemp234;
+    static double G_powerConsumption;
+    static String G_MotorTemps;
+    static String G_InvTemps;
+
 
     TextView m_lv_voltage;
     TextView vMtr1, vMtr2, vMtr3, vMtr4;
@@ -214,8 +221,9 @@ public class MainActivity extends AppCompatActivity {
     private Bluetooth bluetooth;
     private final int count = 0;
     private final int data_num = 100;
-    private final int time_interval = 1;
+    private final int time_interval = 100;
     Thread firebaseThread;
+    Thread DataCategorizer;
     private final ServiceConnection connection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName className, IBinder service) {
@@ -269,49 +277,56 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, "CONNECTING WITH BLUETOOTH DEVICE");
         });
 
+        DataCategorizer = new Thread(() -> {
+            while (true) {
+                //Can be replaced by actual data
+                String[] dataPart = GlobalMessage.split("/");
+                //Determine the data group
+                String dataType = dataPart[0];
+//                    Log.i("DATABASE", "Datatype: " + dataType);
+                switch (dataType) {
+                    case "A":
+                        dataA(GlobalMessage);
+//                            Log.i("DATABASE", "Sending to : " + dataType);
+                        break;
+                    case "B":
+                        dataB(GlobalMessage);
+//                            Log.i("DATABASE", "Sending to : " + dataType);
+                        break;
+                    case "C":
+                        dataC(GlobalMessage);
+//                            Log.i("database", "Sending to : " + dataType);
+                        break;
+                    case "D":
+                        dataD(GlobalMessage);
+//                            Log.i("database", "Sending to : " + dataType);
+                        break;
+                    case "E":
+                        dataE(GlobalMessage);
+//                            Log.i("database", "Sending to : " + dataType);
+                        break;
+                }
+                try {
+                    Thread.sleep(time_interval / 10);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+        DataCategorizer.start();
         //To run continuously increasing number
         runButton = findViewById(R.id.runButton);
         runButton.setOnClickListener(v -> {
             Log.i("DATABASE", "The data is being sent to the database");
             firebase.countRun();
             firebaseThread = new Thread(() -> {
-                while (true) {
-                    //Can be replaced by actual data
-                    String[] dataPart = GlobalMessage.split("/");
-                    //Determine the data group
-                    String dataType = dataPart[0];
-//                    Log.i("DATABASE", "Datatype: " + dataType);
-                    switch (dataType) {
-                        case "A":
-                            dataA(GlobalMessage);
-//                            Log.i("DATABASE", "Sending to : " + dataType);
-                            break;
-                        case "B":
-                            dataB(GlobalMessage);
-//                            Log.i("DATABASE", "Sending to : " + dataType);
-                            break;
-                        case "C":
-                            dataC(GlobalMessage);
-//                            Log.i("database", "Sending to : " + dataType);
-                            break;
-                        case "D":
-                            dataD(GlobalMessage);
-//                            Log.i("database", "Sending to : " + dataType);
-                            break;
-                        case "E":
-                            dataE(GlobalMessage);
-//                            Log.i("database", "Sending to : " + dataType);
-                            break;
-                    }
-                    try {
-                        Thread.sleep(time_interval);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-
+                try {
+                    dataUploader();
+                    Thread.sleep(time_interval);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
                 }
             });
-            firebaseThread.start();
         });
 
         pauseButton = findViewById(R.id.pauseButton);
@@ -404,8 +419,8 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "MainActivity is onStart()");
         Intent intent = new Intent(this, Bluetooth.class);
         bindService(intent, connection, Context.BIND_AUTO_CREATE);
-        checkPermission(this);
-        checkPermissionSCAN(this);
+        checkPermission(getApplicationContext());
+        checkPermissionSCAN(getApplicationContext());
     }
 
     @Override
@@ -498,7 +513,7 @@ public class MainActivity extends AppCompatActivity {
             ShowTxt.append(time + ":" + GlobalMessage + "\n");
 //            Log.i(TAG, "receive: " + GlobalMessage);
             if (VIEW==404){
-                Log.d(bluetooth.TAG, "RESTARTING BLUETOOTH BROADCAST RECEVEIVED");
+                Log.d(bluetooth.TAG, "RESTARTING BLUETOOTH BROADCAST RECEIVED");
                 bluetooth.BluetoothConnection(getApplicationContext());
             }
 
@@ -556,6 +571,14 @@ public class MainActivity extends AppCompatActivity {
         } else {
             Log.i("permission", "SCAN permission is granted already");
         }
+    }
+    public void dataUploader(){
+        firebase.realFireStore("LV", "LV",G_lowSystemVoltage);
+        firebase.realFireStore("HV", "BTR",G_batterySOC);
+        firebase.realFireStore("HV", "TEMP",G_hv_maxtemp234);
+        firebase.realFireStore("PWT", GlobalTime,G_powerConsumption);
+        firebase.realFireStore("TEMPS", "MOTOR_TEMP", G_MotorTemps);
+        firebase.realFireStore("TEMPS", "INV_TEMP", G_InvTemps);
     }
 
     //A/<low system voltage>/<high system voltage>/<motor temp[0]>x<motor temp[1]>x<motor temp[2]>x<motor temp[3]>/<inv temp>/A
@@ -644,10 +667,18 @@ public class MainActivity extends AppCompatActivity {
         */
 
         FindID();
+        G_lowSystemVoltage = lowSystemVoltage;
+        G_batterySOC = batterySOC;
+        G_hv_maxtemp234 = hv_maxtemp234;
+        G_powerConsumption = powerConsumption;
+
+        /*
         firebase.realFireStore("LV", "LV",lowSystemVoltage);
         firebase.realFireStore("HV", "BTR",batterySOC);
         firebase.realFireStore("HV", "TEMP",hv_maxtemp234);
         firebase.realFireStore("PWT", GlobalTime,powerConsumption);
+        */
+
         //firebase.realFireStore("TEMPS", "MOTOR_TEMP", MotorTemps);
         //firebase.realFireStore("TEMPS", "INV_TEMP",inverterTemperature);
 
@@ -777,11 +808,15 @@ public class MainActivity extends AppCompatActivity {
 //        System.out.println("Torque: " + Torque[0] + "N.m, " + Torque[1] + "N.m, " + Torque[2] + "N.m, " + Torque[3] + "N.m");
 
         String MotorTemps = motor_temp[0] + "/" + motor_temp[1] + "/" + motor_temp[2] + "/" + motor_temp[3];
-        firebase.realFireStore("TEMPS", "MOTOR_TEMP", MotorTemps);
+//        firebase.realFireStore("TEMPS", "MOTOR_TEMP", MotorTemps);
         String InvTemps = inv_temp[0] + "/" + inv_temp[1] + "/" + inv_temp[2] + "/" + inv_temp[3];
-        firebase.realFireStore("TEMPS", "INV_TEMP", InvTemps);
+//        firebase.realFireStore("TEMPS", "INV_TEMP", InvTemps);
         //firebase.realFireStore("VELOCITY", GlobalTime, Velocity);
         //firebase.realFireStore("TORQUE", GlobalTime, Torques);
+
+        G_MotorTemps = MotorTemps;
+        G_InvTemps = InvTemps;
+
 
         // Use the Handler to update the TextView on the main thread
         //TODO 8/29
