@@ -45,6 +45,14 @@ public class Firebase extends Service {
         Log.i(TAG, "FIREBASE_SERVICE IS CREATED");
         ref.child("STATUS").setValue("START");
 
+        //FirebaseDatabase.getInstance().setPersistenceEnabled(false); //will this work???????? tODO:
+        try {
+            FirebaseDatabase.getInstance().setPersistenceCacheSizeBytes(1024 * 1024);
+        }
+        catch(Exception e){
+            Log.e(TAG, "error");
+        }
+
 
         Log.i(TAG, "Thread ToDriver Started");
         DatabaseReference myRef = database.getReference(title + '/' + date);
@@ -53,9 +61,14 @@ public class Firebase extends Service {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 // This method is called once with the initial value and again whenever data at this location is updated.
-                String message = dataSnapshot.getValue(String.class);
-                Log.d(TAG, "Message: " + message);
-                SendBroadcast(0, message);      //TODO:change VIEW number to the correct one later.
+                try {
+                    String message = dataSnapshot.getValue(String.class);
+                    Log.d(TAG, "Message: " + message);
+                    SendBroadcast(0, message);      //TODO:change VIEW number to the correct one later.
+                }
+                catch(Exception e){
+                    Log.e("ERROR", "DATABASE ERROR");
+                }
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
@@ -74,57 +87,67 @@ public class Firebase extends Service {
 
     //Store data to Realtime Database
     public void realFireStore(String folder, String key, Object data){
-        DatabaseReference REF = database.getReference(title + "/" + date);
-        //To read the value COUNT stored in each date first, in order to name the RUN:x
-        REF.child("COUNT").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                Integer count = dataSnapshot.getValue(Integer.class);
+        try {
+            DatabaseReference REF = database.getReference(title + "/" + date);
+            //To read the value COUNT stored in each date first, in order to name the RUN:x
+            REF.child("COUNT").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    Integer count = dataSnapshot.getValue(Integer.class);
 
-                if (count != null) {
+                    if (count != null) {
 //                    System.out.println("sending "+ data);
-                    REF.child("/RUN:" + COUNT + "/" + folder + "/" + key).setValue(data);
-                } else {
-                    System.out.println("Cannot obtain COUNT, Data will be sent to RUN:1");
-                    REF.child("COUNT").setValue(1);
-                    REF.child("/RUN:1/" + folder + "/" + key).setValue(data);
-                    COUNT = 1;
+                        REF.child("/RUN:" + COUNT + "/" + folder + "/" + key).setValue(data);
+                    } else {
+                        System.out.println("Cannot obtain COUNT, Data will be sent to RUN:1");
+                        REF.child("COUNT").setValue(1);
+                        REF.child("/RUN:1/" + folder + "/" + key).setValue(data);
+                        COUNT = 1;
+                    }
                 }
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                System.out.println("Error: " + databaseError.getMessage());
-            }
-        });
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    System.out.println("Error: " + databaseError.getMessage());
+                }
+            });
+        }
+        catch(Exception e){
+            Log.e("DATABASE", "DATABASE ERROR");
+        }
     }
     public void countRun(){
+        try {
+            DatabaseReference REF = database.getReference(title + "/" + date);
 
-        DatabaseReference REF = database.getReference(title + "/" + date);
+            REF.child("COUNT").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-        REF.child("COUNT").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    Integer count = dataSnapshot.getValue(Integer.class);
 
-                Integer count = dataSnapshot.getValue(Integer.class);
+                    if (count != null) {
+                        count = count + 1;
+                        COUNT = count;
+                        REF.child("COUNT").setValue(count);
 
-                if (count != null) {
-                    count = count + 1;
-                    COUNT = count;
-                    REF.child("COUNT").setValue(count);
+                    } else {
+                        COUNT = 1;
+                        REF.child("COUNT").setValue(1);
 
-                } else {
-                    COUNT = 1;
-                    REF.child("COUNT").setValue(1);
-
+                    }
                 }
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                System.out.println("Error: " + databaseError.getMessage());
-            }
-        });
-        COUNT++;
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    System.out.println("Error: " + databaseError.getMessage());
+                }
+            });
+            COUNT++;
+        }
+        catch (Exception e){
+            Log.e("DATABASE", "DATABASE ERROR");
+        }
     }
     //TODO: Fix RealFireRead
     //Detect any change in Realtime database
@@ -192,11 +215,16 @@ public class Firebase extends Service {
     }
 
     private void SendBroadcast(int VIEW, String message) {
-        // IntentをブロードキャストすることでMainActivityへデータを送信
-        Intent intent = new Intent();
-        intent.setAction("FIREBASE");  //Set code as BLUETOOTH for the receiver to know where the information is from
-        intent.putExtra("VIEW", VIEW);
-        intent.putExtra("message", message);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        try {
+            // IntentをブロードキャストすることでMainActivityへデータを送信
+            Intent intent = new Intent();
+            intent.setAction("FIREBASE");  //Set code as BLUETOOTH for the receiver to know where the information is from
+            intent.putExtra("VIEW", VIEW);
+            intent.putExtra("message", message);
+            LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        }
+        catch(Exception e){
+            Log.e("TEST", "DATABASE ERR");
+        }
     }
 }
