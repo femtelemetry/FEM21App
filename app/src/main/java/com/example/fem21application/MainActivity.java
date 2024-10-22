@@ -272,6 +272,11 @@ public class MainActivity extends AppCompatActivity {
             connectBtn.setEnabled(false);
             Log.d(TAG, "CONNECTING WITH BLUETOOTH DEVICE");
             DataCategorize.start();
+            if (DataCategorize.isAlive()){
+                Log.d(TAG, "DataCategorize is alive");
+            } else {
+                Log.e(TAG, "DataCategorize is dead");
+            }
         });
 
         DataCategorize = new Thread(() -> {
@@ -317,11 +322,13 @@ public class MainActivity extends AppCompatActivity {
             Log.i("DATABASE", "The data is being sent to the database");
             firebase.countRun();
             firebaseThread = new Thread(() -> {
-                try {
-                    dataUploader();
-                    Thread.sleep(time_interval * 100);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
+                while(true){
+                    try {
+                        dataUploader();
+                        Thread.sleep(time_interval * 100);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
             });
             firebaseThread.start();
@@ -504,7 +511,7 @@ public class MainActivity extends AppCompatActivity {
             int VIEW = intent.getIntExtra("VIEW", 0);
             //ShowMessage(VIEW, message); //受信した文字列を表示 - this shows the received string characters on the screen of the phone
 //            Firebase firebase = new Firebase();
-            //Log.i(TAG, "receive: " + message);
+//            Log.i(TAG, "receive: " + message);
             assert message != null;
             GlobalMessage = message.trim();
             GlobalTime = time;
