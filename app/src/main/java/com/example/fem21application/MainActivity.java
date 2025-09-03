@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.graphics.drawable.ClipDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.ShapeDrawable;
@@ -17,6 +18,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -25,6 +27,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -38,6 +41,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicReference;
@@ -50,17 +54,53 @@ public class MainActivity extends AppCompatActivity {
     String documentPath = "test"; //Title of document inside a collection [Cloud FireStore database]
     String TAG = "MainActivity";
 
+    double lowSystemVoltage = 0.0;
+    double batterySOC = 0.0;
+    double hv_maxtemp234 = 0.0;
+    double powerConsumption = 0.0;
+    double minvoltage = 0.0;
+
+    double finalLowSystemVoltage;
+    int finalBatterySOC;
+    double final_hv_maxtemp234;
+    double final_powerconsumption;
+    double final_minvoltage;
+
+    double[] motor_temp = new double[4];
+
+    double final_motortemp_fl;
+    double final_motortemp_fr;
+    double final_motortemp_rr;
+    double final_motortemp_rl;
+
+    double[] inv_temp = new double[4];
+
+    double final_invtemp_fl;
+    double final_invtemp_fr;
+    double final_invtemp_rr;
+    double final_invtemp_rl;
+
+    String MotorTemps;
+    String InvTemps;
+
+    double velocity = 0.0;
+    int final_velocity;
+
+    double throttle_percentage = 0.0;
+    int final_throttle_percentage;
+
+    int[] ready_to_drive = new int[4];
+
+    int final_RtoD_fl;
+    int final_RtoD_fr;
+    int final_RtoD_rr;
+    int final_RtoD_rl;
+
     int signalFlag = 1;
 
 
-    //Action(ステータス表示).
-    static final int VIEW_STATUS = 0; //integers generally just set for the sake of
-
     //Action(LV).
     static final int VIEW_LV = 1;
-
-    //Action(HV)
-    static final int VIEW_HV = 2;
 
     //Action(MOTOR)
     static final int VIEW_MT = 3;
@@ -71,118 +111,26 @@ public class MainActivity extends AppCompatActivity {
     //Action(RTD)
     static final int VIEW_RTD = 5;
 
-    //信号受信時エラーは六番目
-    static final int VIEW_ERR = 6;
     //Action(VELOCITY)
     static final int VIEW_VELO = 7;
 
-    //Action(ERROR)
-    static final int VIEW_ERRFR = 61;
-    static final int VIEW_ERRFL = 62;
-    static final int VIEW_ERRRR = 63;
-    static final int VIEW_ERRRL = 64;
-
-    //Action(NOWBTT)
-    static final int VIEW_NOWBTT = 10;
 
     //Action(VCMINFO)
     static final int VIEW_VCMINFO = 11;
 
     //Action(Torques)
     static final int VIEW_TORQ = 12;
-    //Action(TSV)
-    static final int VIEW_TSV = 12;
 
-    //Action(MAXCELLV)
-    static final int VIEW_MAXCELLV = 13;
-
-    //Action(MINCELLV)
-    static final int VIEW_MINCELLV = 14;
-
-    //Action(ZYUUDEN)
-    static final int VIEW_ZYUUDEN = 15;
-
-    //Action(MAXCELLT)
-    static final int VIEW_MAXCELLT = 16;
-
-    //Action(AMS)
-    static final int VIEW_AMS = 17;
-
-    //Action(ERRORCOUNT)
-    static final int VIEW_ERRORCOUNT = 18;
-
-    //Action(STATUSAMS)
-    static final int VIEW_STATUSAMS = 19;
-
-    static final int VIEW_RED = 20;
-    static final int VIEW_YELLOW = 21;
-    static final int VIEW_LIGHTGREEN = 22;
-    static final int VIEW_GREEN = 23;
-
-    //Action(LayoutChange:RTD)
-    static final int LAYOUT_RTD = 51;
-
-    //Action(LayoutChange:HVON)
-    static final int LAYOUT_HVON = 52;
-
-    //Action(LayoutChange:LVON)
-    static final int LAYOUT_DEFAULT = 53;
-
-    //Action(LayoutChange:ERROR)
-    static final int LAYOUT_ERR = 54;
-
-    //Action(LayoutChange:BORON)
-    static final int LAYOUT_BOR = 55;
-
-    //Action(LayoutVisible:HITEMP)
-    static final int LAYOUT_HITEMP = 56;
-
-    static final int LAYOUT_DRIVE = 57;
-
-    static final int LAYOUT_LVON = 58;
-
-
-    //Action(bluetooth)
-    static final int VIEW_BLUETOOTH = 100;
-
-    //Action(デバック用取得文字列)
-    static final int VIEW_INPUT = 101;
-
-
-    static final int CHECK_RTOD = 102;
-
-    //Showmessageする文字列の受け渡し用
-    static String msg;
-
-    //HTTPSサービス確認用フラグ
-    static boolean isSerHTTPS = false;
-
-    //BLUETOOTHサービス確認用フラグ
-    static boolean btServiceOn = false;
-
-    static boolean btConnected = false;
-
-    boolean isRun = false;
-    static boolean isSleep;
-    public static boolean LVFlag;
-    boolean stopThread = false;
     static boolean pauseThread = false;
     static String GlobalMessage;
     static String GlobalTime;
-    static double G_lowSystemVoltage;
-    static double G_batterySOC;
-    static double G_hv_maxtemp234;
-    static double G_powerConsumption;
-    static String G_MotorTemps;
-    static String G_InvTemps;
-
 
     TextView m_lv_voltage;
     TextView vMtr1, vMtr2, vMtr3, vMtr4;
     TextView vVelo;
     ProgressBar bttBar, accelBar, brakeBar;
 
-    TextView vBattCharge;
+    TextView vBattCharge, vPowerCons;
 
     TextView m_hv_maxtemp234;
 
@@ -193,6 +141,8 @@ public class MainActivity extends AppCompatActivity {
     //dataC
     TextView m_velocity;
     ImageView i_rtod_fl, i_rtod_fr, i_rtod_rr, i_rtod_rl;
+
+    ImageView drivsig;
 
     //dataD
 
@@ -215,11 +165,8 @@ public class MainActivity extends AppCompatActivity {
     Firebase firebase = new Firebase();
 //    Bluetooth bluetooth = new Bluetooth();
     private Bluetooth bluetooth;
-    private final int count = 0;
-    private final int data_num = 100;
     private final int time_interval = 1;
     Thread firebaseThread;
-    Thread DataCategorize;
     private final ServiceConnection connection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName className, IBinder service) {
@@ -237,6 +184,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "MainActivity is onCreate()");
 
+
+
         //TODO:Define 3 types of variables and initialize (e.g. view, status, flags): How to format?
         //TODO: Weerawit test
 
@@ -245,14 +194,21 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.main_disp_temp); //sets the initial layout to "activity_main.xml"
 //        Firebase firebase = new Firebase();
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON); //keeps screen on
-
+        try {
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON); //keeps screen on
+        }
+        catch(Exception e){
+            Log.e(TAG, "ANTI SLEEP ERR");
+        }
         // Initialize the Handler using the main thread's Looper
         handler = new Handler(Looper.getMainLooper());
 
         //To continuously send signal to database to keep connecting to it.
-        AtomicReference<ScheduledExecutorService> executor = new AtomicReference<>(Executors.newScheduledThreadPool(1));
-
+        try {
+            AtomicReference<ScheduledExecutorService> executor = new AtomicReference<>(Executors.newScheduledThreadPool(1));
+        }catch (Exception e){
+            Log.e(TAG, "DATABASE CONNECTION ATTEMPT ERR");
+        }
         FindID(); //TODO: 8/27
 
 //        Firebase firebase = new Firebase();
@@ -261,99 +217,110 @@ public class MainActivity extends AppCompatActivity {
         startService(FirebaseIntent);
         startService(BluetoothIntent);
 
-        textbox = findViewById(R.id.textBox);
+        try {
+            textbox = findViewById(R.id.textBox);
 
-        scrollView = findViewById(R.id.scrollView);
-        ShowTxt = findViewById(R.id.InputStream);
+            scrollView = findViewById(R.id.scrollView);
+            ShowTxt = findViewById(R.id.InputStream);
 
-        connectBtn = findViewById(R.id.connectButton);
-        connectBtn.setOnClickListener(v -> {
-            bluetooth.BluetoothConnection(this);
-            connectBtn.setEnabled(false);
-            Log.d(TAG, "CONNECTING WITH BLUETOOTH DEVICE");
-            DataCategorize.start();
-            if (DataCategorize.isAlive()){
-                Log.d(TAG, "DataCategorize is alive");
-            } else {
-                Log.e(TAG, "DataCategorize is dead");
-            }
-        });
-
-        DataCategorize = new Thread(() -> {
-            while (true) {
-                //Can be replaced by actual data
-                String[] dataPart = GlobalMessage.split("/");
-                //Determine the data group
-                String dataType = dataPart[0];
-//                    Log.i("DATABASE", "Datatype: " + dataType);
-                switch (dataType) {
-                    case "A":
-                        dataA(GlobalMessage);
-//                            Log.i("DATABASE", "Sending to : " + dataType);
-                        break;
-                    case "B":
-                        dataB(GlobalMessage);
-//                            Log.i("DATABASE", "Sending to : " + dataType);
-                        break;
-                    case "C":
-                        dataC(GlobalMessage);
-//                            Log.i("database", "Sending to : " + dataType);
-                        break;
-                    case "D":
-                        dataD(GlobalMessage);
-//                            Log.i("database", "Sending to : " + dataType);
-                        break;
-                    case "E":
-                        dataE(GlobalMessage);
-//                            Log.i("database", "Sending to : " + dataType);
-                        break;
-                }
-                try {
-                    Thread.sleep(time_interval);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
-
-        //To run continuously increasing number
-        runButton = findViewById(R.id.runButton);
-        runButton.setOnClickListener(v -> {
-            Log.i("DATABASE", "The data is being sent to the database");
-            firebase.countRun();
-            firebaseThread = new Thread(() -> {
-                while(true){
-                    try {
-                        dataUploader();
-                        Thread.sleep(time_interval * 100);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
+            connectBtn = findViewById(R.id.connectButton);
+            connectBtn.setOnClickListener(v -> {
+                bluetooth.BluetoothConnection(this);
+                connectBtn.setEnabled(false);
+                Log.d(TAG, "CONNECTING WITH BLUETOOTH DEVICE");
             });
-            firebaseThread.start();
-        });
 
-        pauseButton = findViewById(R.id.pauseButton);
-        pauseButton.setOnClickListener( v -> {
-            if (pauseThread){
-                pauseThread = false;
-                bluetooth.resumeConnectedThread();
+            //To run continuously increasing number
+            runButton = findViewById(R.id.runButton);
+            runButton.setOnClickListener(v -> {
+                Log.i("DATABASE", "The data is being sent to the database");
+                firebase.countRun();
+                firebaseThread = new Thread(() -> {
+                    while (true) {
+                        try {
+                            //Can be replaced by actual data
+                            String[] dataPart = GlobalMessage.split("/");
+                            //Determine the data group
+                            String dataType = dataPart[0];
+//                    Log.i("DATABASE", "Datatype: " + dataType);
+                            switch (dataType) {
+                                case "A":
+                                    try {
+                                        dataA(GlobalMessage);
+                                    } catch (Exception e) {
+                                        Log.e("DATAERR", "DATA A ERR");
+                                    }
+//                            Log.i("DATABASE", "Sending to : " + dataType);
+                                    break;
+                                case "B":
+                                    try {
+                                        dataB(GlobalMessage);
+                                    } catch (Exception e) {
+                                        Log.e("DATAERR", "DATA B ERR");
+                                    }
+//                            Log.i("DATABASE", "Sending to : " + dataType);
+                                    break;
+                                case "C":
+                                    try {
+                                        dataC(GlobalMessage);
+                                    } catch (Exception e) {
+                                        Log.e("DATAERR", "DATA C ERR");
+                                    }
+//                            Log.i("database", "Sending to : " + dataType);
+                                    break;
+                                case "D":
+                                    try {
+                                        dataD(GlobalMessage);
+                                    } catch (Exception e) {
+                                        Log.e("DATAERR", "DATA D ERR");
+                                    }
+//                            Log.i("database", "Sending to : " + dataType);
+                                    break;
+                                case "E":
+                                    try {
+                                        dataE(GlobalMessage);
+                                    } catch (Exception e) {
+                                        Log.e("DATAERR", "DATA E ERR");
+                                    }
+//                            Log.i("database", "Sending to : " + dataType);
+                                    break;
+                            }
+                        } catch (Exception e) {
+                            Log.e(TAG, "SORT ERROR");
+                        }
+                        try {
+                            Thread.sleep(time_interval);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+
+                    }
+                });
+                firebaseThread.start();
+            });
+
+            pauseButton = findViewById(R.id.pauseButton);
+            pauseButton.setOnClickListener(v -> {
+                if (pauseThread) {
+                    pauseThread = false;
+                    bluetooth.resumeConnectedThread();
 //                Log.i(bluetooth.TAG , "Resuming thread ");
-                pauseButton.setText("PAUSE");
-            } else {
-                pauseThread = true;
-                bluetooth.pauseConnectedThread();
+                    pauseButton.setText("PAUSE");
+                } else {
+                    pauseThread = true;
+                    bluetooth.pauseConnectedThread();
 
 //                Log.i(bluetooth.TAG, "pausing thread ");
-                GlobalMessage = "";
-                pauseButton.setText("RESUME");
-            }
-        });
+                    GlobalMessage = "";
+                    pauseButton.setText("RESUME");
+                }
+            });
 
-        scrollView = findViewById(R.id.scrollView);
-        ShowTxt = findViewById(R.id.InputStream);
-
+            scrollView = findViewById(R.id.scrollView);
+            ShowTxt = findViewById(R.id.InputStream);
+        }catch(Exception e){
+            Log.e(TAG, "buttons error");
+        }
     }
 
     private void updateProgressBarColor(ProgressBar progressBar) {
@@ -424,8 +391,8 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "MainActivity is onStart()");
         Intent intent = new Intent(this, Bluetooth.class);
         bindService(intent, connection, Context.BIND_AUTO_CREATE);
-        checkPermission(this);
-        checkPermissionSCAN(this);
+        checkPermission(getApplicationContext());
+        checkPermissionSCAN(getApplicationContext());
     }
 
     @Override
@@ -486,8 +453,22 @@ public class MainActivity extends AppCompatActivity {
             String message = intent.getStringExtra("message");
             int VIEW = intent.getIntExtra("VIEW", 0);
 
-            ToDriverTxt = findViewById(R.id.ToDriverText);
-            ToDriverTxt.setText(message);
+            try {
+                ToDriverTxt = findViewById(R.id.ToDriverText);
+                ToDriverTxt.setText(message);
+
+                drivsig = findViewById(R.id.driverSignal2);
+
+                if (ToDriverTxt.getText().equals("1")) {
+                    drivsig.setImageResource(R.drawable.speed);
+                } else if (ToDriverTxt.getText().equals("2")) {
+                    drivsig.setImageResource(R.drawable.keep);
+                } else if (ToDriverTxt.getText().equals("3")) {
+                    drivsig.setImageResource(R.drawable.slow);
+                }
+            }catch(Exception e){
+                Log.e(TAG, "TO driver text err");
+            }
         }
     };
     BroadcastReceiver rReceiver = new BroadcastReceiver() {
@@ -511,7 +492,7 @@ public class MainActivity extends AppCompatActivity {
             int VIEW = intent.getIntExtra("VIEW", 0);
             //ShowMessage(VIEW, message); //受信した文字列を表示 - this shows the received string characters on the screen of the phone
 //            Firebase firebase = new Firebase();
-//            Log.i(TAG, "receive: " + message);
+            //Log.i(TAG, "receive: " + message);
             assert message != null;
             GlobalMessage = message.trim();
             GlobalTime = time;
@@ -577,14 +558,6 @@ public class MainActivity extends AppCompatActivity {
             Log.i("permission", "SCAN permission is granted already");
         }
     }
-    public void dataUploader(){
-        firebase.realFireStore("LV", "LV",G_lowSystemVoltage);
-        firebase.realFireStore("HV", "BTR",G_batterySOC);
-        firebase.realFireStore("HV", "TEMP",G_hv_maxtemp234);
-        firebase.realFireStore("PWT", GlobalTime,G_powerConsumption);
-        firebase.realFireStore("TEMPS", "MOTOR_TEMP", G_MotorTemps);
-        firebase.realFireStore("TEMPS", "INV_TEMP", G_InvTemps);
-    }
 
     //A/<low system voltage>/<high system voltage>/<motor temp[0]>x<motor temp[1]>x<motor temp[2]>x<motor temp[3]>/<inv temp>/A
     @SuppressLint("SetTextI18n")
@@ -599,18 +572,15 @@ public class MainActivity extends AppCompatActivity {
         }
 
         //Extract values
-        String startA = partA[0];
+        //String startA = partA[0];
 
-        double lowSystemVoltage = 0.0;
         //For Low System Voltage
         try {
             lowSystemVoltage = Double.parseDouble(partA[1]);
         }catch(Exception e){
 //            Log.e("DATAErr", "LV Electrical System Voltage failed to parse.");
         }
-        double finalLowSystemVoltage = lowSystemVoltage;
 
-        double batterySOC = 0.0;
         // For Battery State of Charge
         try {
             batterySOC = Double.parseDouble(partA[2]);
@@ -619,7 +589,6 @@ public class MainActivity extends AppCompatActivity {
 //            Log.e("DATAErr", "HV Electrical System Charge failed to parse.");
         }
 
-        double hv_maxtemp234 = 0.0;
         try {
             hv_maxtemp234 = Double.parseDouble(partA[4]);
         }
@@ -627,7 +596,14 @@ public class MainActivity extends AppCompatActivity {
 //            Log.e("DATAErr", "HV Electrical System Max Temperature failed to parse.");
         }
 
-        double powerConsumption = 0.0;
+        // For Battery State of Charge
+        try {
+            minvoltage = Double.parseDouble(partA[5]);
+        }
+        catch(Exception e){
+//            Log.e("DATAErr", "Power Consumption failed to parse.");
+        }
+
         // For Battery State of Charge
         try {
             powerConsumption = Double.parseDouble(partA[6]);
@@ -636,78 +612,35 @@ public class MainActivity extends AppCompatActivity {
 //            Log.e("DATAErr", "Power Consumption failed to parse.");
         }
 
-        /*
-        //For Motor Temperature
-        //Split motor temperature by "x" for motor temperature
-        String[] motorTemps = partA[3].split("x");
-        if (motorTemps.length != 4){
-            throw new IllegalArgumentException("Motor Temperature length error");
-        }
-        int[] motorTemperature = new int[4];
-        //Convert string in motorTemps into int type
-        for (int i =0; i < motorTemps.length; i++){
-            try {
-                motorTemperature[i] = Integer.parseInt(motorTemps[i]);
-            }
-            catch(Exception e){
-                Log.e("DATAErr", "MotorTempErr");
-            }
-        }
-        String MotorTemps = motorTemperature[0] + "/" + motorTemperature[1] + "/" + motorTemperature[2] + "/" + motorTemperature[3];
-        //For Inverter Temperature
-        int inverterTemperature = 0;
-        try {
-            inverterTemperature = Integer.parseInt(partA[4]);
-        }
-        catch(Exception e){
-            Log.e("DATAErr", "InvTempErr");
-        }
-
-        int batteryCharge = 0;
-        try {
-            batteryCharge = Integer.parseInt(partA[5]);
-        }catch(Exception e){
-            Log.e("DATAErr", "BttChargeErr");
-        }
-        */
-
         FindID();
-        G_lowSystemVoltage = lowSystemVoltage;
-        G_batterySOC = batterySOC;
-        G_hv_maxtemp234 = hv_maxtemp234;
-        G_powerConsumption = powerConsumption;
-
-        /*
         firebase.realFireStore("LV", "LV",lowSystemVoltage);
         firebase.realFireStore("HV", "BTR",batterySOC);
         firebase.realFireStore("HV", "TEMP",hv_maxtemp234);
         firebase.realFireStore("PWT", GlobalTime,powerConsumption);
-        */
-
-        //firebase.realFireStore("TEMPS", "MOTOR_TEMP", MotorTemps);
-        //firebase.realFireStore("TEMPS", "INV_TEMP",inverterTemperature);
+        firebase.realFireStore("HV", "MIN", minvoltage);
 
         // Use the Handler to update the TextView on the main thread
         //TODO 8/29
 
-
-        int finalBatterySOC = (int) Math.round(batterySOC);
-        double final_hv_maxtemp234 = hv_maxtemp234;
+        finalLowSystemVoltage = lowSystemVoltage;
+        finalBatterySOC = (int) Math.round(batterySOC);
+        final_hv_maxtemp234 = hv_maxtemp234;
+        final_minvoltage = minvoltage;
+        final_powerconsumption = powerConsumption;
 
         handler.post(new Runnable() {
             @Override
             public void run() {
                 m_lv_voltage.setText(String.valueOf(finalLowSystemVoltage));
                 m_hv_maxtemp234.setText(String.valueOf(final_hv_maxtemp234));
-                //vMtr1.setText(String.valueOf(motorTemperature[0]));
-                //vMtr2.setText(String.valueOf(motorTemperature[1]));
-                //vMtr3.setText(String.valueOf(motorTemperature[2]));
-                //vMtr4.setText(String.valueOf(motorTemperature[3]));
                 if(finalBatterySOC > 0){
                     bttBar.setProgress(finalBatterySOC); // Set initial progress
                 }
                 updateProgressBarColor(bttBar);
                 vBattCharge.setText(String.valueOf(finalBatterySOC));
+                if(final_powerconsumption < 16000) {
+                    vPowerCons.setText(String.valueOf(final_powerconsumption));
+                }
             }
         });
     }
@@ -725,7 +658,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         //Extract values
-        String startB = partB[0];
+        //String startB = partB[0];
 
         //For MotorTemp
         //Split Mtoro temperature by "x"
@@ -733,7 +666,6 @@ public class MainActivity extends AppCompatActivity {
         if (received_motortemp.length != 4) {
             //throw new IllegalArgumentException("RTD data Length error");
         }
-        double[] motor_temp = new double[4];
         //Convert to the double type
         for (int i =0; i < received_motortemp.length; i++ ) {
             try {
@@ -744,10 +676,10 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        double final_motortemp_fl = motor_temp[0];
-        double final_motortemp_fr = motor_temp[1];
-        double final_motortemp_rr = motor_temp[2];
-        double final_motortemp_rl = motor_temp[3];
+        final_motortemp_fl = motor_temp[0];
+        final_motortemp_fr = motor_temp[1];
+        final_motortemp_rr = motor_temp[2];
+        final_motortemp_rl = motor_temp[3];
 
         //For InvTemp
         //Split inverter cold plate temperature by "x"
@@ -755,7 +687,6 @@ public class MainActivity extends AppCompatActivity {
         if (received_invtemp.length != 4) {
             //throw new IllegalArgumentException("RTD data Length error");
         }
-        double[] inv_temp = new double[4];
         //Convert to the double type
         for (int i =0; i < received_invtemp.length; i++ ){
             try{
@@ -766,62 +697,18 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        double final_invtemp_fl = inv_temp[0];
-        double final_invtemp_fr = inv_temp[1];
-        double final_invtemp_rr = inv_temp[2];
-        double final_invtemp_rl = inv_temp[3];
-
-        /*
-        //For RTD
-        //Split RTD value by "x"
-        String[] originalRTD = partB[1].split("x");
-        if (originalRTD.length != 4) {
-            throw new IllegalArgumentException("RTD data Length error");
-        }
-        int[] RTD = new int[4];
-        //Convert to the integer type
-        for (int i =0; i < originalRTD.length; i++ ){
-            RTD[i] = Integer.parseInt(originalRTD[i]);
-        }
-
-        //For VCM
-        String VCMInfo = partB[2];
-
-        //For velocity
-        int Velocity = Integer.parseInt(partB[3]);
-
-        //For Torque
-        //Split Torque by "x"
-        String[] originalTorque = partB[4].split("x");
-        if (originalTorque.length != 4) {
-            throw new IllegalArgumentException("Torque data length error");
-        }
-        int[] Torque = new int[4];
-        //Convert to Integer
-        for (int i =0; i < originalTorque.length; i++){
-            Torque[i] = Integer.parseInt(originalTorque[i]);
-        }
-        String Torques = Torque[0] + "/" + Torque[1] + "/" + Torque[2] + "/" + Torque[3];
+        final_invtemp_fl = inv_temp[0];
+        final_invtemp_fr = inv_temp[1];
+        final_invtemp_rr = inv_temp[2];
+        final_invtemp_rl = inv_temp[3];
 
 
-         */
-        //Output the values (Can be replaced by Broadcast)
-//        System.out.println("DataGroup: " + startB);
-//        System.out.println("RTD: " + RTD[0] + " ?" + RTD[1] + " ?" + RTD[2] + " ?" + RTD[3] + " ?");
-//        System.out.println("VCM Info: " + VCMInfo + " !");
-//        System.out.println("Velocity: " + Velocity + "m/s?");
-//        System.out.println("Torque: " + Torque[0] + "N.m, " + Torque[1] + "N.m, " + Torque[2] + "N.m, " + Torque[3] + "N.m");
-
-        String MotorTemps = motor_temp[0] + "/" + motor_temp[1] + "/" + motor_temp[2] + "/" + motor_temp[3];
-//        firebase.realFireStore("TEMPS", "MOTOR_TEMP", MotorTemps);
-        String InvTemps = inv_temp[0] + "/" + inv_temp[1] + "/" + inv_temp[2] + "/" + inv_temp[3];
-//        firebase.realFireStore("TEMPS", "INV_TEMP", InvTemps);
+        MotorTemps = motor_temp[0] + "/" + motor_temp[1] + "/" + motor_temp[2] + "/" + motor_temp[3];
+        //firebase.realFireStore("TEMPS", "MOTOR_TEMP", MotorTemps);
+        InvTemps = inv_temp[0] + "/" + inv_temp[1] + "/" + inv_temp[2] + "/" + inv_temp[3];
+        //firebase.realFireStore("TEMPS", "INV_TEMP", InvTemps);
         //firebase.realFireStore("VELOCITY", GlobalTime, Velocity);
         //firebase.realFireStore("TORQUE", GlobalTime, Torques);
-
-        G_MotorTemps = MotorTemps;
-        G_InvTemps = InvTemps;
-
 
         // Use the Handler to update the TextView on the main thread
         //TODO 8/29
@@ -874,9 +761,9 @@ public class MainActivity extends AppCompatActivity {
         }
 
         //Extract Values
-        String startC = partC[0];
+        //String startC = partC[0];
 
-        double velocity = 0.0;
+
         //For Low System Voltage
         try {
             velocity = Double.parseDouble(partC[1]);
@@ -884,7 +771,7 @@ public class MainActivity extends AppCompatActivity {
 //            Log.e("DATAErr", "Velocity failed to parse.");
         }
 
-        int final_velocity = (int) velocity;
+        final_velocity = (int) velocity;
 
         /*
         //For AMS
@@ -947,9 +834,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         //Extract Values
-        String startC = partD[0];
+        //String startC = partD[0];
 
-        double throttle_percentage = 0.0;
         //For Low System Voltage
         try {
             throttle_percentage = Double.parseDouble(partD[1]);
@@ -957,25 +843,9 @@ public class MainActivity extends AppCompatActivity {
 //            Log.e("DATAErr", "Throttle percentage failed to parse.");
         }
 
-        int final_throttle_percentage = (int) throttle_percentage;
+        final_throttle_percentage = (int) throttle_percentage;
 
-        /*
-        //For AMS
-        int AMS = Integer.parseInt(partC[1]);
-        //For BSPD
-        int BSPD = Integer.parseInt(partC[2]);
-        //For IMD
-        int IMD = Integer.parseInt(partC[3]);
-        //For TC
-        int TC = Integer.parseInt(partC[4]);
-        //For ABS
-        int ABS = Integer.parseInt(partC[5]);
-        //For VDC
-        int VDC = Integer.parseInt(partC[6]);
-        //For a fixed 80kW
-//        int fixed80 = Integer.parseInt(partC[7]); TODO: fix this
 
-         */
         //Output the values (Can be replaced by Broadcast)
 //        System.out.println("DataGroup: " + startC);
 //        System.out.println("AMS: " + AMS + " ?");
@@ -1020,15 +890,20 @@ public class MainActivity extends AppCompatActivity {
         }
 
         //Extract Values
-        String startC = partE[0];
+        //String startC = partE[0];
 
         //For RTD
         //Split RTD value by "x"
-        String[] received_RToD = partE[2].split("x");
+        String[] received_RToD  = new String[]{""};
+        try{
+            received_RToD = partE[2].split("x");
+        }catch(Exception e){
+            Log.e("DATAErr", "Ready-to-Drive failed to parse.");
+        }
+
         if (received_RToD.length != 4) {
             //throw new IllegalArgumentException("RTD data Length error");
         }
-        int[] ready_to_drive = new int[4];
         //Convert to the integer type
         for (int i =0; i < received_RToD.length; i++ ) {
             try {
@@ -1039,10 +914,10 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        int final_RtoD_fl = ready_to_drive[0];
-        int final_RtoD_fr = ready_to_drive[1];
-        int final_RtoD_rr = ready_to_drive[2];
-        int final_RtoD_rl = ready_to_drive[3];
+        final_RtoD_fl = ready_to_drive[0];
+        final_RtoD_fr = ready_to_drive[1];
+        final_RtoD_rr = ready_to_drive[2];
+        final_RtoD_rl = ready_to_drive[3];
 
         if(final_RtoD_fl == 1 && final_RtoD_fr == 1 && final_RtoD_rr == 1 && final_RtoD_rl == 1){
             //rtod_flag = true;
@@ -1128,7 +1003,9 @@ public class MainActivity extends AppCompatActivity {
         vVelo = findViewById(R.id.veloText);
         bttBar = findViewById(R.id.bttBar);
         accelBar = findViewById(R.id.accelProgressBar);
-        vBattCharge = findViewById(R.id.bttText);
+        //vBattCharge = findViewById(R.id.bttText); // REMOVED 9/12 for acceleration
+        vBattCharge = findViewById(R.id.bttText2);
+        vPowerCons = findViewById(R.id.powerconsumptiontext);
         m_hv_maxtemp234 = findViewById(R.id.hvData);
         m_motor_temp_fl = findViewById(R.id.mtrFLtext);
         m_motor_temp_fr = findViewById(R.id.mtrFRtext);
@@ -1149,6 +1026,7 @@ public class MainActivity extends AppCompatActivity {
         i_rtod_fr = findViewById(R.id.rtodFR);
         i_rtod_rr = findViewById(R.id.rtodRR);
         i_rtod_rl = findViewById(R.id.rtodRL);
+        drivsig = findViewById(R.id.driverSignal2);
     }
 
 
