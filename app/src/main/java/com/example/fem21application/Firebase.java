@@ -45,7 +45,7 @@ public class Firebase extends Service {
         Log.i(TAG, "FIREBASE_SERVICE IS CREATED");
         ref.child("STATUS").setValue("START");
 
-        //FirebaseDatabase.getInstance().setPersistenceEnabled(false); //will this work???????? tODO:
+        //FirebaseDatabase.getInstance().setPersistenceEnabled(false); //will this work???????? tODO:9/4
         try {
             FirebaseDatabase.getInstance().setPersistenceCacheSizeBytes(1024 * 1024);
         }
