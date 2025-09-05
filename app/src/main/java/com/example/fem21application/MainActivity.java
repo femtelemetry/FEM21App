@@ -395,6 +395,7 @@ public class MainActivity extends AppCompatActivity {
                             throw new RuntimeException(e);
                         }
                     });
+                    firebaseThread.start();
             });
 
             pauseButton = findViewById(R.id.pauseButton);
